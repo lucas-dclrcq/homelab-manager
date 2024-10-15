@@ -22,7 +22,7 @@ class ArrWebhooksResourceTest {
     public void setup() {
         wireMockServer.resetAll();
         wireMockServer
-                .stubFor(post(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+                .stubFor(put(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
                         .willReturn(aResponse().withStatus(200)));
     }
 
@@ -71,7 +71,7 @@ class ArrWebhooksResourceTest {
                 .when().post("radarr")
                 .then().statusCode(200);
 
-        wireMockServer.verify(1, postRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
                 .withRequestBody(equalToJson("""
                         {
                           "msgtype": "m.text",
@@ -124,7 +124,7 @@ class ArrWebhooksResourceTest {
                 .when().post("radarr")
                 .then().statusCode(200);
 
-        wireMockServer.verify(1, postRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
                 .withRequestBody(equalToJson("""
                         {
                           "msgtype": "m.text",
@@ -180,7 +180,7 @@ class ArrWebhooksResourceTest {
                 .when().post("radarr")
                 .then().statusCode(200);
 
-        wireMockServer.verify(1, postRequestedFor(urlMatching("/_matrix/client/r0/rooms/!testroom:test-server.tld/send/m.room.message/.*")));
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/!testroom:test-server.tld/send/m.room.message/.*")));
     }
 
     @Test
@@ -228,7 +228,7 @@ class ArrWebhooksResourceTest {
                 .when().post("radarr")
                 .then().statusCode(200);
 
-        wireMockServer.verify(1, postRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")));
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")));
     }
 
     @Test
@@ -276,7 +276,7 @@ class ArrWebhooksResourceTest {
                 .when().post("radarr")
                 .then().statusCode(200);
 
-        wireMockServer.verify(1, postRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
                 .withHeader("Authorization", equalTo("Bearer TOKEN")));
     }
 }
