@@ -24,11 +24,6 @@ public class ArrWebhooksResource {
         this.matrixRoomId = matrixRoomId;
     }
 
-    @Path("test")
-    @GET
-    public Response test() {
-        return Response.ok().entity("Ok !").build();
-    }
     @POST
     @Path("/radarr")
     public Uni<Response> radarrWebhook(RadarrMovieDownloadedDTO radarrMovieDownloadedNotification) {
