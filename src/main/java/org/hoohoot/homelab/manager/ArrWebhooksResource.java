@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager;
 
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -27,6 +28,8 @@ public class ArrWebhooksResource {
     @POST
     @Path("/radarr")
     public Uni<Response> radarrWebhook(RadarrMovieDownloadedDTO radarrMovieDownloadedNotification) {
+        Log.infof("Received radarr wehbook of type {}", radarrMovieDownloadedNotification.eventType());
+
         return switch (radarrMovieDownloadedNotification.eventType()) {
             case "Download" -> buildDownloadedMovieMatrixMessage(radarrMovieDownloadedNotification);
             case "Test" -> this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html("Howdy this is a test notification from Radarr!"));
