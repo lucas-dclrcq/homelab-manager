@@ -5,6 +5,8 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.hoohoot.homelab.manager.config.InjectWireMock;
+import org.hoohoot.homelab.manager.config.WiremockTestResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ import static io.restassured.RestAssured.given;
 @QuarkusTest
 @TestHTTPEndpoint(ArrWebhooksResource.class)
 @QuarkusTestResource(WiremockTestResource.class)
-class ArrWebhooksResourceTest {
+class RadarrWebhooksTest {
     @InjectWireMock
     private WireMockServer wireMockServer;
 

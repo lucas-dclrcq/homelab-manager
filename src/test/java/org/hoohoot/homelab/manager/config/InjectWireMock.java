@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager;
+package org.hoohoot.homelab.manager.config;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
