@@ -33,8 +33,10 @@ public class ArrWebhooksResource {
         return switch (radarrMovieDownloadedNotification.eventType()) {
             case "Download" -> buildDownloadedMovieMatrixMessage(radarrMovieDownloadedNotification);
             case "Test" -> this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html("Howdy this is a test notification from Radarr!"));
-            default ->
-                    throw new IllegalStateException("Unexpected value: " + radarrMovieDownloadedNotification.eventType());
+            default -> {
+                Log.warn("Ignored event type");
+                yield Uni.createFrom().item(Response.ok().build());
+            }
         };
     }
 
