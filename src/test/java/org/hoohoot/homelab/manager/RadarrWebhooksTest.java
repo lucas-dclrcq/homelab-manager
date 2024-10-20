@@ -54,7 +54,7 @@ class RadarrWebhooksTest {
                     "id": 36745,
                     "relativePath": "<filenameAfterRename",
                     "path": "<pathToDownloadedFile>",
-                    "quality": "WEBDL-1080p",
+                    "quality": "WEBDL-720p",
                     "qualityVersion": 1,
                     "releaseGroup": "<rlsGroup>",
                     "sceneName": "The.Movie.Title.2012.1080p.BluRay.x265-<rlsGroup>",
@@ -77,9 +77,9 @@ class RadarrWebhooksTest {
                 .withRequestBody(equalToJson("""
                         {
                           "msgtype": "m.text",
-                          "body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-1080p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>",
+                          "body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>",
                           "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-1080p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>"
+                          "formatted_body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>"
                         }
                         """)));
     }

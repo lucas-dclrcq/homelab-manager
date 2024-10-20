@@ -44,7 +44,7 @@ public class ArrWebhooksResource {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<h1>Movie Downloaded</h1>");
         stringBuilder.append("<p>");
-        stringBuilder.append("%s (%s) [WEBDL-1080p] https://www.imdb.com/title/%s/<br>".formatted(radarrMovieDownloadedNotification.movie().title(), radarrMovieDownloadedNotification.movie().year(), radarrMovieDownloadedNotification.movie().imdbId()));
+        stringBuilder.append("%s (%s) [%s] https://www.imdb.com/title/%s/<br>".formatted(radarrMovieDownloadedNotification.movie().title(), radarrMovieDownloadedNotification.movie().year(), radarrMovieDownloadedNotification.movieFile().quality(), radarrMovieDownloadedNotification.movie().imdbId()));
         stringBuilder.append("Requested by : %s".formatted(radarrMovieDownloadedNotification.movie().userTag()));
         stringBuilder.append("</p>");
 
