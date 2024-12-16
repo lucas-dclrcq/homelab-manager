@@ -16,6 +16,7 @@ import java.util.UUID;
 @Path("/api/arr/webhooks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Deprecated
 public class ArrWebhooksResource {
     private final MatrixAPI matrixAPI;
     private final String matrixRoomId;
