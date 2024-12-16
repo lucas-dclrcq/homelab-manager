@@ -51,31 +51,3 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ghcr.io/${{ github.repository_owner }}/homelab-manager:latest
-
-      - uses: actions/checkout@master
-        if: github.event_name != 'pull_request'
-        with:
-          repository: 'lucas-dclrcq/homelabitty'
-          ref: main
-          path: gitops
-
-      - name: Set new sha in HelmRelease
-        id: production
-        if: github.event_name != 'pull_request'
-        env:
-          DIGEST: ${{ steps.docker_build.outputs.digest }}
-        run: |
-          echo "set image version to ${DIGEST}"
-          yq eval '.spec.values.controllers.main.containers.main.image.tag |= sub("@sha256:.*", "@" + strenv(DIGEST))' -i ./gitops/kubernetes/apps/default/homelab-manager/app/helmrelease.yaml
-
-      - name: Commit and push changes
-        if: github.event_name != 'pull_request'
-        env:
-          DIGEST: ${{ steps.docker_build.outputs.digest }}
-        run: |
-          cd gitops
-          git config --global user.email "homelab.manager@github.com"
-          git config --global user.name "Homelab Manager CI"
-          git add .
-          git commit -m "feat(homelab-manager): upgrade to ${DIGEST}"
-          git push
