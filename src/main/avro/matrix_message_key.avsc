@@ -1,0 +1,11 @@
+{
+  "namespace": "me.ldclrcq.kafka.matrix.sink",
+  "type": "record",
+  "name": "IncomingMatrixMessageKey",
+  "fields": [
+    {
+      "name": "channel_id",
+      "type": "string"
+    }
+  ]
+}
