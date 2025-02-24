@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager;
+package org.hoohoot.homelab.manager.notifications.legacy;
 
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
@@ -7,9 +7,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.hoohoot.homelab.manager.matrix.MatrixAPI;
-import org.hoohoot.homelab.manager.matrix.MatrixMessage;
-import org.hoohoot.homelab.manager.radarr.RadarrMovieDownloadedDTO;
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
+import org.hoohoot.homelab.manager.notifications.legacy.radarr.RadarrMovieDownloadedDTO;
 
 import java.util.UUID;
 

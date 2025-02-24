@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.radarr;
+package org.hoohoot.homelab.manager.notifications.legacy.radarr;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

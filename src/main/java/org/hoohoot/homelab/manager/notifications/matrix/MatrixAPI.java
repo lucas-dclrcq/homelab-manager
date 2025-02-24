@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.matrix;
+package org.hoohoot.homelab.manager.notifications.matrix;
 
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.PUT;
