@@ -31,7 +31,10 @@ public class RadarrNotificationsConsumer {
         String title = movie.getString("title");
         String year = movie.getString("year");
         String imdbId = movie.getString("imdbId");
-        String quality = payload.getJsonObject("movieFile").getString("quality");
+
+
+        JsonObject movieFile = payload.getJsonObject("movieFile");
+        String quality = movieFile == null ? "" : movieFile.getString("quality");
 
         JsonArray tags = movie.getJsonArray("tags");
 
