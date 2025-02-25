@@ -280,9 +280,9 @@ class LidarrNotificationsTest {
                 .withRequestBody(equalToJson("""
                         {
                           "msgtype": "m.text",
-                          "body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>",
+                          "body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>",
                           "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>"
+                          "formatted_body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>"
                         }
                         """)));
     }

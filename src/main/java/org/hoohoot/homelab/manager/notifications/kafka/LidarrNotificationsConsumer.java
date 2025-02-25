@@ -9,6 +9,8 @@ import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,7 +48,10 @@ public class LidarrNotificationsConsumer {
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
 
-        String notificationContent = "<h1>Album Downloaded</h1><p>%s - %s<br>Cover: %s<br>Genres: %s<br>Source: %s</p>".formatted(artistName, albumTitle, coverUrl, genres, downloadClient);
+        String releaseDate = album.getString("releaseDate");
+        String year = LocalDateTime.parse(releaseDate, DateTimeFormatter.ISO_ZONED_DATE_TIME).format(DateTimeFormatter.ofPattern("yyyy"));
+
+        String notificationContent = "<h1>Album Downloaded</h1><p>%s - %s (%s)<br>Cover: %s<br>Genres: %s<br>Source: %s</p>".formatted(artistName, albumTitle, year, coverUrl, genres, downloadClient);
 
         return this.matrixAPI.sendMessage(this.matrixRooms.lidarr(), UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
     }
