@@ -10,7 +10,6 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
 
 @Path("/api/notifications")
@@ -25,8 +24,6 @@ public class NotificationsResource {
     public NotificationsResource(@Channel("incoming-notifications") Emitter<Record<String, String>> priceEmitter) {
         this.notificationEmitter = priceEmitter;
     }
-
-
 
     @POST
     @Path("/{source}")
