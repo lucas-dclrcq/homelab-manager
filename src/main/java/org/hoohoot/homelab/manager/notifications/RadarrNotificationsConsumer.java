@@ -41,20 +41,9 @@ public class RadarrNotificationsConsumer {
         String notificationContent = "<h1>Movie Downloaded</h1>" +
                                      "<p>" +
                                      "%s (%s) [%s] https://www.imdb.com/title/%s/<br>".formatted(title, year, quality, imdbId) +
-                                     "Requested by : %s".formatted(userTag(tags)) +
+                                     "Requested by : %s".formatted(ParseRequester.fromTags(tags)) +
                                      "</p>";
 
         return this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
-    }
-
-    public String userTag(JsonArray tags) {
-        if (tags == null) return "unknown";
-
-        return tags.stream()
-                .map(Object::toString)
-                .filter(tag -> tag.matches("\\d+ - \\w+"))
-                .map(tag -> tag.split(" - ")[1])
-                .findFirst()
-                .orElse("unknown");
     }
 }

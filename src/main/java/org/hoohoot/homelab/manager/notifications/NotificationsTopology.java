@@ -26,6 +26,11 @@ public class NotificationsTopology {
                 .map((key,value) -> KeyValue.pair(value.getJsonObject("artist").getString("id"), value))
                 .to("lidarr-notifications", Produced.with(Serdes.String(), new JsonObjectSerde()));
 
+        builder.stream("incoming-notifications", Consumed.with(Serdes.String(), new JsonObjectSerde()))
+                .filter((key, value) -> "sonarr".equals(key))
+                .map((key,value) -> KeyValue.pair(value.getJsonObject("series").getString("titleSlug"), value))
+                .to("sonarr-notifications", Produced.with(Serdes.String(), new JsonObjectSerde()));
+
         return builder.build();
     }
 }
