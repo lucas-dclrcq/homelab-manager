@@ -9,6 +9,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -16,11 +17,11 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class LidarrNotificationsConsumer {
     private final MatrixAPI matrixAPI;
-    private final String matrixRoomId;
+    private final MatrixRoomsConfiguration matrixRooms;
 
-    public LidarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, @ConfigProperty(name = "matrix.room_id") String matrixRoomId) {
+    public LidarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, MatrixRoomsConfiguration matrixRooms) {
         this.matrixAPI = matrixAPI;
-        this.matrixRoomId = matrixRoomId;
+        this.matrixRooms = matrixRooms;
     }
 
     @Incoming("lidarr-notifications")
@@ -49,6 +50,6 @@ public class LidarrNotificationsConsumer {
 
         String notificationContent = "<h1>Album Downloaded</h1><p>%s - %s<br>Cover: %s<br>Genres: %s<br>Source: %s</p>".formatted(artistName, albumTitle, coverUrl, genres, downloadClient);
 
-        return this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
+        return this.matrixAPI.sendMessage(this.matrixRooms.lidarr(), UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
     }
 }

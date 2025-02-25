@@ -137,7 +137,7 @@ class RadarrNotificationsTest {
 
         await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).until(() -> !wireMockServer.getServeEvents().getRequests().isEmpty());
 
-        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/!testroom:test-server.tld/send/m.room.message/.*")));
+        wireMockServer.verify(1, putRequestedFor(urlMatching("/_matrix/client/r0/rooms/!radarr:test-server.tld/send/m.room.message/.*")));
     }
 
     @Test

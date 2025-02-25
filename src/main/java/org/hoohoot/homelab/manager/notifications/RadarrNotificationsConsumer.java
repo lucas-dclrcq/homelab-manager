@@ -9,17 +9,18 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
 
 import java.util.UUID;
 
 @ApplicationScoped
 public class RadarrNotificationsConsumer {
     private final MatrixAPI matrixAPI;
-    private final String matrixRoomId;
+    private final MatrixRoomsConfiguration matrixRooms;
 
-    public RadarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, @ConfigProperty(name = "matrix.room_id") String matrixRoomId) {
+    public RadarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, MatrixRoomsConfiguration matrixRooms) {
         this.matrixAPI = matrixAPI;
-        this.matrixRoomId = matrixRoomId;
+        this.matrixRooms = matrixRooms;
     }
 
     @Incoming("radarr-notifications")
@@ -44,6 +45,6 @@ public class RadarrNotificationsConsumer {
                                      "Requested by : %s".formatted(ParseRequester.fromTags(tags)) +
                                      "</p>";
 
-        return this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
+        return this.matrixAPI.sendMessage(this.matrixRooms.radarr(), UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
     }
 }

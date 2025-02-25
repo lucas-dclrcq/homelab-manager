@@ -8,6 +8,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,11 +17,11 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class SonarrNotificationsConsumer {
     private final MatrixAPI matrixAPI;
-    private final String matrixRoomId;
+    private final MatrixRoomsConfiguration matrixRooms;
 
-    public SonarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, @ConfigProperty(name = "matrix.room_id") String matrixRoomId) {
+    public SonarrNotificationsConsumer(@RestClient MatrixAPI matrixAPI, MatrixRoomsConfiguration matrixRooms) {
         this.matrixAPI = matrixAPI;
-        this.matrixRoomId = matrixRoomId;
+        this.matrixRooms = matrixRooms;
     }
 
     @Incoming("sonarr-notifications")
@@ -47,6 +48,6 @@ public class SonarrNotificationsConsumer {
         String notificationContent = "<h1>Episode Downloaded</h1><p>%s - %sx%s - %s [%s]<br>Requested by : %s<br>Source: %s (%s)</p>"
                 .formatted(seriesName, seasonNumber, episodeNumber, episodeName, quality, requester, downloadClient, indexer);
 
-        return this.matrixAPI.sendMessage(this.matrixRoomId, UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
+        return this.matrixAPI.sendMessage(this.matrixRooms.sonarr(), UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
     }
 }
