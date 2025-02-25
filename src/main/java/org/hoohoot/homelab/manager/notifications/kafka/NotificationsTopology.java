@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.notifications;
+package org.hoohoot.homelab.manager.notifications.kafka;
 
 import io.quarkus.kafka.client.serialization.JsonObjectSerde;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -7,7 +7,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.hoohoot.homelab.manager.config.InjectWireMock;
 import org.hoohoot.homelab.manager.config.WiremockTestResource;
-import org.hoohoot.homelab.manager.notifications.NotificationsResource;
+import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

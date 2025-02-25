@@ -1,18 +1,17 @@
-package org.hoohoot.homelab.manager.notifications;
+package org.hoohoot.homelab.manager.notifications.kafka;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.hoohoot.homelab.manager.notifications.ParseRequester;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class SonarrNotificationsConsumer {

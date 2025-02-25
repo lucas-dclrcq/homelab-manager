@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.notifications;
+package org.hoohoot.homelab.manager.notifications.resource;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
