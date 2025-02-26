@@ -160,9 +160,9 @@ class SonarrNotificationsTest {
                 .withRequestBody(equalToJson("""
                         {
                           "msgtype": "m.text",
-                          "body": "<h1>Episode Downloaded</h1><p>Australian Survivor - S12E06 - Episode 6 [WEBDL-720p]<br>Requested by : flo<br>Source: SABnzbd (NZBFinder)</p>",
+                          "body": "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source: SABnzbd (NZBFinder)</p>",
                           "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Episode Downloaded</h1><p>Australian Survivor - S12E06 - Episode 6 [WEBDL-720p]<br>Requested by : flo<br>Source: SABnzbd (NZBFinder)</p>"
+                          "formatted_body": "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source: SABnzbd (NZBFinder)</p>"
                         }
                         """)));
     }

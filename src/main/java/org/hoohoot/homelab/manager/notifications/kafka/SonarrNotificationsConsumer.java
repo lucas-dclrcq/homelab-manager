@@ -26,8 +26,8 @@ public class SonarrNotificationsConsumer {
     public Uni<Void> process(JsonObject payload) {
         ParseSeries parseSeries = ParseSeries.from(payload);
 
-        String messageContent = "<h1>Episode Downloaded</h1><p>%s - %s - %s [%s]<br>Requested by : %s<br>Source: %s (%s)</p>"
-                .formatted(parseSeries.seriesName(), parseSeries.seasonAndEpisodeNumber(), parseSeries.episodeName(), parseSeries.quality(), parseSeries.requester(), parseSeries.downloadClient(), parseSeries.indexer());
+        String messageContent = "<h1>Episode Downloaded</h1><p>Series : %s [%s]<br>Episode : %s - %s [%s]<br>Series requested by : %s<br>Source: %s (%s)</p>"
+                .formatted(parseSeries.seriesName(), parseSeries.imdbLink(), parseSeries.seasonAndEpisodeNumber(), parseSeries.episodeName(), parseSeries.quality(), parseSeries.requester(), parseSeries.downloadClient(), parseSeries.indexer());
 
         return this.matrixAPI.sendMessage(this.matrixRooms.sonarr(), UUID.randomUUID().toString(), MatrixMessage.html(messageContent)).replaceWithVoid();
     }

@@ -65,4 +65,10 @@ public class ParseSeries extends ArrParser {
                 .map(r -> r.getString("indexer").replace(" (Prowlarr)", ""))
                 .orElse(DEFAULT_VALUE);
     }
+
+    public String imdbLink() {
+        return this.series.map(series -> series.getString("imdbId"))
+                .map("https://www.imdb.com/title/%s/"::formatted)
+                .orElse(DEFAULT_VALUE);
+    }
 }
