@@ -33,7 +33,7 @@ internal class RadarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendMovieDownloadedNotification() {
+    fun `should send movie downloaded notification`() {
         val notification = """
                 {
                   "movie": {
@@ -79,7 +79,7 @@ internal class RadarrNotificationsTest {
             .then().statusCode(200)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { !wireMockServer!!.serveEvents.requests.isEmpty() }
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -100,7 +100,7 @@ internal class RadarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendNotificationToConfiguredRoom() {
+    fun `should send notification to configured room`() {
         val notification = """
                 {
                   "movie": {
@@ -146,7 +146,7 @@ internal class RadarrNotificationsTest {
             .then().statusCode(200)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { !wireMockServer!!.serveEvents.requests.isEmpty() }
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
@@ -155,7 +155,7 @@ internal class RadarrNotificationsTest {
     }
 
     @Test
-    fun shouldUseUUIDAsRandomTransactionId() {
+    fun `should use uuid as random transaction id`() {
         val notification = """
                 {
                   "movie": {
@@ -201,7 +201,7 @@ internal class RadarrNotificationsTest {
             .then().statusCode(200)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { !wireMockServer!!.serveEvents.requests.isEmpty() }
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
@@ -210,7 +210,7 @@ internal class RadarrNotificationsTest {
     }
 
     @Test
-    fun shouldAddMatrixTokenAsBearer() {
+    fun `should add matrix token as bearer`() {
         val notification = """
                 {
                   "movie": {
@@ -256,7 +256,7 @@ internal class RadarrNotificationsTest {
             .then().statusCode(200)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { !wireMockServer!!.serveEvents.requests.isEmpty() }
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))

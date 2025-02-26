@@ -36,7 +36,8 @@ jobs:
         if: success() || failure()
         with:
           report_paths: '**/target/surefire-reports/TEST-*.xml'
-          comment: true
+          annotate_only: true
+          include_passed: true
 
       - name: Set up Docker Buildx
         id: buildx
