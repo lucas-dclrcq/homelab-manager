@@ -33,7 +33,7 @@ class NotificationsTopology {
             .to("sonarr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
 
         builder.stream("incoming-notifications", Consumed.with(Serdes.String(), JsonObjectSerde()))
-            .filter { key, value -> "jellyseerr" == key && value.getString("notification_type") == "ISSUE_CREATED"}
+            .filter { key, _ -> "jellyseerr" == key}
             .map { _, value -> KeyValue.pair(value.getJsonObject("media").getString("tmdbId"), value) }
             .to("jellyseerr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
 
