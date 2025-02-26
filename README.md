@@ -1,62 +1,117 @@
-# homelab-manager
+# Homelab Manager
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+### Description
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+**Homelab Manager** is a modular application designed to handle notifications and workflows for home media setups. It
+integrates with popular services like Sonarr, Radarr, and Lidarr to process notifications via Kafka and deliver them to
+various channels, such as Matrix chat rooms. This tool is ideal for those who want to automate media management
+workflows in a homelab environment.
 
-## Running the application in dev mode
+This app is quite specific to my needs, and also because I use it to experiment and keep current on the latest tech, it is quite overkill :D
 
-You can run your application in dev mode that enables live coding using:
+### Features
 
-```shell script
-./mvnw compile quarkus:dev
+- **Matrix Chat Integration**: Easily forwards notifications to Matrix chat rooms for easy monitoring.
+
+### Prerequisites
+
+Make sure you have the following installed before running the application:
+
+- Java Development Kit (JDK) **21**
+- **Apache Kafka** for notification streaming
+- A **Matrix Server** instance and API access token
+- Build Tool: **Maven**
+
+### Installation
+
+1. **Clone the Repository**:
+
+``` bash
+   git clone https://github.com/your-username/homelab-manager.git  
+   cd homelab-manager  
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+1. **Build the Application**:
+   Ensure Maven is installed and run the following command:
 
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
+``` bash
+   mvn clean install  
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+1. **Configure Environment Variables**:
+   Set the necessary environment variables for Kafka, Matrix, and other services. See
+   the [Configuration](#configuration) section for details.
+2. **Run the Application**:
+   Use the following command to start the application:
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+``` bash
+   java -jar target/homelab-manager.jar  
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+### Configuration
 
-## Creating a native executable
+This application is configured entirely through **environment variables**, removing the need for property files in
+production. Quarkus automatically maps environment variables to application properties by replacing `.` with `_` and
+converting them to uppercase.
 
-You can create a native executable using:
+#### Required Environment Variables
 
-```shell script
-./mvnw package -Dnative
+| Environment Variable      | Description                                        | Example                   |
+|---------------------------|----------------------------------------------------|---------------------------|
+| `KAFKA_BOOTSTRAP_SERVERS` | Kafka brokers for the application to use           | `localhost:9092`          |
+| `MATRIX_ROOM_SONARR`      | Matrix room for Sonarr notifications               | `!sonarr:test-server.tld` |
+| `MATRIX_ROOM_RADARR`      | Matrix room for Radarr notifications               | `!radarr:test-server.tld` |
+| `MATRIX_ROOM_LIDARR`      | Matrix room for Lidarr notifications               | `!lidarr:test-server.tld` |
+| `MATRIX_API_TOKEN`        | API access token for Matrix notifications          | `your-matrix-token`       |
+
+#### Optional Environment Variables
+
+| Environment Variable | Description                      | Default Value |
+|----------------------|----------------------------------|---------------|
+| `LOG_LEVEL`          | Logging level of the application | `INFO`        |
+
+### Usage
+
+#### Running the Application Locally
+
+1. Export necessary environment variables:
+
+``` bash
+   export KAFKA_BOOTSTRAP_SERVERS="localhost:9092"  
+   export MATRIX_ROOM_SONARR="!sonarr:test-server.tld"  
+   export MATRIX_ROOM_RADARR="!radarr:test-server.tld"  
+   export MATRIX_ROOM_LIDARR="!lidarr:test-server.tld"  
+   export MATRIX_API_TOKEN="your-matrix-token"  
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+1. Run the jar file:
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+``` bash
+   java -jar target/homelab-manager.jar  
 ```
 
-You can then execute your native executable with: `./target/homelab-manager-1.0-SNAPSHOT-runner`
+#### Running with Docker
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+You can package the application into a Docker container and run it easily.
 
-## Provided Code
+1. **Build the Docker Image**:
 
-### REST
+``` bash
+   docker build -t homelab-manager .  
+```
 
-Easily start your REST Web Services
+1. **Run the Container**:
+   Pass the environment variables to the container like this:
 
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+``` bash
+   docker run -e KAFKA_BOOTSTRAP_SERVERS="localhost:9092" \  
+   -e MATRIX_ROOM_SONARR="sonarr-topic" \  
+   -e MATRIX_ROOM_RADARR="radarr-topic" \  
+   -e MATRIX_ROOM_LIDARR="lidarr-topic" \  
+   -e MATRIX_API_TOKEN="your-matrix-token" \  
+   homelab-manager  
+```
+
+### License
+
+This project is licensed under the [MIT License](LICENSE).
