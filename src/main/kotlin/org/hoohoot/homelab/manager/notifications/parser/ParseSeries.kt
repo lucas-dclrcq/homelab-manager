@@ -3,7 +3,7 @@ package org.hoohoot.homelab.manager.notifications.parser
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 
-const val DEFAULT_VALUE = "unknown"
+private const val DEFAULT_VALUE = "unknown"
 
 class ParseSeries private constructor(payload: JsonObject) {
     private val series: JsonObject? = payload.getJsonObject("series")

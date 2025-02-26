@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.stream.Collectors
 
-@ApplicationScoped
+
 class LidarrNotificationsConsumer(@param:RestClient private val matrixAPI: MatrixAPI, private val matrixRooms: MatrixRoomsConfiguration) {
     @Incoming("lidarr-notifications")
     fun process(payload: JsonObject): Uni<Void> {

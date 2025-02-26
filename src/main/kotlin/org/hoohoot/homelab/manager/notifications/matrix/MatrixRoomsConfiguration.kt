@@ -7,4 +7,5 @@ interface MatrixRoomsConfiguration {
     fun sonarr(): String?
     fun radarr(): String?
     fun lidarr(): String?
+    fun jellyseerr(): String?
 }

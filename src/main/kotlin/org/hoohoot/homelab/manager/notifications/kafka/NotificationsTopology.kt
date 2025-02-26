@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.notifications.kafka
+package org.hoohoot.homelab.manager.notifications.kafk
 
 import io.quarkus.kafka.client.serialization.JsonObjectSerde
 import io.vertx.core.json.JsonObject
@@ -18,34 +18,24 @@ class NotificationsTopology {
         val builder = StreamsBuilder()
 
         builder.stream("incoming-notifications", Consumed.with(Serdes.String(), JsonObjectSerde()))
-            .filter { key: String, _: JsonObject? -> "radarr" == key }
-            .map { _: String?, value: JsonObject ->
-                KeyValue.pair(
-                    value.getJsonObject("movie").getString("id"),
-                    value
-                )
-            }
+            .filter { key, value -> "radarr" == key && value.getString("eventType") == "Download"}
+            .map { _, value -> KeyValue.pair(value.getJsonObject("movie").getString("tmdbId"), value) }
             .to("radarr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
 
         builder.stream("incoming-notifications", Consumed.with(Serdes.String(), JsonObjectSerde()))
-            .filter { key: String, _: JsonObject? -> "lidarr" == key }
-            .map { _: String?, value: JsonObject ->
-                KeyValue.pair(
-                    value.getJsonObject("artist").getString("id"),
-                    value
-                )
-            }
+            .filter { key, value -> "lidarr" == key && value.getString("eventType") == "Download"}
+            .map { _, value -> KeyValue.pair(value.getJsonObject("album").getString("mbId"), value) }
             .to("lidarr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
 
         builder.stream("incoming-notifications", Consumed.with(Serdes.String(), JsonObjectSerde()))
-            .filter { key: String, _: JsonObject? -> "sonarr" == key }
-            .map { _: String?, value: JsonObject ->
-                KeyValue.pair(
-                    value.getJsonObject("series").getString("titleSlug"),
-                    value
-                )
-            }
+            .filter { key, value -> "sonarr" == key && value.getString("eventType") == "Download"}
+            .map { _, value -> KeyValue.pair(value.getJsonObject("series").getString("tmdbId"), value) }
             .to("sonarr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
+
+        builder.stream("incoming-notifications", Consumed.with(Serdes.String(), JsonObjectSerde()))
+            .filter { key, value -> "jellyseerr" == key && value.getString("notification_type") == "ISSUE_CREATED"}
+            .map { _, value -> KeyValue.pair(value.getJsonObject("media").getString("tmdbId"), value) }
+            .to("jellyseerr-notifications", Produced.with(Serdes.String(), JsonObjectSerde()))
 
         return builder.build()
     }

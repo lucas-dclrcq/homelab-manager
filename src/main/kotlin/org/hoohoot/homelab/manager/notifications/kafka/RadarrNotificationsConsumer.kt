@@ -11,7 +11,6 @@ import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage.Companion.
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration
 import java.util.*
 
-@ApplicationScoped
 class RadarrNotificationsConsumer(
     @param:RestClient private val matrixAPI: MatrixAPI,
     private val matrixRooms: MatrixRoomsConfiguration
