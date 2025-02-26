@@ -6,7 +6,6 @@ import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.hoohoot.homelab.manager.notifications.ParseRequester;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixAPI;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixMessage;
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomsConfiguration;
@@ -42,9 +41,21 @@ public class RadarrNotificationsConsumer {
         String notificationContent = "<h1>Movie Downloaded</h1>" +
                                      "<p>" +
                                      "%s (%s) [%s] https://www.imdb.com/title/%s/<br>".formatted(title, year, quality, imdbId) +
-                                     "Requested by : %s".formatted(ParseRequester.fromTags(tags)) +
+                                     "Requested by : %s".formatted(requester(tags)) +
                                      "</p>";
 
         return this.matrixAPI.sendMessage(this.matrixRooms.radarr(), UUID.randomUUID().toString(), MatrixMessage.html(notificationContent)).replaceWithVoid();
+    }
+
+    @Deprecated
+    public static String requester(JsonArray tags) {
+        if (tags == null) return "unknown";
+
+        return tags.stream()
+                .map(Object::toString)
+                .filter(tag -> tag.matches("\\d+ - \\w+"))
+                .map(tag -> tag.split(" - ")[1])
+                .findFirst()
+                .orElse("unknown");
     }
 }
