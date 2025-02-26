@@ -33,7 +33,7 @@ internal class LidarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendMovieDownloadedNotification() {
+    fun `should send movie downloaded notification`() {
         val notification = """
                 {
                 	"artist": {
@@ -297,7 +297,7 @@ internal class LidarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendNotificationToConfiguredRoom() {
+    fun `should send notification to configured room`() {
         val notification = """
                 {
                 	"artist": {

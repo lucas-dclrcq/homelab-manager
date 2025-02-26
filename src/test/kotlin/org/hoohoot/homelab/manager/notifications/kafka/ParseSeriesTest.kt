@@ -1,7 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.kafka
 
 import io.vertx.core.json.JsonObject
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.hoohoot.homelab.manager.notifications.parser.ParseSeries.Companion.from
 import org.junit.jupiter.api.Test
@@ -10,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource
 
 internal class ParseSeriesTest {
     @Test
-    fun shouldParseQuality() {
+    fun `should parse quality`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -139,7 +138,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseQualityWhenNoEpisodeFiles() {
+    fun `should parse quality when no episode files`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -234,7 +233,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseSeriesName() {
+    fun `should parse series name`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -363,7 +362,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseEpisodeName() {
+    fun `should parse episode name`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -492,7 +491,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseDownloadClient() {
+    fun `should parse download client`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -621,7 +620,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseIndexer() {
+    fun `should parse indexer`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -750,7 +749,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseRequester() {
+    fun `should parse requester`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -879,7 +878,7 @@ internal class ParseSeriesTest {
     }
 
     @Test
-    fun shouldParseImdbLink() {
+    fun `should parse imdb link`() {
         // ASSERT
         val payload = JsonObject(
             """
@@ -1011,7 +1010,7 @@ internal class ParseSeriesTest {
     @CsvSource(
         "12,6,S12E06", "2,24,S02E24", "0,123,S00E123"
     )
-    fun shouldParseSeasonAndEpisodeNumber(seasonNumber: String?, episodeNumber: String?, expected: String?) {
+    fun `should parse season and episode number`(seasonNumber: String?, episodeNumber: String?, expected: String?) {
         // ASSERT
         val payload = JsonObject(
             """

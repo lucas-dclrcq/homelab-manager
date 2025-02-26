@@ -33,7 +33,7 @@ internal class SonarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendSeriesEpisodeDownloadedNotification() {
+    fun `should send series episode downloaded notification`() {
         val notification = """
                 {
                  	"series": {
@@ -177,7 +177,7 @@ internal class SonarrNotificationsTest {
     }
 
     @Test
-    fun shouldSendNotificationToConfiguredRoom() {
+    fun `should send notification to configured room`() {
         val notification = """
                 {
                  	"series": {
