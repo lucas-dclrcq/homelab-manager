@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager
+package org.hoohoot.homelab.manager.it
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -7,10 +7,11 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
 import org.hoohoot.homelab.manager.config.InjectWireMock
 import org.hoohoot.homelab.manager.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
@@ -65,7 +66,7 @@ internal class JellySeerrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("jellyseerr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -75,13 +76,12 @@ internal class JellySeerrNotificationsTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {
-                          "msgtype": "m.text",
-                          "body": "<h1>New Video Issue Reported</h1><p>- Subject : A Complete Unknown (2024)<br>- Message : test<br>- Reporter : lucasd</p>",
-                          "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>New Video Issue Reported</h1><p>- Subject : A Complete Unknown (2024)<br>- Message : test<br>- Reporter : lucasd</p>"
-                        }
-                        
+                            {
+                              "msgType" : "m.text",
+                              "body" : "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd",
+                              "format" : "org.matrix.custom.html",
+                              "formattedBody" : "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>"
+                            }
                         """.trimIndent()
                     )
                 )
@@ -122,7 +122,7 @@ internal class JellySeerrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("jellyseerr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -132,13 +132,12 @@ internal class JellySeerrNotificationsTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {
-                          "msgtype": "m.text",
-                          "body": "<h1>Subtitle Issue Resolved</h1><p>- Subject : Bad Moms (2016)<br>- Message : test<br>- Reporter : lucasd</p>",
-                          "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Subtitle Issue Resolved</h1><p>- Subject : Bad Moms (2016)<br>- Message : test<br>- Reporter : lucasd</p>"
-                        }
-                        
+                            {
+                              "msgType": "m.text",
+                              "body": "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd",
+                              "format": "org.matrix.custom.html",
+                              "formattedBody": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>"
+                            }
                         """.trimIndent()
                     )
                 )
@@ -178,14 +177,14 @@ internal class JellySeerrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("jellyseerr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!jellyseerr:test-server.tld/send/m.room.message/.*"))
+            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!support:test-server.tld/send/m.room.message/.*"))
         )
     }
 }

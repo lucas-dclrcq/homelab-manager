@@ -1,8 +1,8 @@
-package org.hoohoot.homelab.manager.notifications.kafka
+package org.hoohoot.homelab.manager.notifications.domain
 
 import io.vertx.core.json.JsonObject
 import org.assertj.core.api.Assertions.*
-import org.hoohoot.homelab.manager.notifications.parser.ParseSeries.Companion.from
+import org.hoohoot.homelab.manager.notifications.domain.ParseSeries.Companion.from
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -131,7 +131,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val seriesName = from(payload).seriesName()
+        val seriesName = from(payload).seriesName
 
         // ASSERT
         assertThat(seriesName).isEqualTo("Australian Survivor")
@@ -226,7 +226,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val quality = from(payload).quality()
+        val quality = from(payload).quality
 
         // ASSERT
         assertThat(quality).isEqualTo("unknown")
@@ -355,7 +355,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val seriesName = from(payload).seriesName()
+        val seriesName = from(payload).seriesName
 
         // ASSERT
         assertThat(seriesName).isEqualTo("Australian Survivor")
@@ -484,7 +484,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val episodeName = from(payload).episodeName()
+        val episodeName = from(payload).episodeName
 
         // ASSERT
         assertThat(episodeName).isEqualTo("Episode 6")
@@ -613,7 +613,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val downloadClient = from(payload).downloadClient()
+        val downloadClient = from(payload).downloadClient
 
         // ASSERT
         assertThat(downloadClient).isEqualTo("SABnzbd")
@@ -742,7 +742,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val indexer = from(payload).indexer()
+        val indexer = from(payload).indexer
 
         // ASSERT
         assertThat(indexer).isEqualTo("NZBFinder")
@@ -871,7 +871,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val requester = from(payload).requester()
+        val requester = from(payload).requester
 
         // ASSERT
         assertThat(requester).isEqualTo("flo")
@@ -1000,17 +1000,17 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val imdbLink = from(payload).imdbLink()
+        val imdbLink = from(payload).imdbId
 
         // ASSERT
-        assertThat(imdbLink).isEqualTo("https://www.imdb.com/title/tt0310416/")
+        assertThat(imdbLink).isEqualTo("tt0310416")
     }
 
     @ParameterizedTest
     @CsvSource(
         "12,6,S12E06", "2,24,S02E24", "0,123,S00E123"
     )
-    fun `should parse season and episode number`(seasonNumber: String?, episodeNumber: String?, expected: String?) {
+    fun `should parse various season and episode number formats`(seasonNumber: String?, episodeNumber: String?, expected: String?) {
         // ASSERT
         val payload = JsonObject(
             """
@@ -1132,7 +1132,7 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val seasonAndEpisodeNumber = from(payload).seasonAndEpisodeNumber()
+        val seasonAndEpisodeNumber = from(payload).seasonAndEpisodeNumber
 
         // ASSERT
         assertThat(seasonAndEpisodeNumber).isEqualTo(expected)

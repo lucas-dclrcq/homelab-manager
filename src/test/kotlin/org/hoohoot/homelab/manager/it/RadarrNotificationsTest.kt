@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager
+package org.hoohoot.homelab.manager.it
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -7,12 +7,15 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
 import org.hoohoot.homelab.manager.config.InjectWireMock
 import org.hoohoot.homelab.manager.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.util.concurrent.TimeUnit
 
 @QuarkusTest
@@ -76,7 +79,7 @@ internal class RadarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("radarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -86,13 +89,12 @@ internal class RadarrNotificationsTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {
-                          "msgtype": "m.text",
-                          "body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>",
-                          "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>"
-                        }
-                        
+                            {
+                              "msgType" : "m.text",
+                              "body" : "Movie Downloaded\nThe Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/\nRequested by : lucasd",
+                              "format" : "org.matrix.custom.html",
+                              "formattedBody" : "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>"
+                            }
                         """.trimIndent()
                     )
                 )
@@ -143,14 +145,14 @@ internal class RadarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("radarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!radarr:test-server.tld/send/m.room.message/.*"))
+            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!media:test-server.tld/send/m.room.message/.*"))
         )
     }
 
@@ -198,7 +200,7 @@ internal class RadarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("radarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -253,7 +255,7 @@ internal class RadarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("radarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }

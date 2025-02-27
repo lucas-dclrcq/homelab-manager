@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager
+package org.hoohoot.homelab.manager.it
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -7,10 +7,11 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
 import org.hoohoot.homelab.manager.config.InjectWireMock
 import org.hoohoot.homelab.manager.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
@@ -153,7 +154,7 @@ internal class SonarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("sonarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -163,13 +164,12 @@ internal class SonarrNotificationsTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {
-                          "msgtype": "m.text",
-                          "body": "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source: SABnzbd (NZBFinder)</p>",
-                          "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source: SABnzbd (NZBFinder)</p>"
-                        }
-                        
+                            {
+                              "msgType" : "m.text",
+                              "body" : "Episode Downloaded\nSeries : Australian Survivor [https://www.imdb.com/title/tt0310416/]\nEpisode : Episode 6 [WEBDL-720p]\nSeries requested by : flo\nSource : SABnzbd (NZBFinder)",
+                              "format" : "org.matrix.custom.html",
+                              "formattedBody" : "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>"
+                            }
                         """.trimIndent()
                     )
                 )
@@ -297,14 +297,14 @@ internal class SonarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("sonarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!sonarr:test-server.tld/send/m.room.message/.*"))
+            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!media:test-server.tld/send/m.room.message/.*"))
         )
     }
 }

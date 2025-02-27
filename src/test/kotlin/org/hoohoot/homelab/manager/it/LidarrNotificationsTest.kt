@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager
+package org.hoohoot.homelab.manager.it
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -7,10 +7,11 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
 import org.hoohoot.homelab.manager.config.InjectWireMock
 import org.hoohoot.homelab.manager.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
@@ -28,7 +29,11 @@ internal class LidarrNotificationsTest {
         wireMockServer
             .stubFor(
                 WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                    .willReturn(WireMock.aResponse().withStatus(200))
+                    .willReturn(WireMock.aResponse().withStatus(200).withBody("""
+                        {
+                          "event_id": "${'$'}0xznhNTIjU0kiLDUqxafbzFGrPyYNCWeG9l0UMh1X5c"
+                        }
+                    """.trimIndent()))
             )
     }
 
@@ -273,7 +278,7 @@ internal class LidarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("lidarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
@@ -283,13 +288,12 @@ internal class LidarrNotificationsTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {
-                          "msgtype": "m.text",
-                          "body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>",
-                          "format": "org.matrix.custom.html",
-                          "formatted_body": "<h1>Album Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres: Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source: qBittorrent</p>"
-                        }
-                        
+                            {
+                              "msgType" : "m.text",
+                              "body" : "Movie Downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\nCover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\nGenres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\nSource : qBittorrent",
+                              "format" : "org.matrix.custom.html",
+                              "formattedBody" : "<h1>Movie Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source : qBittorrent</p>"
+                            }
                         """.trimIndent()
                     )
                 )
@@ -537,14 +541,14 @@ internal class LidarrNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .`when`().post("lidarr")
-            .then().statusCode(200)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!lidarr:test-server.tld/send/m.room.message/.*"))
+            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!music:test-server.tld/send/m.room.message/.*"))
         )
     }
 }
