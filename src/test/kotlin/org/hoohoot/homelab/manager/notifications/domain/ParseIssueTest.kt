@@ -2,7 +2,6 @@ package org.hoohoot.homelab.manager.notifications.domain
 
 import io.vertx.core.json.JsonObject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.domain.ParseIssue
 import org.junit.jupiter.api.Test
 
 class ParseIssueTest {
@@ -127,7 +126,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = ParseIssue.from(payload).issueId
+        val message = ParseIssue.from(payload).id
 
         // ASSERT
         assertThat(message).isEqualTo("24")

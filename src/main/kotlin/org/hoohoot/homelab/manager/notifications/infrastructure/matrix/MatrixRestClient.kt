@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.infrastructure.matrix
 
+import io.quarkus.rest.client.reactive.jackson.ClientObjectMapper
 import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
@@ -10,7 +11,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 @Path("/_matrix/client")
 @RegisterRestClient(configKey = "matrix-api")
 @ClientHeaderParam(name = "Authorization", value = ["Bearer \${matrix.access_token}"])
-@RegisterProvider(value = MatrixApiObjectMapper::class)
 interface MatrixRestClient {
     @PUT
     @Path("/r0/rooms/{matrixRoom}/send/m.room.message/{transactionId}")

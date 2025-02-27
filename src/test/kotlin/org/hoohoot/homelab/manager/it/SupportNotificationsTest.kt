@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
-internal class JellySeerrNotificationsTest {
+internal class SupportNotificationsTest {
     @InjectWireMock
     private val wireMockServer: WireMockServer? = null
 
@@ -29,7 +29,12 @@ internal class JellySeerrNotificationsTest {
         wireMockServer
             .stubFor(
                 WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                    .willReturn(WireMock.aResponse().withStatus(200))
+                    .willReturn(
+                        WireMock.aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withStatus(200)
+                            .withBody("{\"event_id\": \"toto\"}")
+                    )
             )
     }
 
@@ -77,10 +82,11 @@ internal class JellySeerrNotificationsTest {
                     WireMock.equalToJson(
                         """
                             {
-                              "msgType" : "m.text",
+                              "msgtype" : "m.text",
                               "body" : "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd",
                               "format" : "org.matrix.custom.html",
-                              "formattedBody" : "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>"
+                              "formatted_body" : "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>",
+                              "m.relates_to" : null
                             }
                         """.trimIndent()
                     )
@@ -89,8 +95,99 @@ internal class JellySeerrNotificationsTest {
     }
 
     @Test
-    fun `should send issue resolved notification`() {
+    fun `should send issue resolved notification when no issue created was sent before`() {
         val notification = """
+            {
+            	"notification_type": "ISSUE_RESOLVED",
+            	"event": "Subtitle Issue Resolved",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "30",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "RESOLVED",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .`when`().post("jellyseerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
+
+        wireMockServer!!.verify(
+            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                            {
+                              "msgtype": "m.text",
+                              "body": "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd",
+                              "format": "org.matrix.custom.html",
+                              "formatted_body": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>",
+                               "m.relates_to" : null
+                            }
+                        """.trimIndent()
+                    )
+                )
+        )
+    }
+
+    @Test
+    fun `should send issue resolved notification in thread of created issue`() {
+        val issueCreated = """
+            {
+            	"notification_type": "ISSUE_CREATED",
+            	"event": "Subtitle Issue Created",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "28",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "RESOLVED",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
+            .`when`().post("jellyseerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val issueResolved = """
             {
             	"notification_type": "ISSUE_RESOLVED",
             	"event": "Subtitle Issue Resolved",
@@ -120,23 +217,32 @@ internal class JellySeerrNotificationsTest {
             }
 """.trimIndent()
 
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
+            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
+
+        wireMockServer!!.resetAll()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .`when`().post("jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
+            .until { wireMockServer.serveEvents.requests.isNotEmpty() }
 
-        wireMockServer!!.verify(
+        wireMockServer.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
                             {
-                              "msgType": "m.text",
+                              "msgtype": "m.text",
                               "body": "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd",
                               "format": "org.matrix.custom.html",
-                              "formattedBody": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>"
+                              "formatted_body": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>",
+                              "m.relates_to": {
+                                  "event_id": "toto",
+                                  "rel_type": "m.thread"
+                              }
                             }
                         """.trimIndent()
                     )

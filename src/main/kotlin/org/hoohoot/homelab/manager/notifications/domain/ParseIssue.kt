@@ -4,7 +4,7 @@ import io.vertx.core.json.JsonObject
 
 private const val DEFAULT_VALUE = "unknown"
 
-data class Issue(val notificationType: String, val message: String, val subject: String, val reportedByUserName: String, val title: String, val issueId: String)
+data class Issue(val notificationType: String, val message: String, val subject: String, val reportedByUserName: String, val title: String, val id: String)
 
 class ParseIssue private constructor(private val payload : JsonObject) {
 
@@ -26,5 +26,5 @@ class ParseIssue private constructor(private val payload : JsonObject) {
 
     private fun title() = payload.getString("event") ?: DEFAULT_VALUE
 
-    private fun issueId() = payload.getJsonObject("issue")?.getString("issue_id") ?: DEFAULT_VALUE
+    private fun issueId() = payload.getJsonObject("issue")?.getString("issue_id")!!
 }

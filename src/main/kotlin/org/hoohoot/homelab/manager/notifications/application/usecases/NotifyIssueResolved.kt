@@ -10,12 +10,12 @@ import org.hoohoot.homelab.manager.notifications.application.ports.NotificationG
 import org.hoohoot.homelab.manager.notifications.domain.NotificationBuilder
 import org.hoohoot.homelab.manager.notifications.domain.ParseIssue
 
-data class NotifyIssueCreated(val webhookPayload: JsonObject) : Command
+data class NotifyIssueResolved(val webhookPayload: JsonObject) : Command
 
 @Startup
 @ApplicationScoped
-class NotifyIssueEventHandler(private val notificationGateway: NotificationGateway, private val issueRepository: IssueRepository) : CommandHandler<NotifyIssueCreated> {
-    override suspend fun handle(command: NotifyIssueCreated) {
+class NotifyIssueResolvedHandler(private val notificationGateway: NotificationGateway, private val issueRepository: IssueRepository) : CommandHandler<NotifyIssueResolved> {
+    override suspend fun handle(command: NotifyIssueResolved) {
         val issue = ParseIssue.from(command.webhookPayload)
 
         val notification = NotificationBuilder()
@@ -25,8 +25,13 @@ class NotifyIssueEventHandler(private val notificationGateway: NotificationGatew
             .addInfoLine("Reporter : ${issue.reportedByUserName}")
             .buildNotification()
 
-        val sentNotificationId = this.notificationGateway.sendSupportNotification(notification)
+        val issueCreatedNotificationId = issueRepository.getNotificationIdForIssue(issue.id)
 
-        this.issueRepository.saveNotificationIdForIssue(issue.id, sentNotificationId)
+        if (issueCreatedNotificationId != null) {
+            this.notificationGateway.sendSupportNotification(notification, issueCreatedNotificationId)
+        } else {
+            this.notificationGateway.sendSupportNotification(notification)
+
+        }
     }
 }

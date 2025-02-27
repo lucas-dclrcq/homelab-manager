@@ -26,6 +26,6 @@ class NotifySeriesDownloadedHandler(private val notificationGateway: Notificatio
             .addInfoLine("Source : ${series.downloadClient} (${series.indexer})")
             .buildNotification()
 
-        this.notificationGateway.sendSeriesNotification(notification)
+        this.notificationGateway.sendMediaNotification(notification)
     }
 }

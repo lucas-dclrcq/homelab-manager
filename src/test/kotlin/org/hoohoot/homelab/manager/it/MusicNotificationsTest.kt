@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
-internal class LidarrNotificationsTest {
+internal class MusicNotificationsTest {
     @InjectWireMock
     private val wireMockServer: WireMockServer? = null
 
@@ -289,10 +289,11 @@ internal class LidarrNotificationsTest {
                     WireMock.equalToJson(
                         """
                             {
-                              "msgType" : "m.text",
+                              "msgtype" : "m.text",
                               "body" : "Movie Downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\nCover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\nGenres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\nSource : qBittorrent",
                               "format" : "org.matrix.custom.html",
-                              "formattedBody" : "<h1>Movie Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source : qBittorrent</p>"
+                              "formatted_body" : "<h1>Movie Downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source : qBittorrent</p>",
+                              "m.relates_to" : null
                             }
                         """.trimIndent()
                     )

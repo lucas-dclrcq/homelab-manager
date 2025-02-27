@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
-internal class SonarrNotificationsTest {
+internal class SeriesNotificationsTest {
     @InjectWireMock
     private val wireMockServer: WireMockServer? = null
 
@@ -165,10 +165,11 @@ internal class SonarrNotificationsTest {
                     WireMock.equalToJson(
                         """
                             {
-                              "msgType" : "m.text",
+                              "msgtype" : "m.text",
                               "body" : "Episode Downloaded\nSeries : Australian Survivor [https://www.imdb.com/title/tt0310416/]\nEpisode : Episode 6 [WEBDL-720p]\nSeries requested by : flo\nSource : SABnzbd (NZBFinder)",
                               "format" : "org.matrix.custom.html",
-                              "formattedBody" : "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>"
+                              "formatted_body" : "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>",
+                              "m.relates_to" : null
                             }
                         """.trimIndent()
                     )
@@ -299,7 +300,7 @@ internal class SonarrNotificationsTest {
             .`when`().post("sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
             .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(

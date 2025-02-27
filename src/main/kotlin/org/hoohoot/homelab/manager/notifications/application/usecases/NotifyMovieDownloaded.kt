@@ -24,6 +24,6 @@ class NotifyMovieDownloadedHandler(private val notificationGateway: Notification
             .addInfoLine("Requested by : ${movie.requester}")
             .buildNotification()
 
-        this.notificationGateway.sendMovieNotification(notification)
+        this.notificationGateway.sendMediaNotification(notification)
     }
 }
