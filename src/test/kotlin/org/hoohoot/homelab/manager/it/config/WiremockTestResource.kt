@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.config
+package org.hoohoot.homelab.manager.it.config
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager

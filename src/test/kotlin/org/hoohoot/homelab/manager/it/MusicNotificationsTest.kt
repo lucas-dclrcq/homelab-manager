@@ -9,8 +9,8 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
-import org.hoohoot.homelab.manager.config.InjectWireMock
-import org.hoohoot.homelab.manager.config.WiremockTestResource
+import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

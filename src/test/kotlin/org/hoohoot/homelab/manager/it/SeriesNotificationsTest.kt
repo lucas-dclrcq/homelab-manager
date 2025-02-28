@@ -9,8 +9,8 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.ws.rs.core.Response
 import org.awaitility.Awaitility
-import org.hoohoot.homelab.manager.config.InjectWireMock
-import org.hoohoot.homelab.manager.config.WiremockTestResource
+import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -99,7 +99,7 @@ internal class SeriesNotificationsTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -243,7 +243,7 @@ internal class SeriesNotificationsTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",

@@ -18,7 +18,7 @@ data class Series(
 class ParseSeries private constructor(payload: JsonObject) {
     private val series: JsonObject? = payload.getJsonObject("series")
     private val episodes: JsonArray? = payload.getJsonArray("episodes")
-    private val episodeFiles: JsonArray? = payload.getJsonArray("episodeFiles")
+    private val episodeFile: JsonArray? = payload.getJsonArray("episodeFile")
     private val release: JsonObject? = payload.getJsonObject("release")
     private val downloadClient: String? = payload.getString("downloadClient")
 
@@ -30,7 +30,7 @@ class ParseSeries private constructor(payload: JsonObject) {
         }
     }
 
-    private fun quality(): String = episodeFiles
+    private fun quality(): String = episodeFile
         ?.getJsonObject(0)
         ?.getString("quality")
         ?: DEFAULT_VALUE

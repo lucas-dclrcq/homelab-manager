@@ -76,7 +76,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -131,10 +131,10 @@ internal class ParseSeriesTest {
         )
 
         // ACT
-        val seriesName = from(payload).seriesName
+        val quality = from(payload).quality
 
         // ASSERT
-        assertThat(seriesName).isEqualTo("Australian Survivor")
+        assertThat(quality).isEqualTo("WEBDL-720p")
     }
 
     @Test
@@ -300,7 +300,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -429,7 +429,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -558,7 +558,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -687,7 +687,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -816,7 +816,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -945,7 +945,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -1077,7 +1077,7 @@ internal class ParseSeriesTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFiles": [
+                 	"episodeFile": [
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
