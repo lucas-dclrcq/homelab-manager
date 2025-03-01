@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.application.usecases.PublishGenericNotification
+import org.hoohoot.homelab.manager.notifications.application.usecases.SendWhatsNextWeeklyReport
 
 @Path("/api/notifications")
 @Produces(MediaType.APPLICATION_JSON)
@@ -14,7 +15,11 @@ import org.hoohoot.homelab.manager.notifications.application.usecases.PublishGen
 @Tag(name = "Notifications")
 class NotificationsResource(private val mediator: Mediator) {
     @POST
-    @Path("/{source}")
-    suspend fun pushNotification(@RequestBody notification: JsonObject, @PathParam("source") source: String) =
+    @Path("/incoming/{source}")
+    suspend fun handleIncomingNotification(@RequestBody notification: JsonObject, @PathParam("source") source: String) =
         this.mediator.send(PublishGenericNotification(source, notification))
+
+    @POST
+    @Path("/send-whats-next-report")
+    suspend fun sendWhatsNextReport() = this.mediator.send(SendWhatsNextWeeklyReport)
 }

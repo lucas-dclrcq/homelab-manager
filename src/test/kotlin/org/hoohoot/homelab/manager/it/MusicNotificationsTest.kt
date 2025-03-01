@@ -277,7 +277,7 @@ internal class MusicNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("lidarr")
+            .`when`().post("/incoming/lidarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -541,7 +541,7 @@ internal class MusicNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("lidarr")
+            .`when`().post("/incoming/lidarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)

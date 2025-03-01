@@ -70,7 +70,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("jellyseerr")
+            .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -127,7 +127,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("jellyseerr")
+            .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -184,7 +184,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
-            .`when`().post("jellyseerr")
+            .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val issueResolved = """
@@ -223,7 +223,7 @@ internal class SupportNotificationsTest {
         wireMockServer!!.resetAll()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
-            .`when`().post("jellyseerr")
+            .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -282,7 +282,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("jellyseerr")
+            .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)

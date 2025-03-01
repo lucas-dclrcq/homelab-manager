@@ -76,7 +76,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("radarr")
+            .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -143,7 +143,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("radarr")
+            .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -198,7 +198,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("radarr")
+            .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -253,7 +253,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("radarr")
+            .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)

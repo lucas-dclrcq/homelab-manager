@@ -12,7 +12,10 @@ class WiremockTestResource : QuarkusTestResourceLifecycleManager {
         wireMockServer = WireMockServer(0)
         wireMockServer!!.start()
 
-        return java.util.Map.of("quarkus.rest-client.matrix-api.url", wireMockServer!!.baseUrl())
+        return java.util.Map.of(
+            "quarkus.rest-client.matrix-api.url", wireMockServer!!.baseUrl(),
+            "quarkus.rest-client.sonarr-api.url", wireMockServer!!.baseUrl()
+        )
     }
 
     override fun stop() {

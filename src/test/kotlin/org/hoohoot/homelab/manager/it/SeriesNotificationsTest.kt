@@ -99,7 +99,7 @@ internal class SeriesNotificationsTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFile": [
+                 	"episodeFile": 
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -131,8 +131,7 @@ internal class SeriesNotificationsTest {
                  				"videoDynamicRange": "",
                  				"videoDynamicRangeType": ""
                  			}
-                 		}
-                 	],
+                 		},
                  	"downloadClient": "SABnzbd",
                  	"downloadClientType": "SABnzbd",
                  	"downloadId": "SABnzbd_nzo__sf78tpj",
@@ -153,7 +152,7 @@ internal class SeriesNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("sonarr")
+            .`when`().post("/incoming/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
@@ -243,7 +242,7 @@ internal class SeriesNotificationsTest {
                  			"tvdbId": 10958514
                  		}
                  	],
-                 	"episodeFile": [
+                 	"episodeFile": 
                  		{
                  			"id": 13457,
                  			"relativePath": "Season 12/Australian Survivor (2002) - S12E06 - Episode 6 [WEBDL-720p][AAC 2.0][h264]-WH.mkv",
@@ -275,8 +274,7 @@ internal class SeriesNotificationsTest {
                  				"videoDynamicRange": "",
                  				"videoDynamicRangeType": ""
                  			}
-                 		}
-                 	],
+                 		},
                  	"downloadClient": "SABnzbd",
                  	"downloadClientType": "SABnzbd",
                  	"downloadId": "SABnzbd_nzo__sf78tpj",
@@ -297,7 +295,7 @@ internal class SeriesNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .`when`().post("sonarr")
+            .`when`().post("/incoming/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         Awaitility.await().atMost(500, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)

@@ -30,12 +30,23 @@ class NotificationBuilder {
     }
 
     fun addInfoLine(infoLine: String): NotificationBuilder {
-        if (textBody.isNotEmpty()) textBody += "\n"
-        if (htmlBody.isNotEmpty()) htmlBody += "<br>"
+        if (textBody.isNotEmpty() && textBody != "\n") textBody += "\n"
+        if (htmlBody.isNotEmpty() && htmlBody != "<br>") htmlBody += "<br>"
 
         textBody += infoLine
         htmlBody += infoLine
 
+        return this
+    }
+
+    fun addEmptyLine(): NotificationBuilder {
+        textBody += "\n"
+        htmlBody += "<br>"
+        return this
+    }
+
+    fun addInfoLines(infoLines: List<String>): NotificationBuilder {
+        infoLines.forEach { addInfoLine(it) }
         return this
     }
 }
