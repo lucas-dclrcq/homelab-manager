@@ -18,7 +18,7 @@ class NotifyMusicDownloadedHandler(private val notificationGateway: Notification
         val album = ParseMusic.from(command.webhookPayload)
 
         val notification = NotificationBuilder()
-            .addTitle("Movie Downloaded")
+            .addTitle("Album downloaded")
             .addInfoLine("${album.artistName} - ${album.albumTitle} (${album.year})")
             .addInfoLine("Cover: ${album.coverUrl}")
             .addInfoLine("Genres : ${album.genres.joinToString(", ")}")
