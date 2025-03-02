@@ -69,17 +69,16 @@ jobs:
     name: Deploy latest to homelab
     runs-on: ubuntu-latest
     needs: build
+    if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Checkout GitOps Repo
         uses: actions/checkout@v4
-        if: ${{ github.event_name != 'pull_request' }}
         with:
           repository: lucas-dclrcq/homelabitty
           token: ${{ secrets.GH_PAT }}
           path: gitops-repo
 
       - name: Update HelmRelease File
-        if: ${{ github.event_name != 'pull_request' }}
         env:
           SHA256: ${{ needs.build.outputs.latest-sha }}
         run: |
@@ -87,7 +86,6 @@ jobs:
             -i gitops-repo/kubernetes/apps/default/homelab-manager/app/helmrelease.yaml
 
       - name: Commit & push new version
-        if: ${{ github.event_name != 'pull_request' }}
         env:
           SHA256: ${{ needs.build.outputs.latest-sha }}
         run: |
