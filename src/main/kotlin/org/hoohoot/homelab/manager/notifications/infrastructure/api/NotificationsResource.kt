@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.application.usecases.PublishGenericNotification
+import org.hoohoot.homelab.manager.notifications.application.usecases.SendMediaStatisticsMonthlyReport
 import org.hoohoot.homelab.manager.notifications.application.usecases.SendWhatsNextWeeklyReport
 
 @Path("/api/notifications")
@@ -22,4 +23,8 @@ class NotificationsResource(private val mediator: Mediator) {
     @POST
     @Path("/send-whats-next-report")
     suspend fun sendWhatsNextReport() = this.mediator.send(SendWhatsNextWeeklyReport)
+
+    @POST
+    @Path("/send-monthly-top-watched-report")
+    suspend fun sendMonthlyTopWatchedReport() = this.mediator.send(SendMediaStatisticsMonthlyReport)
 }

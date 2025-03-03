@@ -4,7 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.notifications.application.ports.arr.ArrGateway
 import org.hoohoot.homelab.manager.notifications.application.ports.arr.Episode
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
