@@ -2,6 +2,7 @@ package org.hoohoot.homelab.manager.notifications.application.usecases
 
 import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
+import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
@@ -17,6 +18,8 @@ data class NotifyIssueResolved(val webhookPayload: JsonObject) : Command
 class NotifyIssueResolvedHandler(private val notificationGateway: NotificationGateway, private val issueRepository: IssueRepository) : CommandHandler<NotifyIssueResolved> {
     override suspend fun handle(command: NotifyIssueResolved) {
         val issue = ParseIssue.from(command.webhookPayload)
+
+        Log.info("Notifying issue resolved : ${issue.title}")
 
         val notification = NotificationBuilder()
             .addTitle(issue.title)

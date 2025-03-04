@@ -2,6 +2,7 @@ package org.hoohoot.homelab.manager.notifications.application.usecases
 
 import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
+import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.notifications.application.ports.JellystatGateway
@@ -15,6 +16,8 @@ object SendMediaStatisticsMonthlyReport : Command
 @ApplicationScoped
 class SendMediaStatisticsMonthlyReportHandler(private val jellystatGateway: JellystatGateway, private val notificationGateway: NotificationGateway) : CommandHandler<SendMediaStatisticsMonthlyReport> {
     override suspend fun handle(command: SendMediaStatisticsMonthlyReport) {
+        Log.info("Sending media statistics monthly report")
+
         val mostPopularSeries = this.jellystatGateway.getMostPopularByType(30, JellystatMediaType.Series)
 
         val mostPopularSeriesFormatted = mostPopularSeries

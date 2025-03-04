@@ -2,6 +2,7 @@ package org.hoohoot.homelab.manager.notifications.application.usecases
 
 import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
+import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.notifications.application.ports.Calendar
@@ -17,6 +18,8 @@ object SendWhatsNextWeeklyReport : Command
 @ApplicationScoped
 class SendWhatsNextReportWeeklyHandler(private val arrGateway: ArrGateway, private val notificationGateway: NotificationGateway, private val calendar: Calendar) : CommandHandler<SendWhatsNextWeeklyReport> {
     override suspend fun handle(command: SendWhatsNextWeeklyReport) {
+        Log.info("Sending whats next report")
+
         val currentWeek = calendar.getCurrentWeek()
         val seriesCalendar = arrGateway.getSeriesCalendar(currentWeek.start, currentWeek.end)
 

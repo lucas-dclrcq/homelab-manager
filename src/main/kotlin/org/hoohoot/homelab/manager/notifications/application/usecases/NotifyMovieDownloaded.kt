@@ -2,6 +2,7 @@ package org.hoohoot.homelab.manager.notifications.application.usecases
 
 import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
+import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
@@ -17,6 +18,8 @@ data class NotifyMovieDownloaded(val webhookPayload: JsonObject) : Command
 class NotifyMovieDownloadedHandler(private val notificationGateway: NotificationGateway) : CommandHandler<NotifyMovieDownloaded> {
     override suspend fun handle(command: NotifyMovieDownloaded) {
         val movie = ParseMovie.from(command.webhookPayload)
+
+        Log.info("Notifying movie downloaded : ${movie.title}")
 
         val notification = NotificationBuilder()
             .addTitle("Movie Downloaded")
