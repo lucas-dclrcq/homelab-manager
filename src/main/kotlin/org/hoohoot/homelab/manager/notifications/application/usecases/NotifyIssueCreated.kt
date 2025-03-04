@@ -18,12 +18,19 @@ class NotifyIssueEventHandler(private val notificationGateway: NotificationGatew
     override suspend fun handle(command: NotifyIssueCreated) {
         val issue = ParseIssue.from(command.webhookPayload)
 
-        val notification = NotificationBuilder()
+        var notificationBuilder = NotificationBuilder()
             .addTitle(issue.title)
             .addInfoLine("Subject : ${issue.subject}")
             .addInfoLine("Message : ${issue.message}")
             .addInfoLine("Reporter : ${issue.reportedByUserName}")
-            .buildNotification()
+
+        if (issue.additionalInfo.isNotEmpty()) {
+            notificationBuilder = notificationBuilder
+                .addInfoLine("Additional infos :")
+                .addInfoLines(issue.additionalInfo.map { "- ${it.key} : ${it.value}" })
+        }
+
+        val notification = notificationBuilder.buildNotification()
 
         val sentNotificationId = this.notificationGateway.sendSupportNotification(notification)
 
