@@ -14,7 +14,7 @@ import org.hoohoot.homelab.manager.notifications.application.usecases.SendWhatsN
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
-class NotificationsResource(private val mediator: Mediator) {
+class NotificationsResource(private val mediator: Mediator, private val apiAuthConfiguration: ApiAuthConfiguration) {
     @POST
     @Path("/incoming/{source}")
     suspend fun handleIncomingNotification(@RequestBody notification: JsonObject, @PathParam("source") source: String) =

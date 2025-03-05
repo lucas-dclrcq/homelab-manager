@@ -76,6 +76,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -143,6 +144,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -198,6 +200,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -253,6 +256,7 @@ internal class MovieNotificationsTest {
                 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 

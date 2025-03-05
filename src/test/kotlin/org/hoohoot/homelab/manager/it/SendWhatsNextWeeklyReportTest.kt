@@ -252,6 +252,7 @@ class SendWhatsNextWeeklyReportTest {
     @Test
     fun `should send whats next report`() {
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -276,6 +277,7 @@ class SendWhatsNextWeeklyReportTest {
     @Test
     fun `should send whats next report to correct room`() {
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -290,6 +292,7 @@ class SendWhatsNextWeeklyReportTest {
         this.timeService.setFixedClock(Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse("2023-10-18T12:34:56Z")), ZoneId.systemDefault())
 
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -303,6 +306,7 @@ class SendWhatsNextWeeklyReportTest {
     @Test
     fun `should ask sonarr api to include series details`() {
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 

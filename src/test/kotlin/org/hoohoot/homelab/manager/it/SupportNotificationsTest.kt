@@ -70,6 +70,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -135,6 +136,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -192,6 +194,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -249,6 +252,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -288,6 +292,7 @@ internal class SupportNotificationsTest {
         wireMockServer!!.resetAll()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -347,6 +352,7 @@ internal class SupportNotificationsTest {
 """.trimIndent()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/incoming/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 

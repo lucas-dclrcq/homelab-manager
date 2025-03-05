@@ -94,6 +94,7 @@ class SendMediaStatisticsMonthlyReportTest {
             )
 
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-monthly-top-watched-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -170,6 +171,7 @@ class SendMediaStatisticsMonthlyReportTest {
             )
 
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-monthly-top-watched-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
@@ -238,6 +240,7 @@ class SendMediaStatisticsMonthlyReportTest {
             )
 
         RestAssured.given().contentType(ContentType.JSON)
+            .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-monthly-top-watched-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
