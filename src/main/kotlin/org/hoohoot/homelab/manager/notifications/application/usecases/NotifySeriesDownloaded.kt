@@ -24,7 +24,7 @@ class NotifySeriesDownloadedHandler(private val notificationGateway: Notificatio
         val notification = NotificationBuilder()
             .addTitle("Episode Downloaded")
             .addInfoLine("Series : ${series.seriesName} [${series.imdbId.toImdbLink()}]")
-            .addInfoLine("Episode : ${series.episodeName} [${series.quality}]")
+            .addInfoLine("Episode : ${series.seasonAndEpisodeNumber} - ${series.episodeName} [${series.quality}]")
             .addInfoLine("Series requested by : ${series.requester}")
             .addInfoLine("Source : ${series.downloadClient} (${series.indexer})")
             .buildNotification()

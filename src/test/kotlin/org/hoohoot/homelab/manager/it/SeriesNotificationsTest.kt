@@ -166,9 +166,9 @@ internal class SeriesNotificationsTest {
                         """
                             {
                               "msgtype" : "m.text",
-                              "body" : "Episode Downloaded\nSeries : Australian Survivor [https://www.imdb.com/title/tt0310416/]\nEpisode : Episode 6 [WEBDL-720p]\nSeries requested by : flo\nSource : SABnzbd (NZBFinder)",
+                              "body" : "Episode Downloaded\nSeries : Australian Survivor [https://www.imdb.com/title/tt0310416/]\nEpisode : S12E06 - Episode 6 [WEBDL-720p]\nSeries requested by : flo\nSource : SABnzbd (NZBFinder)",
                               "format" : "org.matrix.custom.html",
-                              "formatted_body" : "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>",
+                              "formatted_body" : "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>",
                               "m.relates_to" : null
                             }
                         """.trimIndent()
