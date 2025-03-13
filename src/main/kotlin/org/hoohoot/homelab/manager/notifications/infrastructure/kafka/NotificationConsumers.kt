@@ -21,6 +21,7 @@ class NotificationConsumers(private val mediator: Mediator) {
         return when (payload.getString("notification_type")) {
             "ISSUE_CREATED" -> mediator.send(NotifyIssueCreated(payload))
             "ISSUE_RESOLVED" -> mediator.send(NotifyIssueResolved(payload))
+            "ISSUE_COMMENT" -> mediator.send(NotifyIssueCommented(payload))
             else -> Log.warn("Unhandled jellyseerr type: ${payload.getString("notification_type")}")
         }
     }

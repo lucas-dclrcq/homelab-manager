@@ -11,7 +11,9 @@ data class Issue(
     val reportedByUserName: String,
     val title: String,
     val id: String,
-    val additionalInfo: Map<String, String>
+    val additionalInfo: Map<String, String>,
+    val comment: String?,
+    val commentedBy: String?
 )
 
 class ParseIssue private constructor(private val payload: JsonObject) {
@@ -27,7 +29,9 @@ class ParseIssue private constructor(private val payload: JsonObject) {
                 parseIssue.reportedByUserName(),
                 parseIssue.title(),
                 parseIssue.issueId(),
-                parseIssue.additionalInfo()
+                parseIssue.additionalInfo(),
+                parseIssue.commentMessage(),
+                parseIssue.commentBy()
             )
         }
     }
@@ -48,4 +52,11 @@ class ParseIssue private constructor(private val payload: JsonObject) {
         ?.map { it as JsonObject }
         ?.associate { it.getString("name") to it.getString("value") }
         ?: emptyMap()
+
+    private fun comment(): JsonObject? = payload.getJsonObject("comment")
+
+    private fun commentBy(): String? = this.comment()?.getString("commentedBy_username")
+
+    private fun commentMessage(): String?  = this.comment()?.getString("comment_message")
+
 }
