@@ -12,8 +12,8 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
-import org.hoohoot.homelab.manager.notifications.infrastructure.time.TimeService
+import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
+import org.hoohoot.homelab.manager.infrastructure.time.TimeService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
