@@ -7,18 +7,12 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import jakarta.enterprise.inject.Default
-import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.infrastructure.api.NotificationsResource
-import org.hoohoot.homelab.manager.notifications.infrastructure.time.TimeService
+import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
