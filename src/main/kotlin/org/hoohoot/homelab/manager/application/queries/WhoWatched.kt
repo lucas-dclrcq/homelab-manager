@@ -12,6 +12,8 @@ data class WhoWatched(val tvShow: String) : Query<WhoWatchedInfos>
 data class WhoWatchedInfos(val tvShow: String, val watchersCount: Int, val watchers: List<WatcherInfo>)
 data class WatcherInfo(val username: String, val episodeWatchedCount: Int, val lastEpisodeWatched: String)
 
+data class NoSeriesFoundException(override val message: String) : Exception(message)
+
 @Startup
 @ApplicationScoped
 class WhoWatchedQueryHandler(
@@ -20,6 +22,11 @@ class WhoWatchedQueryHandler(
 ) : QueryHandler<WhoWatched, WhoWatchedInfos> {
     override suspend fun handle(query: WhoWatched): WhoWatchedInfos {
         val media = jellyfinGateway.searchMedia(query.tvShow)
+
+        if (media.isEmpty()) {
+            throw NoSeriesFoundException("No series found for '${query.tvShow}'")
+        }
+
         val itemId = media.first().itemId
         val mediaWatchEvents = jellystatGateway.getMediaWatchEvents(itemId)
 
