@@ -24,13 +24,17 @@ class WhoWatchedCommand(private val mediator: Mediator) : Command() {
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
-        val whoWatched = mediator.send(WhoWatched(parameters))
+        try {
+            val whoWatched = mediator.send(WhoWatched(parameters))
 
-        val body = """
+            val body = """
             ${whoWatched.watchersCount} people watched ${whoWatched.tvShow} :
             ${whoWatched.watchers.joinToString("\n") { "- ${it.username} watched ${it.episodeWatchedCount} episodes (latest: ${it.lastEpisodeWatched})" }}
         """.trimIndent()
 
-        matrixBot.room().sendMessage(roomId) { text(body) }
+            matrixBot.room().sendMessage(roomId) { text(body) }
+        } catch (e: Exception) {
+            matrixBot.room().sendMessage(roomId) {text("An error occurred : ${e.message}")}
+        }
     }
 }
