@@ -37,7 +37,7 @@ class WhoWatchedQueryHandler(
                 WatcherInfo(username, episodeWatchedCount, lastEpisodeWatched.episodeName)
             }
 
-        return WhoWatchedInfos(query.tvShow, watcherCount, watchers)
+        return WhoWatchedInfos(media.first().name, watcherCount, watchers)
     }
 
 }
