@@ -8,11 +8,12 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.Command
-import org.hoohoot.homelab.manager.application.queries.WhoWatchedTvShow
+import org.hoohoot.homelab.manager.application.queries.WhoWatched
+import org.hoohoot.homelab.manager.domain.NotificationBuilder
 
 class WhoWatchedCommand(private val mediator: Mediator) : Command() {
     override val name: String = "who-watched"
-    override val help: String = "Find out who watched last episode of a TV show."
+    override val help: String = "Find out who watched last episode of a TV show. (usage: !johnny who-watched <show name>)"
     override val autoAcknowledge = true
 
     override suspend fun execute(
@@ -23,7 +24,13 @@ class WhoWatchedCommand(private val mediator: Mediator) : Command() {
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
-        val whoWhatchedResult = mediator.send(WhoWatchedTvShow(parameters))
-        matrixBot.room().sendMessage(roomId) { text(whoWhatchedResult.joinToString()) }
+        val whoWatched = mediator.send(WhoWatched(parameters))
+
+        val body = """
+        ${whoWatched.watchersCount} watched ${whoWatched.tvShow} :
+        ${whoWatched.watchers.map { "- ${it.username} watched ${it.episodeWatchedCount} (latest: ${it.lastEpisodeWatched})\n" }}
+        """.trimIndent()
+
+        matrixBot.room().sendMessage(roomId) { text(body) }
     }
 }
