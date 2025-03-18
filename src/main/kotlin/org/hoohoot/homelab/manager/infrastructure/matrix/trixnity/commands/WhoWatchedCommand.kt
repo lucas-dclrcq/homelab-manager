@@ -27,8 +27,8 @@ class WhoWatchedCommand(private val mediator: Mediator) : Command() {
         val whoWatched = mediator.send(WhoWatched(parameters))
 
         val body = """
-        ${whoWatched.watchersCount} watched ${whoWatched.tvShow} :
-        ${whoWatched.watchers.map { "- ${it.username} watched ${it.episodeWatchedCount} (latest: ${it.lastEpisodeWatched})\n" }}
+            ${whoWatched.watchersCount} people watched ${whoWatched.tvShow} :
+            ${whoWatched.watchers.joinToString("\n") { "- ${it.username} watched ${it.episodeWatchedCount} episodes (latest: ${it.lastEpisodeWatched})" }}
         """.trimIndent()
 
         matrixBot.room().sendMessage(roomId) { text(body) }
