@@ -72,7 +72,7 @@ internal class GetTopWatchedTest {
                     )
             )
 
-        wireMockServer!!
+        wireMockServer
             .stubFor(
                 WireMock.post(WireMock.urlPathMatching("/stats/getMostPopularByType")).withRequestBody(equalToJson("""
                     {
@@ -105,20 +105,97 @@ internal class GetTopWatchedTest {
                     )
             )
 
+        wireMockServer
+            .stubFor(
+                WireMock.post(WireMock.urlPathMatching("/stats/getMostViewedByType")).withRequestBody(equalToJson("""
+                    {
+                      "days": "$days",
+                      "type": "Series"
+                    }
+                """.trimIndent(), true, true))
+                    .willReturn(WireMock.aResponse().withStatus(200)
+                        .withBody("""
+                              [
+                                {
+                                  "Plays": "249",
+                                  "total_playback_duration": "282139",
+                                  "Name": "Malcolm",
+                                  "Id": "975785a867ee3eff1b1e2219a6a15b84",
+                                  "PrimaryImageHash": "dtQcC*%M?^?voxV@xvtS-:j?M|og?HkCbbt7OsWCwvt7",
+                                  "archived": false
+                                },
+                                {
+                                  "Plays": "110",
+                                  "total_playback_duration": "31821",
+                                  "Name": "Simon",
+                                  "Id": "e8e82cef90a1bb4867269cd68e16b8f7",
+                                  "PrimaryImageHash": "dJStExtEmx]Ouj?WER:19S5t8R:wjbt4t1jujsnza#",
+                                  "archived": false
+                                }
+                              ]
+                        """.trimIndent())
+                        .withHeader("Content-Type", "application/json")
+                    )
+            )
+
+        wireMockServer
+            .stubFor(
+                WireMock.post(WireMock.urlPathMatching("/stats/getMostViewedByType")).withRequestBody(equalToJson("""
+                    {
+                      "days": "$days",
+                      "type": "Movie"
+                    }
+                """.trimIndent(), true, true))
+                    .willReturn(WireMock.aResponse().withStatus(200)
+                        .withBody("""
+                              [
+                                {
+                                  "Plays": "6",
+                                  "total_playback_duration": "24236",
+                                  "Name": "Vaiana 2",
+                                  "Id": "46f3c145ed1c8b56c8c4b83a706d982c",
+                                  "PrimaryImageHash": "dPEou}XTo~%hTn2ngV[0j%3RPV[tmtSt6oyrBRjxsM{",
+                                  "archived": false
+                                },
+                                {
+                                  "Plays": "5",
+                                  "total_playback_duration": "6345",
+                                  "Name": "Oscar",
+                                  "Id": "5e932ef1600b0bf031e57b20bef899ef",
+                                  "PrimaryImageHash": "ddQ05R^+_N?u~qo3NGx]t7IoayxCs-t7%NWB%gtRM|kD",
+                                  "archived": false
+                                }
+                              ]
+                        """.trimIndent())
+                        .withHeader("Content-Type", "application/json")
+                    )
+            )
+
         RestAssured.given()
-            .queryParam("searchTerm", "Severance")
             .`when`().get("/top-watched/$apiParameter")
             .then().statusCode(Response.Status.OK.statusCode)
             .body("period", equalTo(period))
-            .body("series[0].name", equalTo("Severance"))
-            .body("series[0].viewers", equalTo(7))
-            .body("series[1].name", equalTo("Bref"))
-            .body("series[1].viewers", equalTo(5))
-            .body("series[2].name", equalTo("The White Lotus"))
-            .body("series[2].viewers", equalTo(3))
-            .body("movies[0].name", equalTo("Le Seigneur des anneaux : La Communauté de l'anneau"))
-            .body("movies[0].viewers", equalTo(7))
-            .body("movies[1].name", equalTo("Le Comte de Monte-Cristo"))
-            .body("movies[1].viewers", equalTo(5))
+            .body("mostPopularSeries[0].name", equalTo("Severance"))
+            .body("mostPopularSeries[0].uniqueViewers", equalTo(7))
+            .body("mostPopularSeries[1].name", equalTo("Bref"))
+            .body("mostPopularSeries[1].uniqueViewers", equalTo(5))
+            .body("mostPopularSeries[2].name", equalTo("The White Lotus"))
+            .body("mostPopularSeries[2].uniqueViewers", equalTo(3))
+            .body("mostPopularMovies[0].name", equalTo("Le Seigneur des anneaux : La Communauté de l'anneau"))
+            .body("mostPopularMovies[0].uniqueViewers", equalTo(7))
+            .body("mostPopularMovies[1].name", equalTo("Le Comte de Monte-Cristo"))
+            .body("mostPopularMovies[1].uniqueViewers", equalTo(5))
+            .body("mostViewedSeries[0].name", equalTo("Malcolm"))
+            .body("mostViewedSeries[0].plays", equalTo(249))
+            .body("mostViewedSeries[0].totalPlaybackInHours", equalTo("78h"))
+            .body("mostViewedSeries[1].name", equalTo("Simon"))
+            .body("mostViewedSeries[1].plays", equalTo(110))
+            .body("mostViewedSeries[1].totalPlaybackInHours", equalTo("9h"))
+            .body("mostViewedMovies[0].name", equalTo("Vaiana 2"))
+            .body("mostViewedMovies[0].plays", equalTo(6))
+            .body("mostViewedMovies[0].totalPlaybackInHours", equalTo("7h"))
+            .body("mostViewedMovies[1].name", equalTo("Oscar"))
+            .body("mostViewedMovies[1].plays", equalTo(5))
+            .body("mostViewedMovies[1].totalPlaybackInHours", equalTo("2h"))
     }
 }

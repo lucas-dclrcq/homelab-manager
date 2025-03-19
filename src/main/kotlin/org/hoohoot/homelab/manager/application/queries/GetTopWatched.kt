@@ -6,6 +6,7 @@ import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.JellystatGateway
 import org.hoohoot.homelab.manager.application.ports.JellystatMediaType
+import kotlin.time.DurationUnit
 
 enum class TopWatchedPeriod(val days: Int) {
     LastWeek(7),
@@ -13,9 +14,16 @@ enum class TopWatchedPeriod(val days: Int) {
     LastYear(365)
 }
 
-data class TopWatched(val period: TopWatchedPeriod, val series: List<TopWatchedMedia>, val movies: List<TopWatchedMedia>)
+data class TopWatched(
+    val period: TopWatchedPeriod,
+    val mostPopularSeries: List<MostPopularMedia>,
+    val mostPopularMovies: List<MostPopularMedia>,
+    val mostViewedSeries: List<MostViewedMedia>,
+    val mostViewedMovies: List<MostViewedMedia>
+)
 
-data class TopWatchedMedia(val name: String, val viewers: Int)
+data class MostPopularMedia(val name: String, val uniqueViewers: Int)
+data class MostViewedMedia(val name: String, val plays: Int, val totalPlaybackInHours: String)
 
 data class GetTopWatched(val period: TopWatchedPeriod) : Query<TopWatched>
 
@@ -24,16 +32,26 @@ data class GetTopWatched(val period: TopWatchedPeriod) : Query<TopWatched>
 class GetTopWatchedQueryHandler(private val jellystatGateway: JellystatGateway) :
     QueryHandler<GetTopWatched, TopWatched> {
     override suspend fun handle(query: GetTopWatched): TopWatched {
-        val mostWatchedSeries = this.jellystatGateway
+        val mostPopularSeries = this.jellystatGateway
             .getMostPopularByType(query.period.days, JellystatMediaType.Series)
-            .map { TopWatchedMedia(it.name, it.uniqueViewers) }
-            .sortedByDescending { it.viewers }
+            .map { MostPopularMedia(it.name, it.uniqueViewers) }
+            .sortedByDescending { it.uniqueViewers }
 
-        val mostWatchedMovies = this.jellystatGateway
+        val mostPopularMovies = this.jellystatGateway
             .getMostPopularByType(query.period.days, JellystatMediaType.Movie)
-            .map { TopWatchedMedia(it.name, it.uniqueViewers) }
-            .sortedByDescending { it.viewers }
+            .map { MostPopularMedia(it.name, it.uniqueViewers) }
+            .sortedByDescending { it.uniqueViewers }
 
-        return TopWatched(query.period, mostWatchedSeries, mostWatchedMovies)
+        val mostViewedSeries = this.jellystatGateway
+            .getMostViewedByType(query.period.days, JellystatMediaType.Series)
+            .map { MostViewedMedia(it.name, it.plays, it.totalPlayback.toString(DurationUnit.HOURS)) }
+            .sortedByDescending { it.plays }
+
+        val mostViewedMovies = this.jellystatGateway
+            .getMostViewedByType(query.period.days, JellystatMediaType.Movie)
+            .map { MostViewedMedia(it.name, it.plays, it.totalPlayback.toString(DurationUnit.HOURS)) }
+            .sortedByDescending { it.plays }
+
+        return TopWatched(query.period, mostPopularSeries, mostPopularMovies, mostViewedSeries, mostViewedMovies)
     }
 }

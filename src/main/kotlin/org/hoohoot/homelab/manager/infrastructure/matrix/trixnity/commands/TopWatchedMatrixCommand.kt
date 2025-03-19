@@ -36,13 +36,21 @@ class TopWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixComman
 
         val message = """
                 <h1>Top watch for ${topWatched.period}</h1>
-                <h2>Top watched series : </h2>
+                <h2>Most popular series : </h2>
                 <ol>
-                    ${topWatched.series.joinToString("\n") { "<li>${it.name} - ${it.viewers} viewers</li>" }}
+                    ${topWatched.mostPopularSeries.joinToString("\n") { "<li>${it.name} - ${it.uniqueViewers} unique viewers</li>" }}
                 </ol>
-                <h2>Top watched movies : </h2>
+                <h2>Most popular movies : </h2>
                 <ol>
-                    ${topWatched.movies.joinToString("\n") { "<li>${it.name} - ${it.viewers} viewers</li>" }}
+                    ${topWatched.mostPopularMovies.joinToString("\n") { "<li>${it.name} - ${it.uniqueViewers} unique viewers</li>" }}
+                </ol>
+                <h2>Most watched series : </h2>
+                <ol>
+                    ${topWatched.mostViewedSeries.joinToString("\n") { "<li>${it.name} - ${it.plays} plays (${it.totalPlaybackInHours})</li>" }}
+                </ol>
+                <h2>Most watched movies : </h2>
+                <ol>
+                    ${topWatched.mostViewedMovies.joinToString("\n") { "<li>${it.name} - ${it.plays} plays (${it.totalPlaybackInHours})</li>" }}
                 </ol>
             """.trimIndent()
 

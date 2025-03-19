@@ -20,6 +20,10 @@ interface JellystatRestClient {
     suspend fun getMostPopularByType(@RequestBody request: StatisticsRequest): List<PopularMediaStatistics>
 
     @POST
+    @Path("/stats/getMostViewedByType")
+    suspend fun getMostViewedByType(@RequestBody request: StatisticsRequest): List<PlayMediaStatistics>
+
+    @POST
     @Path("/api/getItemHistory")
     suspend fun getItemHistory(@RequestBody request: ItemIdRequest, @QueryParam("page") page: Long, @QueryParam("size") size: Long): ItemHistoryResponse
 }
@@ -45,4 +49,24 @@ data class ItemHistoryResult(
     val seasonNumber: Long? = null,
     @field:JsonProperty("FullName")
     val fullName: String? = null,
+)
+
+data class PlayMediaStatistics(
+    @field:JsonProperty("Plays")
+    val plays: String? = null,
+
+    @field:JsonProperty("total_playback_duration")
+    val totalPlaybackDuration: String? = null,
+
+    @field:JsonProperty("Name")
+    val name: String? = null,
+
+    @field:JsonProperty("Id")
+    val id: String? = null,
+
+    @field:JsonProperty("PrimaryImageHash")
+    val primaryImageHash: String? = null,
+
+    @field:JsonProperty("archived")
+    val archived: Boolean? = null
 )
