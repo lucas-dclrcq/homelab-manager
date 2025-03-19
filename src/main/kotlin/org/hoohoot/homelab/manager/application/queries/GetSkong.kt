@@ -25,11 +25,11 @@ class GetSkongQueryHandler : QueryHandler<GetSkong, SkongResponse> {
         val daysSince = skongOrigin.daysUntil(currentDate.date)
 
         when (query.type) {
-            SkongType.Believer -> {
-                "It's been <b>$daysSince days</b>, and there is still no release date. Face it, <i>Silksong</i> is never coming out. Team Cherry is just a myth."
-            }
             SkongType.Doubter -> {
-                "Patience, my child. <i>Silksong</i> will come when it is ready. The longer the wait, the greater the masterpiece!"
+                """🔴 It's been $daysSince days, and there is still no release date. Face it, Silksong is never coming out. Team Cherry is just a myth."""
+            }
+            SkongType.Believer -> {
+                """🟢 Patience, my child. Silksong will come when it is ready. The longer the wait, the greater the masterpiece!"""
             }
         }.let { return SkongResponse(it) }
     }
