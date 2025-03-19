@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.infrastructure.api.resources
 
 import com.trendyol.kediatr.Mediator
+import jakarta.validation.constraints.NotBlank
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
@@ -18,6 +19,6 @@ import org.hoohoot.homelab.manager.application.queries.WhoWatchedInfos
 class MediaInfoResource(private val mediator: Mediator) {
     @GET
     @Path("/who-watched")
-    suspend fun whoWatched(@QueryParam("searchTerm") searchTerm: String): WhoWatchedInfos =
+    suspend fun whoWatched(@QueryParam("searchTerm") @NotBlank searchTerm: String): WhoWatchedInfos =
         this.mediator.send(WhoWatched(searchTerm))
 }

@@ -22,7 +22,6 @@ import org.fuchss.matrix.bots.helper.handleCommand
 import org.fuchss.matrix.bots.helper.handleEncryptedCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.PingCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.WhoWatchedCommand
-import java.io.File
 
 @ApplicationScoped
 class MatrixBotStartup(private val config: MatrixBotConfiguration, private val mediator: Mediator) {

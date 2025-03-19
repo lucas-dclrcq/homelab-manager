@@ -7,7 +7,7 @@ import org.hoohoot.homelab.manager.application.ports.MediaSearchResult
 
 @ApplicationScoped
 class RestJellyfinGateway(@RestClient private val jellyfinRestClient: JellyfinRestClient) : JellyfinGateway {
-    override suspend fun searchMedia(searchTerm: String): List<MediaSearchResult> {
+    override suspend fun searchSeries(searchTerm: String): List<MediaSearchResult> {
         return this.jellyfinRestClient.getSearchHintResult(searchTerm, "Series")
             .searchHints
             ?.map { MediaSearchResult(it.itemId ?: "", it.name ?: "", it.type ?: "") }

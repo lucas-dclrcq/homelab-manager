@@ -122,6 +122,10 @@
             <artifactId>matrix-bot-base</artifactId>
             <version>0.14.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
