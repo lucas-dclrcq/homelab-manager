@@ -11,10 +11,10 @@ import org.hoohoot.homelab.manager.application.ports.WatchEvent
 @ApplicationScoped
 class RestJellystatGateway(@RestClient private val jellystatRestClient: JellystatRestClient) : JellystatGateway {
     override suspend fun getMostPopularByType(
-        numberOfDays: Int,
+        lastNumberOfDays: Int,
         type: JellystatMediaType
     ): List<UniqueViewerStatistics> =
-        jellystatRestClient.getMostPopularByType(StatisticsRequest(numberOfDays.toString(), type.name))
+        jellystatRestClient.getMostPopularByType(StatisticsRequest(lastNumberOfDays.toString(), type.name))
             .map { UniqueViewerStatistics(it.uniqueViewers?.toInt() ?: 0, it.name ?: "unknown") }
 
     override suspend fun getMediaWatchEvents(itemId: String): List<WatchEvent> {

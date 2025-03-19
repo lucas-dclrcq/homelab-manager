@@ -1,0 +1,124 @@
+package org.hoohoot.homelab.manager.it
+
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import io.quarkus.test.common.QuarkusTestResource
+import io.quarkus.test.common.http.TestHTTPEndpoint
+import io.quarkus.test.junit.QuarkusTest
+import io.restassured.RestAssured
+import jakarta.ws.rs.core.Response
+import org.hamcrest.Matchers.equalTo
+import org.hoohoot.homelab.manager.infrastructure.api.resources.MediaInfoResource
+import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.hoohoot.homelab.manager.it.config.WiremockTestResource
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
+
+@QuarkusTest
+@TestHTTPEndpoint(MediaInfoResource::class)
+@QuarkusTestResource(WiremockTestResource::class)
+internal class GetTopWatchedTest {
+    @InjectWireMock
+    private val wireMockServer: WireMockServer? = null
+
+    @BeforeEach
+    fun setup() {
+        wireMockServer!!.resetAll()
+    }
+
+    @ParameterizedTest
+    @CsvSource("7,last-week,LastWeek", "30,last-month,LastMonth", "365,last-year,LastYear")
+    fun `should return last week top watched`(days: String, apiParameter: String, period: String) {
+        wireMockServer!!
+            .stubFor(
+                WireMock.post(WireMock.urlPathMatching("/stats/getMostPopularByType")).withRequestBody(equalToJson("""
+                    {
+                      "days": "$days",
+                      "type": "Series"
+                    }
+                """.trimIndent(), true, true))
+                    .willReturn(WireMock.aResponse().withStatus(200)
+                        .withBody("""
+                              [
+                                {
+                                  "unique_viewers": "3",
+                                  "latest_activity_date": "2025-03-03T16:33:24.711Z",
+                                  "Name": "The White Lotus",
+                                  "Id": "7cbf7d33855704b4991d90450c382f4d",
+                                  "PrimaryImageHash": "dON,bV~n9G_1Kj9HD%NG.PNHIVV[ix-.oLxa9GV[njoe",
+                                  "archived": false
+                                },
+                                {
+                                  "unique_viewers": "7",
+                                  "latest_activity_date": "2025-03-02T20:58:18.585Z",
+                                  "Name": "Severance",
+                                  "Id": "2476d555ebfd0ac55ecb878839b0b4a4",
+                                  "PrimaryImageHash": "drIh?H%NIVM{~qt7x[xa-;ofj@t7bbV@RjofWBIUj[xu",
+                                  "archived": false
+                                },
+                                {
+                                  "unique_viewers": "5",
+                                  "latest_activity_date": "2025-02-27T21:12:01.538Z",
+                                  "Name": "Bref",
+                                  "Id": "cea25dbf13fb88bd598e5e42330b9016",
+                                  "PrimaryImageHash": "d64o1d-;IUIUt7ofRjWB00D%%M%MD%Rjxut7_3%MM{IU",
+                                  "archived": false
+                                }
+                              ]
+                        """.trimIndent())
+                        .withHeader("Content-Type", "application/json")
+                    )
+            )
+
+        wireMockServer!!
+            .stubFor(
+                WireMock.post(WireMock.urlPathMatching("/stats/getMostPopularByType")).withRequestBody(equalToJson("""
+                    {
+                      "days": "$days",
+                      "type": "Movie"
+                    }
+                """.trimIndent(), true, true))
+                    .willReturn(WireMock.aResponse().withStatus(200)
+                        .withBody("""
+                              [
+                                  {
+                                    "unique_viewers": "5",
+                                    "latest_activity_date": "2025-02-03T21:01:47.338Z",
+                                    "Name": "Le Comte de Monte-Cristo",
+                                    "Id": "4314efd1ef4667cd3dc892818f765d12",
+                                    "PrimaryImageHash": "dB8WmZ%057fk?Gs:IpR+0gR,xtNG57WW-oWB${'$'}~j?xa%1",
+                                    "archived": false
+                                  },
+                                  {
+                                    "unique_viewers": "7",
+                                    "latest_activity_date": "2025-03-16T14:47:17.533Z",
+                                    "Name": "Le Seigneur des anneaux : La Communauté de l'anneau",
+                                    "Id": "77df8e301917d0f056668007052d28a6",
+                                    "PrimaryImageHash": "dLGk:caK%2?F8|M{M|Rj58t7IVW=t5x[WXj?02Rjf8V@",
+                                    "archived": false
+                                  }
+                              ]
+                        """.trimIndent())
+                        .withHeader("Content-Type", "application/json")
+                    )
+            )
+
+        RestAssured.given()
+            .queryParam("searchTerm", "Severance")
+            .`when`().get("/top-watched/$apiParameter")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .body("period", equalTo(period))
+            .body("series[0].name", equalTo("Severance"))
+            .body("series[0].viewers", equalTo(7))
+            .body("series[1].name", equalTo("Bref"))
+            .body("series[1].viewers", equalTo(5))
+            .body("series[2].name", equalTo("The White Lotus"))
+            .body("series[2].viewers", equalTo(3))
+            .body("movies[0].name", equalTo("Le Seigneur des anneaux : La Communauté de l'anneau"))
+            .body("movies[0].viewers", equalTo(7))
+            .body("movies[1].name", equalTo("Le Comte de Monte-Cristo"))
+            .body("movies[1].viewers", equalTo(5))
+    }
+}

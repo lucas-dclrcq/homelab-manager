@@ -20,8 +20,9 @@ import org.fuchss.matrix.bots.helper.createMediaStore
 import org.fuchss.matrix.bots.helper.createRepositoriesModule
 import org.fuchss.matrix.bots.helper.handleCommand
 import org.fuchss.matrix.bots.helper.handleEncryptedCommand
-import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.PingCommand
-import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.WhoWatchedCommand
+import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.PingMatrixCommand
+import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.TopWatchedMatrixCommand
+import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.WhoWatchedMatrixCommand
 
 @ApplicationScoped
 class MatrixBotStartup(private val config: MatrixBotConfiguration, private val mediator: Mediator) {
@@ -34,9 +35,10 @@ class MatrixBotStartup(private val config: MatrixBotConfiguration, private val m
             Log.info("Starting Matrix bot...")
             val config = TrixnityConfig.from(config)
 
-            val ping = PingCommand(mediator)
-            val whoWatched = WhoWatchedCommand(mediator)
-            val help = HelpCommand(config, "Johnny Bot") { listOf(ping, whoWatched) }
+            val ping = PingMatrixCommand(mediator)
+            val whoWatched = WhoWatchedMatrixCommand(mediator)
+            val topWatched = TopWatchedMatrixCommand(mediator)
+            val help = HelpCommand(config, "Johnny Bot") { listOf(ping, whoWatched, topWatched) }
 
             val commands = listOf(help, ping, whoWatched)
 

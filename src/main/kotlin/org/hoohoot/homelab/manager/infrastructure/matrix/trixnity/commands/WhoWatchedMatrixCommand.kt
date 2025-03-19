@@ -7,16 +7,15 @@ import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
-import org.fuchss.matrix.bots.command.Command
 import org.hoohoot.homelab.manager.application.queries.WhoWatched
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
 
-class WhoWatchedCommand(private val mediator: Mediator) : Command() {
+class WhoWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
     override val name: String = "who-watched"
-    override val help: String = "Find out who watched last episode of a TV show. (usage: !johnny who-watched <show name>)"
+    override val help: String =
+        "Find out who watched last episode of a TV show. (usage: !johnny who-watched <show name>)"
     override val autoAcknowledge = true
 
-    override suspend fun execute(
+    override suspend fun executeCatching(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,
@@ -24,17 +23,13 @@ class WhoWatchedCommand(private val mediator: Mediator) : Command() {
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
-        try {
-            val whoWatched = mediator.send(WhoWatched(parameters))
+        val whoWatched = mediator.send(WhoWatched(parameters))
 
-            val body = """
+        val body = """
             ${whoWatched.watchersCount} people watched ${whoWatched.tvShow} :
             ${whoWatched.watchers.joinToString("\n") { "- ${it.username} watched ${it.episodeWatchedCount} episodes (latest: ${it.lastEpisodeWatched})" }}
         """.trimIndent()
 
-            matrixBot.room().sendMessage(roomId) { text(body) }
-        } catch (e: Exception) {
-            matrixBot.room().sendMessage(roomId) {text("An error occurred : ${e.message}")}
-        }
+        matrixBot.room().sendMessage(roomId) { text(body) }
     }
 }

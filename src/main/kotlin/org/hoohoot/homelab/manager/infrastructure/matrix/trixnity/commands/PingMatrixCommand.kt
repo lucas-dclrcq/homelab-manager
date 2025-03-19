@@ -10,7 +10,7 @@ import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.Command
 import org.hoohoot.homelab.manager.application.queries.Ping
 
-class PingCommand(private val mediator: Mediator) : Command() {
+class PingMatrixCommand(private val mediator: Mediator) : Command() {
     override val name: String = "ping"
     override val help: String = "Ensure the bot is working. It will reply with 'Pong!'."
     override val autoAcknowledge = true
