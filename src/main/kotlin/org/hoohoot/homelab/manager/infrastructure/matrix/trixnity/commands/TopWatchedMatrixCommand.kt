@@ -35,20 +35,20 @@ class TopWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixComman
         val topWatched = mediator.send(GetTopWatched(topWatchedPeriod))
 
         val message = """
-                <h1>Top watch for ${topWatched.period}</h1>
-                <h2>Most popular series : </h2>
+                <h1>🥇 Top watch for ${topWatched.period} 🥇</h1>
+                <h2>📺 Most popular series : </h2>
                 <ol>
                     ${topWatched.mostPopularSeries.joinToString("\n") { "<li>${it.name} - ${it.uniqueViewers} unique viewers</li>" }}
                 </ol>
-                <h2>Most popular movies : </h2>
+                <h2>🎬 Most popular movies : </h2>
                 <ol>
                     ${topWatched.mostPopularMovies.joinToString("\n") { "<li>${it.name} - ${it.uniqueViewers} unique viewers</li>" }}
                 </ol>
-                <h2>Most watched series : </h2>
+                <h2>📺 Most watched series : </h2>
                 <ol>
                     ${topWatched.mostViewedSeries.joinToString("\n") { "<li>${it.name} - ${it.plays} plays (${it.totalPlaybackInHours})</li>" }}
                 </ol>
-                <h2>Most watched movies : </h2>
+                <h2>🎬 Most watched movies : </h2>
                 <ol>
                     ${topWatched.mostViewedMovies.joinToString("\n") { "<li>${it.name} - ${it.plays} plays (${it.totalPlaybackInHours})</li>" }}
                 </ol>

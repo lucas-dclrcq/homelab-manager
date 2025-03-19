@@ -28,10 +28,12 @@ class WhoWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixComman
         val whoWatched = mediator.send(WhoWatched(parameters))
 
         val body = """
-            ${whoWatched.watchersCount} people watched ${whoWatched.tvShow} :
-            ${whoWatched.watchers.joinToString("\n") { "- ${it.username} watched ${it.episodeWatchedCount} episodes (latest: ${it.lastEpisodeWatched})" }}
+            <h1>📺 Who watched last episode of ${whoWatched.tvShow} ? (${whoWatched.watchersCount} watchers)</h1>
+            <ul>
+                ${whoWatched.watchers.joinToString("\n") { "<li>${it.username} watched ${it.episodeWatchedCount} episodes (latest: ${it.lastEpisodeWatched})</li>" }}
+            </ul>
         """.trimIndent()
 
-        matrixBot.room().sendMessage(roomId) { text(body) }
+        matrixBot.room().sendMessage(roomId) { text(body, body, "org.matrix.custom.html") }
     }
 }
