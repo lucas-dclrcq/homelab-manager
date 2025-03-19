@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
 
 import com.trendyol.kediatr.Mediator
+import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
@@ -10,6 +11,7 @@ import org.fuchss.matrix.bots.MatrixBot
 import org.hoohoot.homelab.manager.application.queries.GetTopWatched
 import org.hoohoot.homelab.manager.application.queries.TopWatchedPeriod
 
+@ApplicationScoped
 class TopWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
     override val name: String = "top-watched"
     override val help: String = "List the top watched medias for a period. (usage: !johnny top-watched <last-week|last-month|last-year>)"

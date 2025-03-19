@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
 
 import com.trendyol.kediatr.Mediator
+import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
@@ -10,6 +11,7 @@ import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.Command
 import org.hoohoot.homelab.manager.application.queries.Ping
 
+@ApplicationScoped
 class PingMatrixCommand(private val mediator: Mediator) : Command() {
     override val name: String = "ping"
     override val help: String = "Ensure the bot is working. It will reply with 'Pong!'."

@@ -19,8 +19,8 @@ data class TopWatchedMedia(val name: String, val viewers: Int)
 
 data class GetTopWatched(val period: TopWatchedPeriod) : Query<TopWatched>
 
-@ApplicationScoped
 @Startup
+@ApplicationScoped
 class GetTopWatchedQueryHandler(private val jellystatGateway: JellystatGateway) :
     QueryHandler<GetTopWatched, TopWatched> {
     override suspend fun handle(query: GetTopWatched): TopWatched {

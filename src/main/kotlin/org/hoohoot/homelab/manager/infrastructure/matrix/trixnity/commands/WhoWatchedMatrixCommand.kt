@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
 
 import com.trendyol.kediatr.Mediator
+import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
@@ -9,6 +10,7 @@ import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
 import org.hoohoot.homelab.manager.application.queries.WhoWatched
 
+@ApplicationScoped
 class WhoWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
     override val name: String = "who-watched"
     override val help: String =

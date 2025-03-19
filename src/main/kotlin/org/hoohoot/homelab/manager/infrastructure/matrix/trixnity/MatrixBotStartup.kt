@@ -1,6 +1,5 @@
 package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity
 
-import com.trendyol.kediatr.Mediator
 import io.ktor.http.*
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
@@ -25,7 +24,12 @@ import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.TopWa
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.WhoWatchedMatrixCommand
 
 @ApplicationScoped
-class MatrixBotStartup(private val config: MatrixBotConfiguration, private val mediator: Mediator) {
+class MatrixBotStartup(
+    private val config: MatrixBotConfiguration,
+    private val pingMatrixCommand: PingMatrixCommand,
+    private val topWatchedMatrixCommand: TopWatchedMatrixCommand,
+    private val whoWatchedMatrixCommand: WhoWatchedMatrixCommand
+) {
     fun onStart(@Observes event: StartupEvent) = runBlocking {
         if (config.enabled().not()) return@runBlocking
 
@@ -35,12 +39,9 @@ class MatrixBotStartup(private val config: MatrixBotConfiguration, private val m
             Log.info("Starting Matrix bot...")
             val config = TrixnityConfig.from(config)
 
-            val ping = PingMatrixCommand(mediator)
-            val whoWatched = WhoWatchedMatrixCommand(mediator)
-            val topWatched = TopWatchedMatrixCommand(mediator)
-            val help = HelpCommand(config, "Johnny Bot") { listOf(ping, whoWatched, topWatched) }
+            val help = HelpCommand(config, "Johnny Bot") { listOf(pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand) }
 
-            val commands = listOf(help, ping, whoWatched)
+            val commands = listOf(help, pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand)
 
             val matrixClient = getMatrixClient(config)
 
