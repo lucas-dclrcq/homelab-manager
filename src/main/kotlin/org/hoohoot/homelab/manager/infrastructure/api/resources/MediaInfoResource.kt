@@ -34,4 +34,9 @@ class MediaInfoResource(private val mediator: Mediator) {
 
         return this.mediator.send(GetTopWatched(topWatchedPeriod))
     }
+
+    @GET
+    @Path("/top-watchers")
+    suspend fun topWatchers(@QueryParam("limit") limit: Int?): List<UserStatistics> =
+        this.mediator.send(GetTopWatchers(limit ?: 10))
 }

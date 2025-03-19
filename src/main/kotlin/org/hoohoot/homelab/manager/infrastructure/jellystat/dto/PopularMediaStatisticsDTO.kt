@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class PopularMediaStatistics(
+data class PopularMediaStatisticsDTO(
     @JsonProperty("unique_viewers")
     val uniqueViewers: String? = null,
 

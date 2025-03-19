@@ -4,6 +4,7 @@ import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.application.ports.*
+import org.hoohoot.homelab.manager.infrastructure.jellystat.dto.ItemIdRequestDTO
 import kotlin.time.Duration
 
 @ApplicationScoped
@@ -33,7 +34,7 @@ override suspend fun getMediaWatchEvents(itemId: String): List<WatchEvent> {
 
     do {
         Log.info("Getting watch events for item $itemId, page $page of $totalPages")
-        val (currentPage, pages, _, _, _, results) = jellystatRestClient.getItemHistory(ItemIdRequest(itemId), page, 50)
+        val (currentPage, pages, _, _, _, results) = jellystatRestClient.getItemHistory(ItemIdRequestDTO(itemId), page, 50)
 
         watchEvents.addAll(
             results
@@ -54,4 +55,12 @@ override suspend fun getMediaWatchEvents(itemId: String): List<WatchEvent> {
 
     return watchEvents.toList()
 }
+
+    override suspend fun getAllUserActivity(): List<UserActivity> {
+        return this.jellystatRestClient.getAllUserActivity().map { UserActivity(
+            it.userName ?: "unknown",
+            it.totalPlays?.toInt() ?: 0,
+            it.totalWatchTime.let { duration -> Duration.parse("${duration}s")}
+        ) }
+    }
 }

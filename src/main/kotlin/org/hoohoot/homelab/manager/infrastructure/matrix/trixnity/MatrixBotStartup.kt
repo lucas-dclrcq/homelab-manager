@@ -21,6 +21,7 @@ import org.fuchss.matrix.bots.helper.handleCommand
 import org.fuchss.matrix.bots.helper.handleEncryptedCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.PingMatrixCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.TopWatchedMatrixCommand
+import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.TopWatchersMatrixCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands.WhoWatchedMatrixCommand
 
 @ApplicationScoped
@@ -28,7 +29,8 @@ class MatrixBotStartup(
     private val config: MatrixBotConfiguration,
     private val pingMatrixCommand: PingMatrixCommand,
     private val topWatchedMatrixCommand: TopWatchedMatrixCommand,
-    private val whoWatchedMatrixCommand: WhoWatchedMatrixCommand
+    private val whoWatchedMatrixCommand: WhoWatchedMatrixCommand,
+    private val topWatchersMatrixCommand: TopWatchersMatrixCommand,
 ) {
     fun onStart(@Observes event: StartupEvent) = runBlocking {
         if (config.enabled().not()) return@runBlocking
@@ -39,9 +41,9 @@ class MatrixBotStartup(
             Log.info("Starting Matrix bot...")
             val config = TrixnityConfig.from(config)
 
-            val help = HelpCommand(config, "Johnny Bot") { listOf(pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand) }
+            val help = HelpCommand(config, "Johnny Bot") { listOf(pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand) }
 
-            val commands = listOf(help, pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand)
+            val commands = listOf(help, pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand)
 
             val matrixClient = getMatrixClient(config)
 
