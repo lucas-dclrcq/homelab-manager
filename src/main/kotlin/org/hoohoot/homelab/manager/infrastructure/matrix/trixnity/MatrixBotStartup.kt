@@ -28,7 +28,8 @@ class MatrixBotStartup(
     private val topWatchedMatrixCommand: TopWatchedMatrixCommand,
     private val whoWatchedMatrixCommand: WhoWatchedMatrixCommand,
     private val topWatchersMatrixCommand: TopWatchersMatrixCommand,
-    private val skongMatrixCommand: SkongMatrixCommand
+    private val skongMatrixCommand: SkongMatrixCommand,
+    private val gifMatrixCommand: GifMatrixCommand
 ) {
     fun onStart(@Observes event: StartupEvent) = runBlocking {
         if (config.enabled().not()) return@runBlocking
@@ -39,9 +40,9 @@ class MatrixBotStartup(
             Log.info("Starting Matrix bot...")
             val config = TrixnityConfig.from(config)
 
-            val help = HelpCommand(config, "Johnny Bot") { listOf(pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand, skongMatrixCommand) }
+            val help = HelpCommand(config, "Johnny Bot") { listOf(pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand, skongMatrixCommand, gifMatrixCommand) }
 
-            val commands = listOf(help, pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand, skongMatrixCommand)
+            val commands = listOf(help, pingMatrixCommand, whoWatchedMatrixCommand, topWatchedMatrixCommand, topWatchersMatrixCommand, skongMatrixCommand, gifMatrixCommand)
 
             val matrixClient = getMatrixClient(config)
 
