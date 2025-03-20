@@ -1,9 +1,12 @@
 package org.hoohoot.homelab.manager.application.ports
 
-import java.time.ZonedDateTime
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 
-data class Week(val start: ZonedDateTime, val end: ZonedDateTime)
+
+data class Week(val start: Instant, val end: Instant)
 
 interface Calendar {
     fun getCurrentWeek(): Week
+    fun getDaysSince(date: LocalDate): Int
 }

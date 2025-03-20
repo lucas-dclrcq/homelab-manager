@@ -6,16 +6,14 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.infrastructure.api.security.ApiAuthConfiguration
 import org.hoohoot.homelab.manager.application.commands.PublishGenericNotification
-import org.hoohoot.homelab.manager.application.commands.SendMediaStatisticsMonthlyReport
 import org.hoohoot.homelab.manager.application.commands.SendWhatsNextWeeklyReport
 
 @Path("/api/notifications")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
-class NotificationsResource(private val mediator: Mediator, private val apiAuthConfiguration: ApiAuthConfiguration) {
+class NotificationsResource(private val mediator: Mediator) {
     @POST
     @Path("/incoming/{source}")
     suspend fun handleIncomingNotification(@RequestBody notification: JsonObject, @PathParam("source") source: String) =
@@ -24,8 +22,4 @@ class NotificationsResource(private val mediator: Mediator, private val apiAuthC
     @POST
     @Path("/send-whats-next-report")
     suspend fun sendWhatsNextReport() = this.mediator.send(SendWhatsNextWeeklyReport)
-
-    @POST
-    @Path("/send-monthly-top-watched-report")
-    suspend fun sendMonthlyTopWatchedReport() = this.mediator.send(SendMediaStatisticsMonthlyReport)
 }

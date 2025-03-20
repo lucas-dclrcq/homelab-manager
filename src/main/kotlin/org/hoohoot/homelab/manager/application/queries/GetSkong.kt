@@ -4,7 +4,8 @@ import com.trendyol.kediatr.Query
 import com.trendyol.kediatr.QueryHandler
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
-import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
+import org.hoohoot.homelab.manager.application.ports.Calendar
 
 enum class SkongType {
     Believer,
@@ -17,12 +18,11 @@ data class GetSkong(val type: SkongType): Query<SkongResponse>
 
 @Startup
 @ApplicationScoped
-class GetSkongQueryHandler : QueryHandler<GetSkong, SkongResponse> {
+class GetSkongQueryHandler(private val calendar: Calendar) : QueryHandler<GetSkong, SkongResponse> {
     private val skongOrigin = LocalDate.parse("2019-02-14")
 
     override suspend fun handle(query: GetSkong): SkongResponse {
-        val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-        val daysSince = skongOrigin.daysUntil(currentDate.date)
+        val daysSince = this.calendar.getDaysSince(skongOrigin)
 
         when (query.type) {
             SkongType.Doubter -> {

@@ -28,7 +28,7 @@ class SkongMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         val skongType = when (parameters) {
-            "believer" -> SkongType.Believer
+            "believer","beleiver" -> SkongType.Believer
             "doubter" -> SkongType.Doubter
             else -> throw IllegalArgumentException("Unsupported skong: $parameters")
         }

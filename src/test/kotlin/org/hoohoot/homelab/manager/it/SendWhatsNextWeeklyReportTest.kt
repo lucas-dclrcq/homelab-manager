@@ -10,15 +10,15 @@ import io.restassured.http.ContentType
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
+import kotlinx.datetime.Instant
+import kotlinx.datetime.format.DateTimeComponents
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
 import org.hoohoot.homelab.manager.infrastructure.time.TimeService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+
 
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
@@ -289,7 +289,7 @@ class SendWhatsNextWeeklyReportTest {
 
     @Test
     fun `should send whats next report with series for current week`() {
-        this.timeService.setFixedClock(Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse("2023-10-18T12:34:56Z")), ZoneId.systemDefault())
+        this.timeService.setFixedClock(Instant.parse("2023-10-18T12:34:56Z", DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET))
 
         RestAssured.given().contentType(ContentType.JSON)
             .and().header("X-Api-Key", "secureapikey")

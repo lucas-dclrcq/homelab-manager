@@ -1,8 +1,7 @@
 package org.hoohoot.homelab.manager.application.ports.arr.sonarr
 
-import java.time.ZonedDateTime
+import kotlinx.datetime.Instant
 
 interface SonarrGateway {
-    suspend fun getSeriesCalendar(start: ZonedDateTime, end: ZonedDateTime): List<Episode>
+    suspend fun getSeriesCalendar(start: Instant, end: Instant): List<Episode>
 }
-

@@ -1,31 +1,39 @@
 package org.hoohoot.homelab.manager.infrastructure.time
 
 import jakarta.enterprise.context.ApplicationScoped
+import kotlinx.datetime.*
 import org.hoohoot.homelab.manager.application.ports.Calendar
 import org.hoohoot.homelab.manager.application.ports.Week
-import java.time.Clock
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
+import kotlin.time.Duration
+
+
+class FixedClock(private val fixedInstant: Instant): Clock {
+    override fun now(): Instant  = fixedInstant
+}
 
 @ApplicationScoped
 class TimeService : Calendar {
-    private var clock = Clock.systemUTC()
+    private var clock: Clock = Clock.System
 
     override fun getCurrentWeek(): Week {
-        val now = LocalDateTime.now(clock)
-            .with(java.time.DayOfWeek.MONDAY)
-            .toLocalDate()
-            .atStartOfDay(java.time.ZoneOffset.UTC)
+        val now = clock.now().toLocalDateTime(TimeZone.UTC)
+            .date
+            .let { it.minus(it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
+            .atStartOfDayIn(TimeZone.UTC)
 
-        val end = now.plusDays(6)
-            .withHour(23)
-            .withMinute(59)
+        val end = now.plus(Duration.parse("P6D"))
+            .plus(23, DateTimeUnit.HOUR)
+            .plus(59, DateTimeUnit.MINUTE)
 
         return Week(now, end)
     }
 
-    fun setFixedClock(fixedInstant: Instant, zone: ZoneId) {
-        this.clock = Clock.fixed(fixedInstant, zone)
+    override fun getDaysSince(date: LocalDate): Int {
+        val currentDate = clock.now().toLocalDateTime(TimeZone.UTC).date
+        return date.daysUntil(currentDate)
+    }
+
+    fun setFixedClock(fixedInstant: Instant) {
+        this.clock = FixedClock(fixedInstant)
     }
 }
