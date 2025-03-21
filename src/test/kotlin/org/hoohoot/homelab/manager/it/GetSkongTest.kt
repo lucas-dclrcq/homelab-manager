@@ -34,7 +34,7 @@ class GetSkongTest {
         timeService.setFixedClock(Instant.parse("2023-10-18T12:34:56Z"))
 
         RestAssured.given()
-            .`when`().get("/$skongType")
+            .`when`().get("/skong/$skongType")
             .then().statusCode(Response.Status.OK.statusCode)
             .body("message", equalTo(expectedMessage))
     }

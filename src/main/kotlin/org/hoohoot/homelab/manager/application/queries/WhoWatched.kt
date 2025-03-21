@@ -7,6 +7,7 @@ import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.JellyfinGateway
 import org.hoohoot.homelab.manager.application.ports.JellystatGateway
+import org.hoohoot.homelab.manager.application.ports.WatchEvent
 
 data class WhoWatched(val tvShow: String) : Query<WhoWatchedInfos>
 
@@ -35,21 +36,25 @@ class WhoWatchedQueryHandler(
             throw MultipleSeriesFoundException("Multiple series found for '${query.tvShow}' : ${media.joinToString(",") { it.name }}. Please be more specific.")
         }
 
-        val itemId = media.first().itemId
-        val mediaWatchEvents = this.jellystatGateway.getMediaWatchEvents(itemId)
+        val firstFoundMedia = media.first()
 
-        val watcherCount = mediaWatchEvents.map { it.username }.distinct().count()
+        val mediaWatchEvents = this.jellystatGateway.getMediaWatchEvents(firstFoundMedia.itemId)
 
-        val watchers = mediaWatchEvents
-            .groupBy { it.username }
-            .toList()
-            .map { (username, events) ->
-                val episodeWatchedCount = events.distinctBy { it.seasonNumber to it.episodeNumber }.count()
-                val lastEpisodeWatched = events.sortedWith(compareBy({ it.seasonNumber }, { it.episodeNumber })).last()
-
-                WatcherInfo(username, episodeWatchedCount, lastEpisodeWatched.episodeName)
-            }
-
-        return WhoWatchedInfos(media.first().name, watcherCount, watchers)
+        return WhoWatchedInfos(
+            firstFoundMedia.name,
+            mediaWatchEvents.distinctWatcherCount(),
+            mediaWatchEvents.watchersInformations()
+        )
     }
+
+    private fun List<WatchEvent>.distinctWatcherCount() = this.map { it.username }.distinct().count()
+
+    private fun List<WatchEvent>.watchersInformations() = this.groupBy { it.username }
+        .toList()
+        .map { (username, events) ->
+            val episodeWatchedCount = events.distinctBy { it.seasonNumber to it.episodeNumber }.count()
+            val lastEpisodeWatched = events.sortedWith(compareBy({ it.seasonNumber }, { it.episodeNumber })).last()
+
+            WatcherInfo(username, episodeWatchedCount, lastEpisodeWatched.episodeName)
+        }
 }

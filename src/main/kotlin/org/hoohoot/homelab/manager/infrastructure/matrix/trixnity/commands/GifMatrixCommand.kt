@@ -16,6 +16,7 @@ import org.hoohoot.homelab.manager.application.queries.GetGif
 class GifMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
     override val name: String = "gif"
     override val help: String = "Sends a gif relatives to the search term. (usage: !johnny gif <search term>)"
+    override val autoAcknowledge = true
 
     override suspend fun executeCatching(
         matrixBot: MatrixBot,

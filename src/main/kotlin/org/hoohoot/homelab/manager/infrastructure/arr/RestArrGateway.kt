@@ -11,5 +11,7 @@ import org.hoohoot.homelab.manager.application.ports.arr.sonarr.SonarrGateway
 @ApplicationScoped
 class RestArrGateway(@param:RestClient private val sonarrRestClient: SonarrRestClient) : SonarrGateway {
     override suspend fun getSeriesCalendar(start: Instant, end: Instant): List<Episode> =
-        this.sonarrRestClient.getCalendar(start.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET), end.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET), true) ?: emptyList()
+        this.sonarrRestClient
+            .getCalendar(start.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET), end.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET), true)
+            ?: emptyList()
 }

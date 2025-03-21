@@ -6,6 +6,7 @@ import io.vertx.mutiny.ext.web.client.WebClient
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.application.ports.GifGateway
+import org.hoohoot.homelab.manager.application.ports.NoGifFoundException
 import org.hoohoot.homelab.manager.application.queries.Gif
 
 @ApplicationScoped
@@ -15,9 +16,11 @@ class GiphyGifGateway(@RestClient private val restClient: GiphyRestClient, vertx
     override suspend fun searchGif(query: String): Gif {
         val gifResult = this.restClient.search(query)
 
-        val gifUrl = gifResult.data?.first()?.images?.original?.url
-        val height = gifResult.data?.first()?.images?.original?.height?.toInt() ?: 0
-        val width = gifResult.data?.first()?.images?.original?.width?.toInt() ?: 0
+        val originalGif = gifResult.data?.first()?.images?.original ?: throw NoGifFoundException(query)
+
+        val gifUrl = originalGif.url
+        val height = originalGif.height?.toInt() ?: 0
+        val width = originalGif.width?.toInt() ?: 0
 
         return webClient
             .getAbs(gifUrl)
