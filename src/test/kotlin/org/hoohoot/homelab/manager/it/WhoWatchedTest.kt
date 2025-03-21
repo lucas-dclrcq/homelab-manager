@@ -74,8 +74,8 @@ internal class WhoWatchedTest {
                 },
                 {
                   "UserName": "michel",
-                  "EpisodeNumber": 2,
-                  "SeasonNumber": 3,
+                  "EpisodeNumber": 3,
+                  "SeasonNumber": 2,
                   "FullName": "Severance : S2E3 - Hello, Michel"
                 }
               ]
@@ -108,11 +108,16 @@ internal class WhoWatchedTest {
             .then().statusCode(Response.Status.OK.statusCode)
             .body("tvShow", equalTo("Severance"))
             .body("watchersCount", equalTo(2))
-            .body("watchers[0].username", equalTo("jacquesdurand"))
+            .body("watchers[1].username", equalTo("jacquesdurand"))
+            .body("watchers[1].episodeWatchedCount", equalTo(1))
+            .body("watchers[1].lastEpisodeWatched", equalTo("Severance : S2E1 - Hello, Ms. Cobel"))
+            .body("watchers[1].seasonNumber", equalTo(2))
+            .body("watchers[1].episodeNumber", equalTo(1))
+            .body("watchers[0].username", equalTo("michel"))
             .body("watchers[0].episodeWatchedCount", equalTo(1))
-            .body("watchers[0].lastEpisodeWatched", equalTo("Severance : S2E1 - Hello, Ms. Cobel"))
-            .body("watchers[1].username", equalTo("michel"))
-            .body("watchers[1].lastEpisodeWatched", equalTo("Severance : S2E3 - Hello, Michel"))
+            .body("watchers[0].lastEpisodeWatched", equalTo("Severance : S2E3 - Hello, Michel"))
+            .body("watchers[0].seasonNumber", equalTo(2))
+            .body("watchers[0].episodeNumber", equalTo(3))
 
     }
 

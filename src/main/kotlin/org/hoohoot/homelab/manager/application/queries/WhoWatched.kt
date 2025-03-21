@@ -12,7 +12,13 @@ import org.hoohoot.homelab.manager.application.ports.WatchEvent
 data class WhoWatched(val tvShow: String) : Query<WhoWatchedInfos>
 
 data class WhoWatchedInfos(val tvShow: String, val watchersCount: Int, val watchers: List<WatcherInfo>)
-data class WatcherInfo(val username: String, val episodeWatchedCount: Int, val lastEpisodeWatched: String)
+data class WatcherInfo(
+    val username: String,
+    val episodeWatchedCount: Int,
+    val lastEpisodeWatched: String,
+    val seasonNumber: Int,
+    val episodeNumber: Int
+)
 
 data class NoSeriesFoundException(override val message: String) : Exception(message)
 data class MultipleSeriesFoundException(override val message: String) : Exception(message)
@@ -55,6 +61,8 @@ class WhoWatchedQueryHandler(
             val episodeWatchedCount = events.distinctBy { it.seasonNumber to it.episodeNumber }.count()
             val lastEpisodeWatched = events.sortedWith(compareBy({ it.seasonNumber }, { it.episodeNumber })).last()
 
-            WatcherInfo(username, episodeWatchedCount, lastEpisodeWatched.episodeName)
+            WatcherInfo(username, episodeWatchedCount, lastEpisodeWatched.episodeName, lastEpisodeWatched.seasonNumber, lastEpisodeWatched.episodeNumber)
         }
+        .sortedWith(compareBy({ it.seasonNumber }, { it.episodeNumber }))
+        .reversed()
 }
