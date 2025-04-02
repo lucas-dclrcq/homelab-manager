@@ -26,7 +26,7 @@ class GetSkongQueryHandler(private val calendar: Calendar) : QueryHandler<GetSko
 
         when (query.type) {
             SkongType.Doubter -> {
-                """🔴 It's been $daysSince days, and there is still no release date. Face it, Silksong is never coming out. Team Cherry is just a myth."""
+                """🟢 Doubt no more, my child."""
             }
             SkongType.Believer -> {
                 """🟢 Patience, my child. Silksong will come when it is ready. The longer the wait, the greater the masterpiece!"""
