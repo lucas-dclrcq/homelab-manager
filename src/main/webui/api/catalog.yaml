@@ -1,0 +1,238 @@
+---
+openapi: 3.1.0
+info:
+  contact:
+    name: ldclrcq
+  title: Homelab Manager API
+  version: 0.0.1
+tags:
+- name: Notifications
+  description: Notification System
+- name: Media Info
+  description: Informations about the homelab Media Center
+components:
+  schemas:
+    JsonObject:
+      type: array
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          value: {}
+    MostPopularMedia:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        uniqueViewers:
+          type: integer
+          format: int32
+    MostViewedMedia:
+      type: object
+      required:
+      - name
+      - totalPlaybackInHours
+      properties:
+        name:
+          type: string
+        plays:
+          type: integer
+          format: int32
+        totalPlaybackInHours:
+          type: string
+    TopWatched:
+      type: object
+      required:
+      - period
+      - mostPopularSeries
+      - mostPopularMovies
+      - mostViewedSeries
+      - mostViewedMovies
+      properties:
+        period:
+          $ref: "#/components/schemas/TopWatchedPeriod"
+        mostPopularSeries:
+          type: array
+          items:
+            $ref: "#/components/schemas/MostPopularMedia"
+        mostPopularMovies:
+          type: array
+          items:
+            $ref: "#/components/schemas/MostPopularMedia"
+        mostViewedSeries:
+          type: array
+          items:
+            $ref: "#/components/schemas/MostViewedMedia"
+        mostViewedMovies:
+          type: array
+          items:
+            $ref: "#/components/schemas/MostViewedMedia"
+    TopWatchedPeriod:
+      type: string
+      enum:
+      - LastWeek
+      - LastMonth
+      - LastYear
+    Unit:
+      type: object
+    UserStatistics:
+      type: object
+      required:
+      - username
+      - totalPlaybackInHours
+      properties:
+        username:
+          type: string
+        totalPlays:
+          type: integer
+          format: int32
+        totalPlaybackInHours:
+          type: string
+    WatcherInfo:
+      type: object
+      required:
+      - username
+      - lastEpisodeWatched
+      properties:
+        username:
+          type: string
+        episodeWatchedCount:
+          type: integer
+          format: int32
+        lastEpisodeWatched:
+          type: string
+        seasonNumber:
+          type: integer
+          format: int32
+        episodeNumber:
+          type: integer
+          format: int32
+    WhoWatchedInfos:
+      type: object
+      required:
+      - tvShow
+      - watchers
+      properties:
+        tvShow:
+          type: string
+        watchersCount:
+          type: integer
+          format: int32
+        watchers:
+          type: array
+          items:
+            $ref: "#/components/schemas/WatcherInfo"
+paths:
+  /api/media-info/top-watched/{period}:
+    get:
+      summary: Find out what's been watched the most in the last period
+      tags:
+      - Media Info
+      parameters:
+      - description: The period to look back in
+        example: last-week
+        name: period
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: \S
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopWatched"
+  /api/media-info/top-watchers:
+    get:
+      summary: Find out who's watching the most
+      tags:
+      - Media Info
+      parameters:
+      - description: The maximum number of watchers to return
+        example: 10
+        required: false
+        name: limit
+        in: query
+        schema:
+          type:
+          - integer
+          - "null"
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserStatistics"
+  /api/media-info/who-watched:
+    get:
+      summary: Find out who watched a tv show
+      tags:
+      - Media Info
+      parameters:
+      - description: The term you want to find watched information for
+        example: Breaking Bad
+        name: searchTerm
+        in: query
+        schema:
+          type: string
+          pattern: \S
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhoWatchedInfos"
+  /api/notifications/incoming/{source}:
+    post:
+      tags:
+      - Notifications
+      parameters:
+      - name: source
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonObject"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unit"
+        "400":
+          description: Bad Request
+      summary: Handle Incoming Notification
+  /api/notifications/send-whats-next-report:
+    post:
+      tags:
+      - Notifications
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unit"
+      summary: Send Whats Next Report
+servers:
+- url: http://localhost:8088
+  description: Auto generated value
+- url: http://0.0.0.0:8088
+  description: Auto generated value

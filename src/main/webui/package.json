@@ -4,18 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "dev": "orval --config ./orval.config.ts && vite",
+    "build": "orval --config ./orval.config.ts && vue-tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "axios": "^1.9.0",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.2",
     "@vue/tsconfig": "^0.7.0",
+    "orval": "^7.8.0",
     "typescript": "~5.7.2",
     "vite": "^6.3.1",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^2.2.8",
+    "prettier": "^3.5.3"
   }
 }
