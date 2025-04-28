@@ -5,7 +5,6 @@ import com.trendyol.kediatr.QueryHandler
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.JellystatGateway
-import org.hoohoot.homelab.manager.application.ports.JellystatMediaType
 import kotlin.time.DurationUnit
 
 data class UserStatistics(val username: String, val totalPlays: Int, val totalPlaybackInHours: String)

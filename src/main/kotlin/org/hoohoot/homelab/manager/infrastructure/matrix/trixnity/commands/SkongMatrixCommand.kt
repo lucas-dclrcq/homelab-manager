@@ -8,9 +8,7 @@ import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
-import org.fuchss.matrix.bots.command.Command
 import org.hoohoot.homelab.manager.application.queries.GetSkong
-import org.hoohoot.homelab.manager.application.queries.Ping
 import org.hoohoot.homelab.manager.application.queries.SkongType
 
 @ApplicationScoped

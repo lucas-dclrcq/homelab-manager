@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1DB954;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #1ed760;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Spotify Playlist Finder</h1>
+
+    <div class="form-group">
+        <label for="userId">Spotify User ID:</label>
+        <input type="text" id="userId" name="userId" placeholder="Enter Spotify user ID">
+    </div>
+
+    <button id="findPlaylists">Find Playlists</button>
+
+    <div id="error" class="error"></div>
+    <div id="results"></div>
+</div>
+
+<script>
+    document.getElementById('findPlaylists').addEventListener('click', function() {
+        const userId = document.getElementById('userId').value.trim();
+        const errorDiv = document.getElementById('error');
+        const resultsDiv = document.getElementById('results');
+
+        if (!userId) {
+            errorDiv.textContent = 'Please enter a Spotify user ID';
+            return;
+        }
+
+        errorDiv.textContent = '';
+        resultsDiv.innerHTML = '<p>Redirecting to Spotify authentication...</p>';
+
+        // Redirect to our API endpoint which will handle the OAuth flow
+        window.location.href = `/api/playlists/users/${userId}/playlists`;
+    });
+</script>
+</body>
+</html>

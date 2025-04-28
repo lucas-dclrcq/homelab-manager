@@ -1,10 +1,9 @@
 package org.hoohoot.homelab.manager.infrastructure.time
 
-import kotlinx.datetime.*
+import kotlinx.datetime.Instant
 import org.hoohoot.homelab.manager.application.ports.Week
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.time.Duration
 
 class TimeServiceTest {
 

@@ -1,0 +1,56 @@
+{
+  "href": "https://api.spotify.com/v1/users/pierretombal/playlists?offset=0&limit=1&locale=en-US,fr-FR;q%3D0.7,en;q%3D0.3",
+  "limit": 1,
+  "next": "https://api.spotify.com/v1/users/pierretombal/playlists?offset=1&limit=1&locale=en-US,fr-FR;q%3D0.7,en;q%3D0.3",
+  "offset": 0,
+  "previous": null,
+  "total": 18,
+  "items": [
+    {
+      "collaborative": false,
+      "description": "partage ta musique !",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6AwerF5LRpBRjvQcan8UDK"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6AwerF5LRpBRjvQcan8UDK",
+      "id": "6AwerF5LRpBRjvQcan8UDK",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e021aebacc79b33347a31c79afeab67616d00001e0224476e704042a1283548e86aab67616d00001e027bcc78f88610d99eaa8c9b50ab67616d00001e02ca727fc0809fb501506ce413",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e021aebacc79b33347a31c79afeab67616d00001e0224476e704042a1283548e86aab67616d00001e027bcc78f88610d99eaa8c9b50ab67616d00001e02ca727fc0809fb501506ce413",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e021aebacc79b33347a31c79afeab67616d00001e0224476e704042a1283548e86aab67616d00001e027bcc78f88610d99eaa8c9b50ab67616d00001e02ca727fc0809fb501506ce413",
+          "width": 60
+        }
+      ],
+      "name": "Musique à partager",
+      "owner": {
+        "display_name": "Florian Delmoitiez",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/1121548839"
+        },
+        "href": "https://api.spotify.com/v1/users/1121548839",
+        "id": "1121548839",
+        "type": "user",
+        "uri": "spotify:user:1121548839"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAjBgXqSAc8u5z3l1PY696wAp3gsRf",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6AwerF5LRpBRjvQcan8UDK/tracks",
+        "total": 162
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6AwerF5LRpBRjvQcan8UDK"
+    }
+  ]
+}

@@ -8,9 +8,7 @@ import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
-import org.hoohoot.homelab.manager.application.queries.GetTopWatched
 import org.hoohoot.homelab.manager.application.queries.GetTopWatchers
-import org.hoohoot.homelab.manager.application.queries.TopWatchedPeriod
 
 @ApplicationScoped
 class TopWatchersMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {

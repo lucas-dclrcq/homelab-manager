@@ -12,10 +12,10 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
-import org.hoohoot.homelab.manager.it.config.InjectWireMock
-import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
 import org.hoohoot.homelab.manager.infrastructure.time.TimeService
+import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
