@@ -16,7 +16,8 @@ class WiremockTestResource : QuarkusTestResourceLifecycleManager {
             "quarkus.rest-client.matrix-api.url", wireMockServer!!.baseUrl(),
             "quarkus.rest-client.sonarr-api.url", wireMockServer!!.baseUrl(),
             "quarkus.rest-client.jellystat-api.url", wireMockServer!!.baseUrl(),
-            "quarkus.rest-client.jellyfin-api.url", wireMockServer!!.baseUrl()
+            "quarkus.rest-client.jellyfin-api.url", wireMockServer!!.baseUrl(),
+            "quarkus.rest-client.apotify-api.url", wireMockServer!!.baseUrl()
         )
     }
 

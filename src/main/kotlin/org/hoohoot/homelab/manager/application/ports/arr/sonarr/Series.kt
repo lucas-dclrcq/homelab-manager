@@ -1,10 +1,5 @@
 package org.hoohoot.homelab.manager.application.ports.arr.sonarr
 
-import org.hoohoot.homelab.manager.application.ports.arr.sonarr.Image
-import org.hoohoot.homelab.manager.application.ports.arr.sonarr.Language
-import org.hoohoot.homelab.manager.application.ports.arr.sonarr.Rating
-import org.hoohoot.homelab.manager.application.ports.arr.sonarr.Season
-
 data class Series(
     val title: String? = null,
     val sortTitle: String? = null,

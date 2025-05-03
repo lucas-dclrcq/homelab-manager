@@ -5,8 +5,6 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
-import org.hoohoot.homelab.manager.infrastructure.matrix.rest.MatrixMessage
-import org.hoohoot.homelab.manager.infrastructure.matrix.rest.MatrixMessageResponse
 
 @Path("/_matrix/client")
 @RegisterRestClient(configKey = "matrix-api")
