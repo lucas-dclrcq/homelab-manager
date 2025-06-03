@@ -75,7 +75,7 @@ jobs:
         env:
           SHA256: ${{ needs.build.outputs.latest-sha }}
         run: |
-          VERSION="latest@${SHA256}" yq eval '.spec.values.controllers.main.containers.main.image.tag = strenv(VERSION)' \
+          VERSION="latest@${SHA256}" yq eval '.spec.values.controllers.homelab-manager.containers.main.image.tag = strenv(VERSION)' \
             -i gitops-repo/kubernetes/apps/default/homelab-manager/app/helmrelease.yaml
 
       - name: Commit & push new version
