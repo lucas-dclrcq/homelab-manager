@@ -128,6 +128,8 @@ class MatrixBot(
 
     fun self() = matrixClient.userId
 
+    fun isSameUser(userId: UserId) = userId == matrixClient.userId
+
     fun <T : EventContent> subscribeContent(
         clazz: KClass<T>,
         subscriber: Subscriber<ClientEvent<T>>,
