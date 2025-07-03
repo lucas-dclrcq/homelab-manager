@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import com.trendyol.kediatr.Mediator
 import jakarta.enterprise.context.ApplicationScoped
@@ -9,15 +9,16 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.application.queries.WhoWatched
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class WhoWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
+class WhoWatchedMatrixCommand(private val mediator: Mediator) : PrefixedBotCommand() {
     override val name: String = "who-watched"
     override val help: String =
         "Find out who watched last episode of a TV show. (usage: !johnny who-watched <show name>)"
     override val autoAcknowledge = true
 
-    override suspend fun executeCatching(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,

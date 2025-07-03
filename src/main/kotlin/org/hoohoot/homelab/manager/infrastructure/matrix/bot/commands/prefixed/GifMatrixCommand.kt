@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import com.trendyol.kediatr.Mediator
 import io.ktor.http.*
@@ -11,14 +11,15 @@ import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import net.folivo.trixnity.utils.toByteArrayFlow
 import org.hoohoot.homelab.manager.application.queries.GetGif
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class GifMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
+class GifMatrixCommand(private val mediator: Mediator) : PrefixedBotCommand() {
     override val name: String = "gif"
     override val help: String = "Sends a gif relatives to the search term. (usage: !johnny gif <search term>)"
     override val autoAcknowledge = true
 
-    override suspend fun executeCatching(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,

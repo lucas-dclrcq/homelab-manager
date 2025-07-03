@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import com.trendyol.kediatr.Mediator
 import jakarta.enterprise.context.ApplicationScoped
@@ -10,14 +10,15 @@ import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.application.queries.GetTopWatched
 import org.hoohoot.homelab.manager.application.queries.TopWatchedPeriod
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class TopWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
+class TopWatchedMatrixCommand(private val mediator: Mediator) : PrefixedBotCommand() {
     override val name: String = "top-watched"
     override val help: String = "List the top watched medias for a period. (usage: !johnny top-watched <last-week|last-month|last-year>)"
     override val autoAcknowledge = true
 
-    override suspend fun executeCatching(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,

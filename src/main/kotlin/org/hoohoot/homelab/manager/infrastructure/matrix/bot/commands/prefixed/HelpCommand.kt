@@ -1,19 +1,20 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
-import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBotCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBotConfiguration
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.MatrixBotCommand
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.markdown
 
 class HelpCommand(
     private val config: MatrixBotConfiguration,
     private val botName: String,
     private val commandGetter: () -> List<MatrixBotCommand>
-) : MatrixBotCommand() {
+) : PrefixedBotCommand() {
     override val name: String = "help"
     override val help: String = "shows this help message"
 
@@ -26,7 +27,7 @@ class HelpCommand(
      * @param[textEventId] The event of the command.
      * @param[textEvent] The event of the command.
      */
-    override suspend fun execute(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,

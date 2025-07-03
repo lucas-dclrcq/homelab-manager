@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import com.trendyol.kediatr.Mediator
 import jakarta.enterprise.context.ApplicationScoped
@@ -10,14 +10,15 @@ import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.application.queries.GetSkong
 import org.hoohoot.homelab.manager.application.queries.SkongType
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class SkongMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
+class SkongMatrixCommand(private val mediator: Mediator) : PrefixedBotCommand() {
     override val name: String = "skong"
     override val help: String = "Skong! (usage: !johnny skong <believer|doubter>)"
     override val autoAcknowledge = true
 
-    override suspend fun executeCatching(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,

@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.infrastructure.matrix.trixnity.commands
+package org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.prefixed
 
 import com.trendyol.kediatr.Mediator
 import jakarta.enterprise.context.ApplicationScoped
@@ -9,14 +9,15 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.application.queries.GetTopWatchers
 import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class TopWatchersMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {
+class TopWatchersMatrixCommand(private val mediator: Mediator) : PrefixedBotCommand() {
     override val name: String = "top-watchers"
     override val help: String = "List the top 10 watchers on Hoohoot (usage: !johnny top-watchers)"
     override val autoAcknowledge = true
 
-    override suspend fun executeCatching(
+    override suspend fun handle(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,
