@@ -29,12 +29,7 @@ internal class MusicNotificationsTest {
         wireMockServer
             .stubFor(
                 WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                    .willReturn(WireMock.aResponse().withStatus(200).withBody("""
-                        {
-                          "event_id": "${'$'}0xznhNTIjU0kiLDUqxafbzFGrPyYNCWeG9l0UMh1X5c"
-                        }
-                    """.trimIndent()))
-            )
+                    .willReturn(WireMock.aResponse().withStatus(200)))
     }
 
     @Test

@@ -31,13 +31,15 @@ class NotifySeriesDownloadedHandler(private val notificationGateway: Notificatio
             .addInfoLine("Source : ${series.downloadClient} (${series.indexer})")
             .buildNotification()
 
-        val seriesPreviousNotificationId = notificationRepository.getNotificationIdForSeries(seriesId)
+        this.notificationGateway.sendMediaNotification(notification)
 
-        if (seriesPreviousNotificationId != null) {
-            this.notificationGateway.sendMediaNotification(notification, seriesPreviousNotificationId)
-        } else {
-            val notificationId = this.notificationGateway.sendMediaNotification(notification)
-            this.notificationRepository.saveNotificationIdForSeries(seriesId, notificationId)
-        }
+//        val seriesPreviousNotificationId = notificationRepository.getNotificationIdForSeries(seriesId)
+//
+//        if (seriesPreviousNotificationId != null) {
+//            this.notificationGateway.sendMediaNotification(notification, seriesPreviousNotificationId)
+//        } else {
+//            val notificationId = this.notificationGateway.sendMediaNotification(notification)
+//            this.notificationRepository.saveNotificationIdForSeries(seriesId, notificationId)
+//        }
     }
 }

@@ -29,14 +29,14 @@ class GlobalKtableNotificationRepository(
         )
     }
 
-    private val seriesNotificationStore: ReadOnlyKeyValueStore<String, String> by lazy {
-        kafkaStreams.store(
-            StoreQueryParameters.fromNameAndType(
-                SERIES_NOTIFICATIONS_SENT_STORE,
-                QueryableStoreTypes.keyValueStore()
-            )
-        )
-    }
+//    private val seriesNotificationStore: ReadOnlyKeyValueStore<String, String> by lazy {
+//        kafkaStreams.store(
+//            StoreQueryParameters.fromNameAndType(
+//                SERIES_NOTIFICATIONS_SENT_STORE,
+//                QueryableStoreTypes.keyValueStore()
+//            )
+//        )
+//    }
 
     override suspend fun saveNotificationIdForIssue(issueId: String, notification: NotificationId) {
         this.issueNotificationEmitter.send(Record.of(issueId, notification.value))
@@ -50,7 +50,7 @@ class GlobalKtableNotificationRepository(
         this.seriesNotificationEmitter.send(Record.of(seriesId, notification.value))
     }
 
-    override suspend fun getNotificationIdForSeries(seriesId: String): NotificationId? {
-        return this.seriesNotificationStore.get(seriesId)?.let { NotificationId(it) }
-    }
+//    override suspend fun getNotificationIdForSeries(seriesId: String): NotificationId? {
+//        return this.seriesNotificationStore.get(seriesId)?.let { NotificationId(it) }
+//    }
 }

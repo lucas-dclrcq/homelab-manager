@@ -47,10 +47,10 @@ class NotificationsTopology {
                 .withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
         )
 
-        builder.globalTable("series-notifications-sent",
-            Materialized.`as`<String, String, KeyValueStore<Bytes, ByteArray>>(SERIES_NOTIFICATIONS_SENT_STORE)
-                .withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
-        )
+//        builder.globalTable("series-notifications-sent",
+//            Materialized.`as`<String, String, KeyValueStore<Bytes, ByteArray>>(SERIES_NOTIFICATIONS_SENT_STORE)
+//                .withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
+//        )
 
         return builder.build()
     }

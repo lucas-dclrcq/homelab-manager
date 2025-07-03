@@ -6,5 +6,5 @@ interface NotificationRepository {
     suspend fun saveNotificationIdForIssue(issueId: String, notification: NotificationId)
     suspend fun getNotificationIdForIssue(issueId: String): NotificationId?
     suspend fun saveNotificationIdForSeries(seriesId: String, notification: NotificationId)
-    suspend fun getNotificationIdForSeries(seriesId: String): NotificationId?
+//    suspend fun getNotificationIdForSeries(seriesId: String): NotificationId?
 }
