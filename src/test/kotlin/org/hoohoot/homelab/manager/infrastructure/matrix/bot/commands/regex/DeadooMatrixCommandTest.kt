@@ -17,9 +17,15 @@ class DeadooMatrixCommandTest {
         "C'est comment",
         "c'est comment",
         "Et sinon c'est comment ?",
-        "c'est comment sinon ?"
+        "c'est comment sinon ?",
+        "deado",
+        "DEADO",
+        "deeeeeAAAAaaaaDDDdddOOOooo",
+        "dddddeeeeeAAAADDooooDooo",
+        "il est deado",
+        "il est DDdeEEAAadoOOO",
     ])
-    fun `should match for c'est comment`(input: String) {
+    fun `should match for c'est comment or deado`(input: String) {
         assertThat(DeadooMatrixCommand(FakeMediator()).matches(input)).isTrue()
     }
 }
