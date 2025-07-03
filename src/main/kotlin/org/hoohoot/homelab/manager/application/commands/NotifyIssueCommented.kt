@@ -6,16 +6,16 @@ import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.application.ports.notifications.IssueNotificationRepository
+import org.hoohoot.homelab.manager.application.ports.notifications.NotificationRepository
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.ParseIssue
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseIssue
 
 data class NotifyIssueCommented(val webhookPayload: JsonObject) : Command
 
 @Startup
 @ApplicationScoped
-class NotifyIssueCommentedHandler(private val notificationGateway: NotificationGateway, private val issueRepository: IssueNotificationRepository) : CommandHandler<NotifyIssueCommented> {
+class NotifyIssueCommentedHandler(private val notificationGateway: NotificationGateway, private val issueRepository: NotificationRepository) : CommandHandler<NotifyIssueCommented> {
     override suspend fun handle(command: NotifyIssueCommented) {
         val issue = ParseIssue.from(command.webhookPayload)
 

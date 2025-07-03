@@ -2,9 +2,9 @@ package org.hoohoot.homelab.manager.notifications.domain
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.hoohoot.homelab.manager.domain.EmptyNotificationException
-import org.hoohoot.homelab.manager.domain.Notification
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.EmptyNotificationException
+import org.hoohoot.homelab.manager.domain.media_notifications.Notification
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
 import org.junit.jupiter.api.Test
 
 class NotificationBuilderTest {

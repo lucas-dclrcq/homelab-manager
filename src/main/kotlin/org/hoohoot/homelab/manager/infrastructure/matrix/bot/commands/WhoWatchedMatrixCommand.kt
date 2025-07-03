@@ -7,8 +7,8 @@ import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.fuchss.matrix.bots.MatrixBot
 import org.hoohoot.homelab.manager.application.queries.WhoWatched
+import org.hoohoot.homelab.manager.infrastructure.matrix.bot.MatrixBot
 
 @ApplicationScoped
 class WhoWatchedMatrixCommand(private val mediator: Mediator) : BaseMatrixCommand() {

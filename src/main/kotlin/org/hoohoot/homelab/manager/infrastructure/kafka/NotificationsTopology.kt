@@ -14,6 +14,7 @@ import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.state.KeyValueStore
 
 const val ISSUE_NOTIFICATIONS_SENT_STORE = "issue-notifications-sent-store"
+const val SERIES_NOTIFICATIONS_SENT_STORE = "series-notifications-sent-store"
 
 @ApplicationScoped
 class NotificationsTopology {
@@ -43,6 +44,11 @@ class NotificationsTopology {
 
         builder.globalTable("issue-notifications-sent",
             Materialized.`as`<String, String, KeyValueStore<Bytes, ByteArray>>(ISSUE_NOTIFICATIONS_SENT_STORE)
+                .withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
+        )
+
+        builder.globalTable("series-notifications-sent",
+            Materialized.`as`<String, String, KeyValueStore<Bytes, ByteArray>>(SERIES_NOTIFICATIONS_SENT_STORE)
                 .withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
         )
 

@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.domain
+package org.hoohoot.homelab.manager.domain.media_notifications
 
 data class NotificationId(val value: String)
 

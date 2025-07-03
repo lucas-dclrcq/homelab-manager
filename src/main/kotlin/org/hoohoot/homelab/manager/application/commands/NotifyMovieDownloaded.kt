@@ -7,9 +7,9 @@ import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.ParseMovie
-import org.hoohoot.homelab.manager.domain.toImdbLink
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseMovie
+import org.hoohoot.homelab.manager.domain.media_notifications.toImdbLink
 
 data class NotifyMovieDownloaded(val webhookPayload: JsonObject) : Command
 

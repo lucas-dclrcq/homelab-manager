@@ -2,7 +2,7 @@ package org.hoohoot.homelab.manager.notifications.domain
 
 import io.vertx.core.json.JsonObject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.domain.ParseSeries.Companion.from
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseSeries.Companion.from
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource

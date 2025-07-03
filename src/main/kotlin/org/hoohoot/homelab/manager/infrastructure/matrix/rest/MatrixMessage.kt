@@ -1,7 +1,7 @@
 package org.hoohoot.homelab.manager.infrastructure.matrix.rest
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.hoohoot.homelab.manager.domain.NotificationId
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationId
 
 data class MatrixMessage(
     @param:JsonProperty("msgtype") val msgType: String,

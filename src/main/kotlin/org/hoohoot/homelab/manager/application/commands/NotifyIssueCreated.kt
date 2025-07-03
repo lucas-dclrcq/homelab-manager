@@ -6,16 +6,16 @@ import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.application.ports.notifications.IssueNotificationRepository
+import org.hoohoot.homelab.manager.application.ports.notifications.NotificationRepository
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.ParseIssue
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseIssue
 
 data class NotifyIssueCreated(val webhookPayload: JsonObject) : Command
 
 @Startup
 @ApplicationScoped
-class NotifyIssueEventHandler(private val notificationGateway: NotificationGateway, private val issueNotificationRepository: IssueNotificationRepository) : CommandHandler<NotifyIssueCreated> {
+class NotifyIssueEventHandler(private val notificationGateway: NotificationGateway, private val notificationRepository: NotificationRepository) : CommandHandler<NotifyIssueCreated> {
     override suspend fun handle(command: NotifyIssueCreated) {
         val issue = ParseIssue.from(command.webhookPayload)
 
@@ -37,6 +37,6 @@ class NotifyIssueEventHandler(private val notificationGateway: NotificationGatew
 
         val sentNotificationId = this.notificationGateway.sendSupportNotification(notification)
 
-        this.issueNotificationRepository.saveNotificationIdForIssue(issue.id, sentNotificationId)
+        this.notificationRepository.saveNotificationIdForIssue(issue.id, sentNotificationId)
     }
 }

@@ -7,8 +7,8 @@ import io.quarkus.runtime.Startup
 import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.ParseMusic
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseMusic
 
 data class NotifyAlbumDownloaded(val webhookPayload: JsonObject) : Command
 

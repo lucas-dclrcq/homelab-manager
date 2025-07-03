@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.Calendar
 import org.hoohoot.homelab.manager.application.ports.arr.sonarr.SonarrGateway
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
-import org.hoohoot.homelab.manager.domain.NotificationBuilder
+import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
 
 object SendWhatsNextWeeklyReport : Command
 

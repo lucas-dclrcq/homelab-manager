@@ -2,7 +2,7 @@ package org.hoohoot.homelab.manager.notifications.domain
 
 import io.vertx.core.json.JsonObject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.domain.ParseIssue
+import org.hoohoot.homelab.manager.domain.media_notifications.ParseIssue
 import org.junit.jupiter.api.Test
 
 class ParseIssueTest {

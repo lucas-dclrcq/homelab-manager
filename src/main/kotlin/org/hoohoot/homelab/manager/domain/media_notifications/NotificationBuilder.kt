@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.domain
+package org.hoohoot.homelab.manager.domain.media_notifications
 
 class NotificationBuilder {
     private var htmlTitle = ""
