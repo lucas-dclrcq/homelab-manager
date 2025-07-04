@@ -4,91 +4,57 @@ import com.trendyol.kediatr.Query
 import com.trendyol.kediatr.QueryHandler
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
+import kotlin.random.Random
 
 object CestDeado : Query<String>
 
 @Startup
 @ApplicationScoped
 class DeadoQueryHandler : QueryHandler<CestDeado, String> {
-    private val deados = listOf(
-        "DEAAAADOOOO",
-        "DEAAAADOOOO",
-        "DEAAAADOOOO",
-        "DEAAAADOOOO",
-        "DEAAAADOOOO",
-        "Dddddeeeeeaaaddoooo",
-        "Dddddeeeeeaaaddoooo",
-        "Dddddeeeeeaaaddoooo",
-        "Dddddeeeeeaaaddoooo",
-        "Dddddeeeeeaaaddoooo",
-        "Deado",
-        "Deado",
-        "Deado",
-        "Deado",
-        "Deado",
-        "deaaaaado",
-        "deaaaaado",
-        "deaaaaado",
-        "deaaaaado",
-        "deaaaaado",
-        "C'est deaaaaaado",
-        "C'est deaaaaaado",
-        "C'est deaaaaaado",
-        "C'est deaaaaaado",
-        "C'est deado",
-        "C'est deado",
-        "C'est deado",
-        "C'est deado",
-        "IT IS DEEEEAADO",
-        "IT IS DEEEEAADO",
-        "IT IS DEEEEAADO",
-        "IT IS DEEEEAADO",
-        "DEADO !!!",
-        "DEADO !!!",
-        "DEADO !!!",
-        "C'est complètement deado",
-        "C'est complètement deado",
-        "C'est complètement deado",
-        "Totalement deado",
-        "Totalement deado",
-        "Totalement deado",
-        "deado deado deado",
-        "deado deado deado",
-        "deado deado deado",
-        "D-E-A-D-O",
-        "D-E-A-D-O",
-        "D-E-A-D-O",
-        "Deado à mort",
-        "Deado à mort",
-        "Deado à mort",
-        "Super deado",
-        "Super deado",
-        "Super deado",
-        "Méga deado",
-        "Méga deado",
-        "Méga deado",
-        "Ultra deado",
-        "Ultra deado",
-        "Ultra deado",
-        "Deado forever",
-        "Deado forever",
-        "Deado forever",
-        "RIP deado",
-        "RIP deado",
-        "RIP deado",
-        "Archi deado",
-        "Archi deado",
-        "Archi deado",
-        "Deado 💀",
-        "Deado dans l'âme",
-        "DEEEP DEEADOO",
-        "FIYAH DEADO 🔥🔥🔥",
-        "DEADO INNA CHEMINAY",
-        "DEADOCLAAT ❤️💛💚",
-        "BRAINDEADO",
-        "DEADOSAMAAAA (˶˃ ᵕ ˂˶)\uD83D\uDC9E",
-        "ÉLÉMENTAIREMENT DEADO"
+    private val deadosWithWeights = listOf(
+        "DEAAAADOOOO" to 5,
+        "Dddddeeeeeaaaddoooo" to 5,
+        "Deado" to 5,
+        "deaaaaado" to 5,
+        "C'est deaaaaaado" to 4,
+        "C'est deado" to 4,
+        "IT IS DEEEEAADO" to 4,
+        "DEADO !!!" to 3,
+        "C'est complètement deado" to 3,
+        "Totalement deado" to 3,
+        "deado deado deado" to 3,
+        "D-E-A-D-O" to 3,
+        "Deado à mort" to 3,
+        "Super deado" to 3,
+        "Méga deado" to 3,
+        "Ultra deado" to 3,
+        "Deado forever" to 3,
+        "RIP deado" to 3,
+        "Archi deado" to 3,
+        "Deado 💀" to 2,
+        "Deado dans l'âme" to 1,
+        "DEEEP DEEADOO" to 1,
+        "FIYAH DEADO 🔥🔥🔥" to 1,
+        "DEADO INNA CHEMINAY" to 1,
+        "DEADOCLAAT ❤️💛💚" to 1,
+        "BRAINDEADO" to 1,
+        "DEADOSAMAAAA (˶˃ ᵕ ˂˶)💞" to 1,
+        "ÉLÉMENTAIREMENT DEADO" to 1
     )
 
-    override suspend fun handle(query: CestDeado): String = deados.random()
+    private val totalWeight = deadosWithWeights.sumOf { it.second }
+
+    override suspend fun handle(query: CestDeado): String {
+        val randomValue = Random.nextInt(1, totalWeight + 1)
+        var currentWeight = 0
+
+        for ((deado, weight) in deadosWithWeights) {
+            currentWeight += weight
+            if (randomValue <= currentWeight) {
+                return deado
+            }
+        }
+
+        return deadosWithWeights.first().first
+    }
 }
