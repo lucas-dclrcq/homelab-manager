@@ -10,5 +10,5 @@ import org.hoohoot.homelab.manager.infrastructure.matrix.bot.commands.RegexBotCo
 class RegexBotCommands(@All private val commands: MutableList<RegexBotCommand>) {
     fun commands(): List<RegexBotCommand> = commands
 
-    fun find(message: String): RegexBotCommand? = commands.find { it.regex.matches(message) }
+    fun find(message: String): RegexBotCommand? = commands.find { it.regex.containsMatchIn(message) }
 }
