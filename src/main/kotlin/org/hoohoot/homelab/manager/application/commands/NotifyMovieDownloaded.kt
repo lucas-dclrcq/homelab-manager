@@ -4,20 +4,19 @@ import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
 import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
-import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
+import org.hoohoot.homelab.manager.domain.media_notifications.Movie
 import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.media_notifications.ParseMovie
 import org.hoohoot.homelab.manager.domain.media_notifications.toImdbLink
 
-data class NotifyMovieDownloaded(val webhookPayload: JsonObject) : Command
+data class NotifyMovieDownloaded(val movie: Movie) : Command
 
 @Startup
 @ApplicationScoped
 class NotifyMovieDownloadedHandler(private val notificationGateway: NotificationGateway) : CommandHandler<NotifyMovieDownloaded> {
     override suspend fun handle(command: NotifyMovieDownloaded) {
-        val movie = ParseMovie.from(command.webhookPayload)
+        val movie = command.movie
 
         Log.info("Notifying movie downloaded : ${movie.title}")
 
@@ -27,6 +26,6 @@ class NotifyMovieDownloadedHandler(private val notificationGateway: Notification
             .addInfoLine("Requested by : ${movie.requester}")
             .buildNotification()
 
-        this.notificationGateway.sendMediaNotification(notification)
+        notificationGateway.sendMediaNotification(notification)
     }
 }

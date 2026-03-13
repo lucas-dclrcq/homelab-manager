@@ -8,13 +8,11 @@ import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.ws.rs.core.Response
-import org.awaitility.Awaitility
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.concurrent.TimeUnit
 
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
@@ -26,16 +24,19 @@ internal class SupportNotificationsTest {
     @BeforeEach
     fun setup() {
         wireMockServer!!.resetAll()
-        wireMockServer
-            .stubFor(
-                WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                    .willReturn(
-                        WireMock.aResponse()
-                            .withHeader("Content-Type", "application/json")
-                            .withStatus(200)
-                            .withBody("{\"event_id\": \"toto\"}")
-                    )
-            )
+        stubMatrixSendMessage()
+    }
+
+    private fun stubMatrixSendMessage() {
+        wireMockServer!!.stubFor(
+            WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("{\"event_id\": \"toto\"}")
+                )
+        )
     }
 
     @Test
@@ -71,11 +72,8 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -137,11 +135,8 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -195,11 +190,8 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -253,7 +245,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val issueResolved = """
@@ -286,18 +278,13 @@ internal class SupportNotificationsTest {
             }
 """.trimIndent()
 
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
-
         wireMockServer!!.resetAll()
+        stubMatrixSendMessage()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer.serveEvents.requests.isNotEmpty() }
 
         wireMockServer.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -354,7 +341,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val issueResolved = """
@@ -394,18 +381,13 @@ internal class SupportNotificationsTest {
             }
 """.trimIndent()
 
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
-
         wireMockServer!!.resetAll()
+        stubMatrixSendMessage()
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer.serveEvents.requests.isNotEmpty() }
 
         wireMockServer.verify(
             1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
@@ -461,11 +443,8 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/incoming/jellyseerr")
+            .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS)
-            .until { wireMockServer!!.serveEvents.requests.isNotEmpty() }
 
         wireMockServer!!.verify(
             1,

@@ -4,21 +4,19 @@ import com.trendyol.kediatr.Command
 import com.trendyol.kediatr.CommandHandler
 import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
-import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.application.ports.notifications.NotificationRepository
 import org.hoohoot.homelab.manager.application.ports.notifications.NotificationGateway
 import org.hoohoot.homelab.manager.domain.media_notifications.NotificationBuilder
-import org.hoohoot.homelab.manager.domain.media_notifications.ParseSeries
+import org.hoohoot.homelab.manager.domain.media_notifications.Series
 import org.hoohoot.homelab.manager.domain.media_notifications.toImdbLink
 
-data class NotifySeriesDownloaded(val webhookPayload: JsonObject) : Command
+data class NotifySeriesDownloaded(val series: Series) : Command
 
 @Startup
 @ApplicationScoped
-class NotifySeriesDownloadedHandler(private val notificationGateway: NotificationGateway, private val notificationRepository: NotificationRepository) : CommandHandler<NotifySeriesDownloaded> {
+class NotifySeriesDownloadedHandler(private val notificationGateway: NotificationGateway) : CommandHandler<NotifySeriesDownloaded> {
     override suspend fun handle(command: NotifySeriesDownloaded) {
-        val series = ParseSeries.from(command.webhookPayload)
+        val series = command.series
 
         Log.info("Notifying series downloaded : ${series.seriesName}")
 
@@ -31,15 +29,6 @@ class NotifySeriesDownloadedHandler(private val notificationGateway: Notificatio
             .addInfoLine("Source : ${series.downloadClient} (${series.indexer})")
             .buildNotification()
 
-        this.notificationGateway.sendMediaNotification(notification)
-
-//        val seriesPreviousNotificationId = notificationRepository.getNotificationIdForSeries(seriesId)
-//
-//        if (seriesPreviousNotificationId != null) {
-//            this.notificationGateway.sendMediaNotification(notification, seriesPreviousNotificationId)
-//        } else {
-//            val notificationId = this.notificationGateway.sendMediaNotification(notification)
-//            this.notificationRepository.saveNotificationIdForSeries(seriesId, notificationId)
-//        }
+        notificationGateway.sendMediaNotification(notification)
     }
 }

@@ -45,3 +45,6 @@ nb-configuration.xml
 .certs/
 
 src/main/resources/application-dev.properties
+.claude
+docs
+CLAUDE.md
