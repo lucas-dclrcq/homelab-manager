@@ -1,43 +1,26 @@
 package org.hoohoot.homelab.manager.it
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.ws.rs.core.Response
-import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.assertj.core.api.Assertions.assertThat
+import org.hoohoot.homelab.manager.it.config.InjectSynapse
+import org.hoohoot.homelab.manager.it.config.SynapseClient
+import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
+@QuarkusTestResource(SynapseTestResource::class)
 internal class SupportNotificationsTest {
-    @InjectWireMock
-    private val wireMockServer: WireMockServer? = null
-
-    @BeforeEach
-    fun setup() {
-        wireMockServer!!.resetAll()
-        stubMatrixSendMessage()
-    }
-
-    private fun stubMatrixSendMessage() {
-        wireMockServer!!.stubFor(
-            WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withStatus(200)
-                        .withBody("{\"event_id\": \"toto\"}")
-                )
-        )
-    }
+    @InjectSynapse
+    private val synapseClient: SynapseClient? = null
 
     @Test
     fun `should send issue created notification`() {
@@ -75,21 +58,13 @@ internal class SupportNotificationsTest {
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype" : "m.text",
-                              "body" : "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd",
-                              "format" : "org.matrix.custom.html",
-                              "formatted_body" : "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>",
-                              "m.relates_to" : null
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd"
+        )
+        assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
+            "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>"
         )
     }
 
@@ -138,21 +113,13 @@ internal class SupportNotificationsTest {
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype" : "m.text",
-                              "body" : "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd\nAdditional infos :\n- Affected Season : 30\n- Affected Episode : 10",
-                              "format" : "org.matrix.custom.html",
-                              "formatted_body" : "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd<br>Additional infos :<br>- Affected Season : 30<br>- Affected Episode : 10</p>",
-                              "m.relates_to" : null
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd\nAdditional infos :\n- Affected Season : 30\n- Affected Episode : 10"
+        )
+        assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
+            "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd<br>Additional infos :<br>- Affected Season : 30<br>- Affected Episode : 10</p>"
         )
     }
 
@@ -193,26 +160,20 @@ internal class SupportNotificationsTest {
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype": "m.text",
-                              "body": "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd",
-                              "format": "org.matrix.custom.html",
-                              "formatted_body": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>",
-                               "m.relates_to" : null
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd"
+        )
+        assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
+            "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>"
         )
     }
 
     @Test
     fun `should send issue resolved notification in thread of created issue`() {
+        val supportRoomId = synapseClient!!.roomId("support")
+
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -247,6 +208,8 @@ internal class SupportNotificationsTest {
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueResolved = """
             {
@@ -278,37 +241,23 @@ internal class SupportNotificationsTest {
             }
 """.trimIndent()
 
-        wireMockServer!!.resetAll()
-        stubMatrixSendMessage()
-
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype": "m.text",
-                              "body": "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd",
-                              "format": "org.matrix.custom.html",
-                              "formatted_body": "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>",
-                              "m.relates_to": {
-                                  "event_id": "toto",
-                                  "rel_type": "m.thread"
-                              }
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient.getLastMessage(supportRoomId)
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd"
         )
+        assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
+        assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
     }
 
     @Test
     fun `should send issue comment notification in thread of created issue`() {
+        val supportRoomId = synapseClient!!.roomId("support")
+
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -344,7 +293,9 @@ internal class SupportNotificationsTest {
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val issueResolved = """
+        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+
+        val issueComment = """
             {
             	"notification_type": "ISSUE_COMMENT",
             	"event": "New Comment on Audio Issue",
@@ -381,33 +332,17 @@ internal class SupportNotificationsTest {
             }
 """.trimIndent()
 
-        wireMockServer!!.resetAll()
-        stubMatrixSendMessage()
-
-        RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
+        RestAssured.given().contentType(ContentType.JSON).body(issueComment)
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype": "m.text",
-                              "body": "New Comment on Audio Issue\nSubject : Bad Moms (2016)\nComment : some comment\nComment by : michel",
-                              "format": "org.matrix.custom.html",
-                              "formatted_body": "<h1>New Comment on Audio Issue</h1><p>Subject : Bad Moms (2016)<br>Comment : some comment<br>Comment by : michel</p>",
-                              "m.relates_to": {
-                                  "event_id": "toto",
-                                  "rel_type": "m.thread"
-                              }
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient.getLastMessage(supportRoomId)
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "New Comment on Audio Issue\nSubject : Bad Moms (2016)\nComment : some comment\nComment by : michel"
         )
+        assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
+        assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
     }
 
     @Test
@@ -441,14 +376,14 @@ internal class SupportNotificationsTest {
 }
 """.trimIndent()
 
+        val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("support"))
+
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/jellyseerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!support:test-server.tld/send/m.room.message/.*"))
-        )
+        val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("support"))
+        assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
     }
 }

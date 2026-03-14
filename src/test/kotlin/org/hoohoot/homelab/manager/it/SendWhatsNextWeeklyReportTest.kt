@@ -12,7 +12,11 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format.DateTimeComponents
+import org.assertj.core.api.Assertions.assertThat
+import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
+import org.hoohoot.homelab.manager.it.config.SynapseClient
+import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
 import org.hoohoot.homelab.manager.infrastructure.time.TimeService
@@ -23,6 +27,7 @@ import org.junit.jupiter.api.Test
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
+@QuarkusTestResource(SynapseTestResource::class)
 class SendWhatsNextWeeklyReportTest {
     @Inject
     @field:Default
@@ -30,6 +35,9 @@ class SendWhatsNextWeeklyReportTest {
 
     @InjectWireMock
     private val wireMockServer: WireMockServer? = null
+
+    @InjectSynapse
+    private val synapseClient: SynapseClient? = null
 
     @BeforeEach
     fun setup() {
@@ -50,7 +58,7 @@ class SendWhatsNextWeeklyReportTest {
                 "absoluteEpisodeNumber": 16,
                 "unverifiedSceneNumbering": false,
                 "series": {
-                  "title": "Anne Rice’s Mayfair Witches",
+                  "title": "Anne Rice's Mayfair Witches",
                   "sortTitle": "anne rices mayfair witches",
                   "status": "continuing",
                   "ended": false,
@@ -240,13 +248,6 @@ class SendWhatsNextWeeklyReportTest {
                         .withHeader("Content-Type", "application/json")
                     )
             )
-        wireMockServer
-            .stubFor(
-                WireMock.put(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                    .willReturn(WireMock.aResponse().withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"event_id\": \"toto\"}"))
-            )
     }
 
     @Test
@@ -256,35 +257,27 @@ class SendWhatsNextWeeklyReportTest {
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1, WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/.*/send/m.room.message/.*"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                            {
-                              "msgtype" : "m.text",
-                              "body" : "What's next report\n\nSeries :\n2025-03-02 : Anne Rice’s Mayfair Witches - S02E08 - The Innocents\n2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams",
-                              "format" : "org.matrix.custom.html",
-                              "formatted_body" : "<h1>What's next report</h1><p><br>Series :<br>2025-03-02 : Anne Rice’s Mayfair Witches - S02E08 - The Innocents<br>2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams</p>",
-                              "m.relates_to" : null
-                            }
-                        """.trimIndent()
-                    )
-                )
+        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
+        assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "What's next report\n\nSeries :\n2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents\n2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams"
+        )
+        assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
+            "<h1>What's next report</h1><p><br>Series :<br>2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents<br>2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams</p>"
         )
     }
 
     @Test
     fun `should send whats next report to correct room`() {
+        val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("media"))
+
         RestAssured.given().contentType(ContentType.JSON)
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/send-whats-next-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        wireMockServer!!.verify(
-            1,
-            WireMock.putRequestedFor(WireMock.urlMatching("/_matrix/client/r0/rooms/!media:test-server.tld/send/m.room.message/.*"))
-        )
+        val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("media"))
+        assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
     }
 
     @Test
