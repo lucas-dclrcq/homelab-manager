@@ -73,8 +73,8 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         synapseClient = SynapseClient(synapseUrl, accessToken, roomIds, httpClient, objectMapper)
 
         return mapOf(
-            "quarkus.rest-client.matrix-api.url" to synapseUrl,
-            "matrix.access_token" to accessToken,
+            "matrix.base-url" to synapseUrl,
+            "matrix.access-token" to accessToken,
             "matrix.room.media" to roomIds["media"]!!,
             "matrix.room.music" to roomIds["music"]!!,
             "matrix.room.support" to roomIds["support"]!!
