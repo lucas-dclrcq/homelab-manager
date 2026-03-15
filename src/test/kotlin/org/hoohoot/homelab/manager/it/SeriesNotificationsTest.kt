@@ -1,10 +1,12 @@
 package org.hoohoot.homelab.manager.it
 
+import io.agroal.api.AgroalDataSource
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
@@ -13,6 +15,7 @@ import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.NotificationsResource
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 @QuarkusTest
 @TestHTTPEndpoint(NotificationsResource::class)
@@ -22,10 +25,13 @@ internal class SeriesNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
 
-    private val notification = """
+    @Inject
+    lateinit var dataSource: AgroalDataSource
+
+    private fun notification(seriesId: Int = 301, episodeNumber: Int = 6) = """
         {
          	"series": {
-         		"id": 301,
+         		"id": $seriesId,
          		"title": "Australian Survivor",
          		"titleSlug": "australian-survivor",
          		"path": "/media/TV/Australian Survivor (2002) [tvdbid-303904]",
@@ -76,13 +82,13 @@ internal class SeriesNotificationsTest {
          	"episodes": [
          		{
          			"id": 20905,
-         			"episodeNumber": 6,
+         			"episodeNumber": $episodeNumber,
          			"seasonNumber": 12,
-         			"title": "Episode 6",
-         			"overview": "There's a bit of a pest problem in one tribe. And has someone finally found peace, or will their reckless behaviour come back to haunt them? As alliances are tested, who will be going home tonight?",
+         			"title": "Episode $episodeNumber",
+         			"overview": "Some overview",
          			"airDate": "2025-02-25",
          			"airDateUtc": "2025-02-25T08:30:00Z",
-         			"seriesId": 301,
+         			"seriesId": $seriesId,
          			"tvdbId": 10958514
          		}
          	],
@@ -139,7 +145,7 @@ internal class SeriesNotificationsTest {
 
     @Test
     fun `should send series episode downloaded notification`() {
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
+        RestAssured.given().contentType(ContentType.JSON).body(notification())
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
@@ -158,12 +164,59 @@ internal class SeriesNotificationsTest {
     fun `should send notification to configured room`() {
         val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("media"))
 
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
+        RestAssured.given().contentType(ContentType.JSON).body(notification())
             .and().header("X-Api-Key", "secureapikey")
             .`when`().post("/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("media"))
         assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
+    }
+
+    @Test
+    fun `should thread second episode notification under first for same series`() {
+        val mediaRoomId = synapseClient!!.roomId("media")
+
+        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 500, episodeNumber = 1))
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/sonarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val firstEventId = synapseClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+
+        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 500, episodeNumber = 2))
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/sonarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val lastMessage = synapseClient.getLastMessage(mediaRoomId)
+        assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(firstEventId)
+        assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
+    }
+
+    @Test
+    fun `should send standalone notification when last notification was more than 24h ago`() {
+        val mediaRoomId = synapseClient!!.roomId("media")
+
+        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 1))
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/sonarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        // Simulate 24h+ elapsed by updating the DB timestamp
+        dataSource.connection.use { conn ->
+            conn.prepareStatement("UPDATE series_notification_thread SET last_notified_at = ? WHERE series_id = '600'").use { stmt ->
+                stmt.setObject(1, LocalDateTime.now().minusHours(25))
+                stmt.executeUpdate()
+            }
+        }
+
+        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 2))
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/sonarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val lastMessage = synapseClient.getLastMessage(mediaRoomId)
+        assertThat(lastMessage.get("m.relates_to")).isNull()
     }
 }

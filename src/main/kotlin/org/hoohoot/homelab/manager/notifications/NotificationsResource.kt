@@ -57,17 +57,27 @@ class NotificationsResource(
 
         Log.info("Notifying series downloaded : ${payload.seriesName()}")
 
-        val seriesId = payload.imdbId()
+        val imdbId = payload.imdbId()
 
         val notification = NotificationBuilder()
             .addTitle("Episode Downloaded")
-            .addInfoLine("Series : ${payload.series?.title ?: "Unknown"} [${seriesId.toImdbLink()}]")
+            .addInfoLine("Series : ${payload.series?.title ?: "Unknown"} [${imdbId.toImdbLink()}]")
             .addInfoLine("Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]")
             .addInfoLine("Series requested by : ${payload.requester()}")
             .addInfoLine("Source : ${payload.downloadClient} (${payload.indexer()})")
             .buildNotification()
 
-        matrixSender.sendMediaNotification(notification)
+        val seriesId = payload.series?.id?.toString()
+
+        if (seriesId != null) {
+            val activeThread = notificationRepo.getActiveThreadForSeries(seriesId)
+            val sentNotificationId = matrixSender.sendMediaNotification(notification, activeThread)
+            val threadEventId = activeThread ?: sentNotificationId
+            notificationRepo.saveOrUpdateThreadForSeries(seriesId, threadEventId)
+        } else {
+            matrixSender.sendMediaNotification(notification)
+        }
+
         return Response.noContent().build()
     }
 
