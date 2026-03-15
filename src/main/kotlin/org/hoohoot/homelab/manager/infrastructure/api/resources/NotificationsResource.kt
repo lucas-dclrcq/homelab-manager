@@ -11,7 +11,7 @@ import org.hoohoot.homelab.manager.application.commands.*
 import org.hoohoot.homelab.manager.domain.media_notifications.ParseIssue
 import org.hoohoot.homelab.manager.domain.media_notifications.ParseMovie
 import org.hoohoot.homelab.manager.domain.media_notifications.ParseMusic
-import org.hoohoot.homelab.manager.domain.media_notifications.ParseSeries
+import org.hoohoot.homelab.manager.infrastructure.api.dto.SonarrWebhookPayload
 
 @Path("/api/notifications")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,12 +32,8 @@ class NotificationsResource(private val mediator: Mediator) {
 
     @POST
     @Path("/sonarr")
-    suspend fun handleSonarrNotification(payload: JsonObject): Response {
-        if (payload.getString("eventType") != "Download") {
-            Log.debug("Ignoring sonarr event: ${payload.getString("eventType")}")
-            return Response.noContent().build()
-        }
-        mediator.send(NotifySeriesDownloaded(ParseSeries.from(payload)))
+    suspend fun handleSonarrNotification(payload: SonarrWebhookPayload): Response {
+        mediator.send(NotifySeriesDownloaded(payload))
         return Response.noContent().build()
     }
 

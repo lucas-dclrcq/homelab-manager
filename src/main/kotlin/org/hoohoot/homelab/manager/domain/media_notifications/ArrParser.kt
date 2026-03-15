@@ -8,4 +8,9 @@ fun JsonArray?.requester(): String? =
         ?.split(" - ")
         ?.get(1)
 
+fun List<String>?.requester(): String? =
+    this?.firstOrNull { it.matches("\\d+ - \\w+".toRegex()) }
+        ?.split(" - ")
+        ?.get(1)
+
 fun String.toImdbLink(): String = "https://www.imdb.com/title/$this/"
