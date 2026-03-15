@@ -9,7 +9,7 @@ import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import jakarta.ws.rs.core.Response
 import org.hamcrest.Matchers.equalTo
-import org.hoohoot.homelab.manager.infrastructure.api.resources.MediaInfoResource
+import org.hoohoot.homelab.manager.media.MediaInfoResource
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.junit.jupiter.api.BeforeEach

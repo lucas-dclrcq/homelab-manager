@@ -1,0 +1,16 @@
+package org.hoohoot.homelab.manager.notifications
+
+import io.vertx.core.json.JsonArray
+
+fun JsonArray?.requester(): String? =
+    this?.map { it.toString() }
+        ?.firstOrNull { it.matches("\\d+ - \\w+".toRegex()) }
+        ?.split(" - ")
+        ?.get(1)
+
+fun List<String>?.requester(): String? =
+    this?.firstOrNull { it.matches("\\d+ - \\w+".toRegex()) }
+        ?.split(" - ")
+        ?.get(1)
+
+fun String.toImdbLink(): String = "https://www.imdb.com/title/$this/"

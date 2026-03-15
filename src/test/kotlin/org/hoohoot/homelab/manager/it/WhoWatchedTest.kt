@@ -9,10 +9,10 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.ws.rs.core.Response
 import org.hamcrest.Matchers.equalTo
-import org.hoohoot.homelab.manager.infrastructure.api.resources.MediaInfoResource
+import org.hoohoot.homelab.manager.media.MediaInfoResource
 import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.NotificationsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

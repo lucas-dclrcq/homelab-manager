@@ -9,8 +9,8 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import kotlinx.datetime.Instant
 import org.hamcrest.Matchers.equalTo
-import org.hoohoot.homelab.manager.infrastructure.api.resources.RandomResource
-import org.hoohoot.homelab.manager.infrastructure.time.TimeService
+import org.hoohoot.homelab.manager.`fun`.RandomResource
+import org.hoohoot.homelab.manager.time.TimeService
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource

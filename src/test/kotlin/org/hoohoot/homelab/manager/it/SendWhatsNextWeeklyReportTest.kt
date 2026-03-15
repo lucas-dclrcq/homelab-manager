@@ -18,8 +18,8 @@ import org.hoohoot.homelab.manager.it.config.InjectWireMock
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
-import org.hoohoot.homelab.manager.infrastructure.time.TimeService
+import org.hoohoot.homelab.manager.notifications.NotificationsResource
+import org.hoohoot.homelab.manager.time.TimeService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

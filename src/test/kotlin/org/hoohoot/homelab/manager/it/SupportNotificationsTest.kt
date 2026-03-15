@@ -11,7 +11,7 @@ import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.infrastructure.api.resources.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.NotificationsResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
