@@ -3,10 +3,14 @@ package org.hoohoot.homelab.manager.notifications
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.matrix.MatrixNotificationSender
-import org.hoohoot.homelab.manager.persistence.NotificationSentRepository
-import org.hoohoot.homelab.manager.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.sonarr.getSeriesCalendar
+import org.hoohoot.homelab.manager.notifications.arr.mediaKey
+import org.hoohoot.homelab.manager.notifications.arr.requester
+import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
+import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
+import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
+import org.hoohoot.homelab.manager.notifications.arr.sonarr.getSeriesCalendar
+import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
 import org.hoohoot.homelab.manager.time.TimeService
 
 private const val DEFAULT_VALUE = "unknown"

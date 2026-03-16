@@ -1,11 +1,11 @@
-package org.hoohoot.homelab.manager.matrix.bot.commands.prefixed
+package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent.TextBased.Text
-import org.hoohoot.homelab.manager.matrix.bot.MatrixBot
-import org.hoohoot.homelab.manager.matrix.bot.commands.PrefixedBotCommand
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -30,7 +30,7 @@ class PrefixedBotCommandsTest {
 
         val config =
             object :
-                org.hoohoot.homelab.manager.matrix.bot.MatrixBotConfiguration {
+                org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotConfiguration {
                 override fun enabled(): Boolean = true
                 override fun prefix(): String = "!"
                 override fun baseUrl(): String = "https://matrix.example.com"

@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.notifications
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hoohoot.homelab.manager.notifications.arr.requester
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class RadarrWebhookPayload(

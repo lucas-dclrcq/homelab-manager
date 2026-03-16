@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.matrix.bot.commands.regex
 
 import org.assertj.core.api.Assertions.assertThat
+import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.regex.DeadooMatrixCommand
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 

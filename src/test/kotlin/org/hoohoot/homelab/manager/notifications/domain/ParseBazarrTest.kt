@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.hoohoot.homelab.manager.notifications.BazarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.SubtitleDownload
-import org.hoohoot.homelab.manager.notifications.mediaKey
+import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.junit.jupiter.api.Test
 
 class ParseBazarrTest {

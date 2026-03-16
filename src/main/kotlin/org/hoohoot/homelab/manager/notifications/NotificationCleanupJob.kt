@@ -3,7 +3,7 @@ package org.hoohoot.homelab.manager.notifications
 import io.quarkus.logging.Log
 import io.quarkus.scheduler.Scheduled
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.persistence.NotificationSentRepository
+import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
 @ApplicationScoped
 class NotificationCleanupJob(private val repo: NotificationSentRepository) {
