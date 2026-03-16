@@ -71,10 +71,10 @@ internal class MovieNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "Movie Downloaded\nThe Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/\nRequested by : lucasd"
+            "🎬 Movie Downloaded\nThe Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/\n👤 Requested by : lucasd"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>Requested by : lucasd</p>"
+            "<h1>🎬 Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>👤 Requested by : lucasd</p>"
         )
     }
 

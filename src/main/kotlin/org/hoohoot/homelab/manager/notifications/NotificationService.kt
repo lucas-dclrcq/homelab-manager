@@ -28,9 +28,9 @@ class NotificationService(
         Log.info("Notifying movie downloaded : ${movie.title}")
 
         val notification = NotificationBuilder()
-            .addTitle("Movie Downloaded")
+            .addTitle("🎬 Movie Downloaded")
             .addInfoLine("${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}")
-            .addInfoLine("Requested by : ${movie.requester}")
+            .addInfoLine("👤 Requested by : ${movie.requester}")
             .buildNotification()
 
         val sentId = matrixSender.sendMediaNotification(notification)
@@ -48,11 +48,11 @@ class NotificationService(
         Log.info("Notifying series downloaded : ${payload.seriesName()}")
 
         val notification = NotificationBuilder()
-            .addTitle("Episode Downloaded")
-            .addInfoLine("Series : ${payload.series?.title ?: "Unknown"} [${payload.imdbId().toImdbLink()}]")
-            .addInfoLine("Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]")
-            .addInfoLine("Series requested by : ${payload.requester()}")
-            .addInfoLine("Source : ${payload.downloadClient} (${payload.indexer()})")
+            .addTitle("📺 Episode Downloaded")
+            .addInfoLine("📡 Series : ${payload.series?.title ?: "Unknown"} [${payload.imdbId().toImdbLink()}]")
+            .addInfoLine("🎞️ Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]")
+            .addInfoLine("👤 Series requested by : ${payload.requester()}")
+            .addInfoLine("📥 Source : ${payload.downloadClient} (${payload.indexer()})")
             .buildNotification()
 
         val seriesId = payload.series?.id?.toString()
@@ -75,11 +75,11 @@ class NotificationService(
         val subtitle = SubtitleDownload.from(payload)
         Log.info("Notifying subtitle downloaded for: ${subtitle.mediaTitle}")
 
-        val episodeInfo = subtitle.episodeInfo?.let { "\n- Episode : $it" } ?: ""
+        val episodeInfo = subtitle.episodeInfo?.let { "\n- 🎞️ Episode : $it" } ?: ""
         val notification = NotificationBuilder()
-            .addTitle("Subtitle Downloaded")
+            .addTitle("💬 Subtitle Downloaded")
             .addInfoLine("${subtitle.mediaTitle} (${subtitle.year})$episodeInfo")
-            .addInfoLine("${subtitle.language} subtitles ${subtitle.action} from ${subtitle.provider} (score: ${subtitle.score}%)")
+            .addInfoLine("🗣️ ${subtitle.language} subtitles ${subtitle.action} from ${subtitle.provider} (score: ${subtitle.score}%)")
             .buildNotification()
 
         val key = mediaKey(subtitle.mediaTitle, subtitle.year)
@@ -92,11 +92,11 @@ class NotificationService(
         Log.info("Notifying album downloaded : ${album.albumTitle}")
 
         val notification = NotificationBuilder()
-            .addTitle("Album downloaded")
+            .addTitle("🎵 Album downloaded")
             .addInfoLine("${album.artistName} - ${album.albumTitle} (${album.year})")
-            .addInfoLine("Cover: ${album.coverUrl}")
-            .addInfoLine("Genres : ${album.genres.joinToString(", ")}")
-            .addInfoLine("Source : ${album.downloadClient}")
+            .addInfoLine("🖼️ Cover: ${album.coverUrl}")
+            .addInfoLine("🎸 Genres : ${album.genres.joinToString(", ")}")
+            .addInfoLine("📥 Source : ${album.downloadClient}")
             .buildNotification()
 
         matrixSender.sendMusicNotification(notification)
@@ -121,9 +121,9 @@ class NotificationService(
             .map { "${it.airDate} : ${it.series?.title} - ${"S%02dE%02d".format(it.seasonNumber, it.episodeNumber)} - ${it.title}" }
 
         val notification = NotificationBuilder()
-            .addTitle("What's next report")
+            .addTitle("📅 What's next report")
             .addEmptyLine()
-            .addInfoLine("Series :")
+            .addInfoLine("📺 Series :")
             .addInfoLines(scheduledSeries)
             .buildNotification()
 
@@ -134,14 +134,14 @@ class NotificationService(
         Log.info("Notifying issue created : ${issue.title}")
 
         var notificationBuilder = NotificationBuilder()
-            .addTitle(issue.title)
-            .addInfoLine("Subject : ${issue.subject}")
-            .addInfoLine("Message : ${issue.message}")
-            .addInfoLine("Reporter : ${issue.reportedByUserName}")
+            .addTitle("🐛 ${issue.title}")
+            .addInfoLine("📌 Subject : ${issue.subject}")
+            .addInfoLine("💬 Message : ${issue.message}")
+            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
 
         if (issue.additionalInfo.isNotEmpty()) {
             notificationBuilder = notificationBuilder
-                .addInfoLine("Additional infos :")
+                .addInfoLine("ℹ️ Additional infos :")
                 .addInfoLines(issue.additionalInfo.map { "- ${it.key} : ${it.value}" })
         }
 
@@ -154,10 +154,10 @@ class NotificationService(
         Log.info("Notifying issue resolved : ${issue.title}")
 
         val notification = NotificationBuilder()
-            .addTitle(issue.title)
-            .addInfoLine("Subject : ${issue.subject}")
-            .addInfoLine("Message : ${issue.message}")
-            .addInfoLine("Reporter : ${issue.reportedByUserName}")
+            .addTitle("✅ ${issue.title}")
+            .addInfoLine("📌 Subject : ${issue.subject}")
+            .addInfoLine("💬 Message : ${issue.message}")
+            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
             .buildNotification()
 
         sendSupportNotificationInThread(notification, issue.id)
@@ -167,10 +167,10 @@ class NotificationService(
         Log.info("Notifying issue commented : ${issue.title}")
 
         val notification = NotificationBuilder()
-            .addTitle(issue.title)
-            .addInfoLine("Subject : ${issue.subject}")
-            .addInfoLine("Comment : ${issue.comment ?: "No comment"}")
-            .addInfoLine("Comment by : ${issue.commentedBy ?: "No reporter"}")
+            .addTitle("💬 ${issue.title}")
+            .addInfoLine("📌 Subject : ${issue.subject}")
+            .addInfoLine("💬 Comment : ${issue.comment ?: "No comment"}")
+            .addInfoLine("👤 Comment by : ${issue.commentedBy ?: "No reporter"}")
             .buildNotification()
 
         sendSupportNotificationInThread(notification, issue.id)

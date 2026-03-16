@@ -268,10 +268,10 @@ internal class MusicNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("music"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "Album downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\nCover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\nGenres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\nSource : qBittorrent"
+            "🎵 Album downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\n🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\n🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\n📥 Source : qBittorrent"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>Album downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>Source : qBittorrent</p>"
+            "<h1>🎵 Album downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>📥 Source : qBittorrent</p>"
         )
     }
 

@@ -84,7 +84,7 @@ internal class SubtitleNotificationsTest {
         val lastMessage = synapseClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(movieEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
-        assertThat(lastMessage.get("body").asText()).contains("Subtitle Downloaded")
+        assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("French")
     }
 
@@ -111,7 +111,7 @@ internal class SubtitleNotificationsTest {
         val lastMessage = synapseClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(seriesEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
-        assertThat(lastMessage.get("body").asText()).contains("Subtitle Downloaded")
+        assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("French")
     }
 
@@ -127,7 +127,7 @@ internal class SubtitleNotificationsTest {
 
         val lastMessage = synapseClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to")).isNull()
-        assertThat(lastMessage.get("body").asText()).contains("Subtitle Downloaded")
+        assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("Unknown Movie (1999)")
     }
 }

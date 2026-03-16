@@ -153,10 +153,10 @@ internal class SeriesNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "Episode Downloaded\nSeries : Australian Survivor [https://www.imdb.com/title/tt0310416/]\nEpisode : S12E06 - Episode 6 [WEBDL-720p]\nSeries requested by : flo\nSource : SABnzbd (NZBFinder)"
+            "📺 Episode Downloaded\n📡 Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]\n🎞️ Episode : S12E06 - Episode 6 [WEBDL-720p]\n👤 Series requested by : flo\n📥 Source : SABnzbd (NZBFinder)"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>Episode Downloaded</h1><p>Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>Episode : S12E06 - Episode 6 [WEBDL-720p]<br>Series requested by : flo<br>Source : SABnzbd (NZBFinder)</p>"
+            "<h1>📺 Episode Downloaded</h1><p>📡 Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]<br>🎞️ Episode : S12E06 - Episode 6 [WEBDL-720p]<br>👤 Series requested by : flo<br>📥 Source : SABnzbd (NZBFinder)</p>"
         )
     }
 

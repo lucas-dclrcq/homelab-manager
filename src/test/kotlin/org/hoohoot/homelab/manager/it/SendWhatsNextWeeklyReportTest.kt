@@ -260,10 +260,10 @@ class SendWhatsNextWeeklyReportTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "What's next report\n\nSeries :\n2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents\n2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams"
+            "📅 What's next report\n\n📺 Series :\n2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents\n2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>What's next report</h1><p><br>Series :<br>2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents<br>2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams</p>"
+            "<h1>📅 What's next report</h1><p><br>📺 Series :<br>2025-03-02 : Anne Rice's Mayfair Witches - S02E08 - The Innocents<br>2025-03-02 : The White Lotus - S03E03 - The Meaning of Dreams</p>"
         )
     }
 

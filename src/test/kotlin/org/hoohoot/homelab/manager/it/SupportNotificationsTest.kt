@@ -61,10 +61,10 @@ internal class SupportNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd"
+            "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd</p>"
+            "<h1>🐛 New Video Issue Reported</h1><p>📌 Subject : A Complete Unknown (2024)<br>💬 Message : test<br>👤 Reporter : lucasd</p>"
         )
     }
 
@@ -116,10 +116,10 @@ internal class SupportNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "New Video Issue Reported\nSubject : A Complete Unknown (2024)\nMessage : test\nReporter : lucasd\nAdditional infos :\n- Affected Season : 30\n- Affected Episode : 10"
+            "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd\nℹ️ Additional infos :\n- Affected Season : 30\n- Affected Episode : 10"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>New Video Issue Reported</h1><p>Subject : A Complete Unknown (2024)<br>Message : test<br>Reporter : lucasd<br>Additional infos :<br>- Affected Season : 30<br>- Affected Episode : 10</p>"
+            "<h1>🐛 New Video Issue Reported</h1><p>📌 Subject : A Complete Unknown (2024)<br>💬 Message : test<br>👤 Reporter : lucasd<br>ℹ️ Additional infos :<br>- Affected Season : 30<br>- Affected Episode : 10</p>"
         )
     }
 
@@ -163,10 +163,10 @@ internal class SupportNotificationsTest {
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd"
+            "✅ Subtitle Issue Resolved\n📌 Subject : Bad Moms (2016)\n💬 Message : test\n👤 Reporter : lucasd"
         )
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
-            "<h1>Subtitle Issue Resolved</h1><p>Subject : Bad Moms (2016)<br>Message : test<br>Reporter : lucasd</p>"
+            "<h1>✅ Subtitle Issue Resolved</h1><p>📌 Subject : Bad Moms (2016)<br>💬 Message : test<br>👤 Reporter : lucasd</p>"
         )
     }
 
@@ -248,7 +248,7 @@ internal class SupportNotificationsTest {
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "Subtitle Issue Resolved\nSubject : Bad Moms (2016)\nMessage : test\nReporter : lucasd"
+            "✅ Subtitle Issue Resolved\n📌 Subject : Bad Moms (2016)\n💬 Message : test\n👤 Reporter : lucasd"
         )
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
@@ -339,7 +339,7 @@ internal class SupportNotificationsTest {
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("body").asText()).isEqualTo(
-            "New Comment on Audio Issue\nSubject : Bad Moms (2016)\nComment : some comment\nComment by : michel"
+            "💬 New Comment on Audio Issue\n📌 Subject : Bad Moms (2016)\n💬 Comment : some comment\n👤 Comment by : michel"
         )
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
