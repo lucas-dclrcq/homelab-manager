@@ -1,33 +1,44 @@
 package org.hoohoot.homelab.manager.notifications
 
-import io.vertx.core.json.JsonObject
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class RadarrWebhookPayload(
+    val eventType: String? = null,
+    val movie: RadarrWebhookMovie? = null,
+    val movieFile: RadarrWebhookMovieFile? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class RadarrWebhookMovie(
+    val id: Int? = null,
+    val title: String? = null,
+    val year: Int? = null,
+    val imdbId: String? = null,
+    val tags: List<String>? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class RadarrWebhookMovieFile(
+    val quality: String? = null,
+)
 
 private const val DEFAULT_VALUE = "unknown"
 
-data class Movie(val title: String, val year: String, val imdbId: String, val quality: String, val requester: String)
-
-class ParseMovie private constructor(private val payload : JsonObject) {
-
+data class Movie(
+    val title: String,
+    val year: String,
+    val imdbId: String,
+    val quality: String,
+    val requester: String
+) {
     companion object {
-        @JvmStatic
-        fun from(payload: JsonObject): Movie {
-            val parseMovie = ParseMovie(payload)
-            return Movie(parseMovie.title(), parseMovie.year(), parseMovie.imdbId(), parseMovie.quality(), parseMovie.requester())
-        }
+        fun from(payload: RadarrWebhookPayload): Movie = Movie(
+            title = payload.movie?.title ?: DEFAULT_VALUE,
+            year = payload.movie?.year?.toString() ?: DEFAULT_VALUE,
+            imdbId = payload.movie?.imdbId ?: DEFAULT_VALUE,
+            quality = payload.movieFile?.quality ?: DEFAULT_VALUE,
+            requester = payload.movie?.tags?.requester() ?: DEFAULT_VALUE
+        )
     }
-
-    private fun movie() = payload.getJsonObject("movie")
-
-    private fun movieFile() = payload.getJsonObject("movieFile")
-
-    private fun title() = movie()?.getString("title") ?: DEFAULT_VALUE
-
-    private fun year() = movie()?.getString("year") ?: DEFAULT_VALUE
-
-    private fun imdbId() = movie()?.getString("imdbId") ?: DEFAULT_VALUE
-
-    private fun quality() = movieFile()?.getString("quality") ?: DEFAULT_VALUE
-
-    private fun requester() = movie()?.getJsonArray("tags")?.requester() ?: DEFAULT_VALUE
-
 }

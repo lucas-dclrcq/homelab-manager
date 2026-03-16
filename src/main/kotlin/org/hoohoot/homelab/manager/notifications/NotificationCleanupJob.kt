@@ -1,0 +1,16 @@
+package org.hoohoot.homelab.manager.notifications
+
+import io.quarkus.logging.Log
+import io.quarkus.scheduler.Scheduled
+import jakarta.enterprise.context.ApplicationScoped
+import org.hoohoot.homelab.manager.persistence.NotificationSentRepository
+
+@ApplicationScoped
+class NotificationCleanupJob(private val repo: NotificationSentRepository) {
+
+    @Scheduled(every = "15m")
+    suspend fun cleanupExpiredThreads() {
+        Log.debug("Cleaning up expired media notification threads")
+        repo.deleteExpiredThreads()
+    }
+}

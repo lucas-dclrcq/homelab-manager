@@ -1,6 +1,36 @@
 package org.hoohoot.homelab.manager.notifications
 
-import io.vertx.core.json.JsonObject
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class JellyseerrWebhookPayload(
+    @JsonProperty("notification_type") val notificationType: String? = null,
+    val event: String? = null,
+    val subject: String? = null,
+    val message: String? = null,
+    val issue: JellyseerrWebhookIssue? = null,
+    val comment: JellyseerrWebhookComment? = null,
+    val extra: List<JellyseerrWebhookExtra>? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class JellyseerrWebhookIssue(
+    @JsonProperty("issue_id") val issueId: String? = null,
+    @JsonProperty("reportedBy_username") val reportedByUsername: String? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class JellyseerrWebhookComment(
+    @JsonProperty("comment_message") val commentMessage: String? = null,
+    @JsonProperty("commentedBy_username") val commentedByUsername: String? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class JellyseerrWebhookExtra(
+    val name: String? = null,
+    val value: String? = null,
+)
 
 private const val DEFAULT_VALUE = "unknown"
 
@@ -14,49 +44,21 @@ data class Issue(
     val additionalInfo: Map<String, String>,
     val comment: String?,
     val commentedBy: String?
-)
-
-class ParseIssue private constructor(private val payload: JsonObject) {
-
+) {
     companion object {
-        @JvmStatic
-        fun from(payload: JsonObject): Issue {
-            val parseIssue = ParseIssue(payload)
-            return Issue(
-                parseIssue.notificationType(),
-                parseIssue.message(),
-                parseIssue.subject(),
-                parseIssue.reportedByUserName(),
-                parseIssue.title(),
-                parseIssue.issueId(),
-                parseIssue.additionalInfo(),
-                parseIssue.commentMessage(),
-                parseIssue.commentBy()
-            )
-        }
+        fun from(payload: JellyseerrWebhookPayload): Issue = Issue(
+            notificationType = payload.notificationType ?: DEFAULT_VALUE,
+            message = payload.message ?: DEFAULT_VALUE,
+            subject = payload.subject ?: DEFAULT_VALUE,
+            reportedByUserName = payload.issue?.reportedByUsername ?: DEFAULT_VALUE,
+            title = payload.event ?: DEFAULT_VALUE,
+            id = payload.issue?.issueId ?: DEFAULT_VALUE,
+            additionalInfo = payload.extra
+                ?.filter { it.name != null && it.value != null }
+                ?.associate { it.name!! to it.value!! }
+                ?: emptyMap(),
+            comment = payload.comment?.commentMessage,
+            commentedBy = payload.comment?.commentedByUsername
+        )
     }
-
-    private fun notificationType() = payload.getString("notification_type") ?: DEFAULT_VALUE
-
-    private fun message() = payload.getString("message") ?: DEFAULT_VALUE
-
-    private fun subject() = payload.getString("subject") ?: DEFAULT_VALUE
-
-    private fun reportedByUserName() = payload.getJsonObject("issue")?.getString("reportedBy_username") ?: DEFAULT_VALUE
-
-    private fun title() = payload.getString("event") ?: DEFAULT_VALUE
-
-    private fun issueId() = payload.getJsonObject("issue")?.getString("issue_id")!!
-
-    private fun additionalInfo() = payload.getJsonArray("extra")
-        ?.map { it as JsonObject }
-        ?.associate { it.getString("name") to it.getString("value") }
-        ?: emptyMap()
-
-    private fun comment(): JsonObject? = payload.getJsonObject("comment")
-
-    private fun commentBy(): String? = this.comment()?.getString("commentedBy_username")
-
-    private fun commentMessage(): String?  = this.comment()?.getString("comment_message")
-
 }

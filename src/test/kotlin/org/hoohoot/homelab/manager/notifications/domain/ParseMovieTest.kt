@@ -1,20 +1,25 @@
 package org.hoohoot.homelab.manager.notifications.domain
 
-import io.vertx.core.json.JsonObject
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.ParseMovie
+import org.hoohoot.homelab.manager.notifications.Movie
+import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
 import org.junit.jupiter.api.Test
 
 class ParseMovieTest {
 
+    private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+
     @Test
     fun `from should parse movie payload correctly when all fields are present`() {
-        val jsonPayload = JsonObject(
+        val payload = mapper.readValue<RadarrWebhookPayload>(
             """
             {
                 "movie": {
                     "title": "Inception",
-                    "year": "2010",
+                    "year": 2010,
                     "imdbId": "tt1375666",
                     "tags": ["Action", "Sci-Fi", "1 - john_doe"]
                 },
@@ -25,7 +30,7 @@ class ParseMovieTest {
             """
         )
 
-        val movie = ParseMovie.from(jsonPayload)
+        val movie = Movie.from(payload)
 
         assertThat(movie).isNotNull
         assertThat(movie.title).isEqualTo("Inception")
@@ -37,7 +42,7 @@ class ParseMovieTest {
 
     @Test
     fun `from should handle missing movie object`() {
-        val jsonPayload = JsonObject(
+        val payload = mapper.readValue<RadarrWebhookPayload>(
             """
             {
                 "movieFile": {
@@ -47,7 +52,7 @@ class ParseMovieTest {
             """
         )
 
-        val movie = ParseMovie.from(jsonPayload)
+        val movie = Movie.from(payload)
 
         assertThat(movie).isNotNull
         assertThat(movie.title).isEqualTo("unknown")
@@ -59,12 +64,12 @@ class ParseMovieTest {
 
     @Test
     fun `from should handle missing movieFile object`() {
-        val jsonPayload = JsonObject(
+        val payload = mapper.readValue<RadarrWebhookPayload>(
             """
             {
                 "movie": {
                     "title": "Avatar",
-                    "year": "2009",
+                    "year": 2009,
                     "imdbId": "tt0499549",
                     "tags": ["Adventure", "1 - jane_doe"]
                 }
@@ -72,7 +77,7 @@ class ParseMovieTest {
             """
         )
 
-        val movie = ParseMovie.from(jsonPayload)
+        val movie = Movie.from(payload)
 
         assertThat(movie).isNotNull
         assertThat(movie.title).isEqualTo("Avatar")
@@ -84,12 +89,12 @@ class ParseMovieTest {
 
     @Test
     fun `from should handle missing tags in movie object`() {
-        val jsonPayload = JsonObject(
+        val payload = mapper.readValue<RadarrWebhookPayload>(
             """
             {
                 "movie": {
                     "title": "Titanic",
-                    "year": "1997",
+                    "year": 1997,
                     "imdbId": "tt0120338"
                 },
                 "movieFile": {
@@ -99,7 +104,7 @@ class ParseMovieTest {
             """
         )
 
-        val movie = ParseMovie.from(jsonPayload)
+        val movie = Movie.from(payload)
 
         assertThat(movie).isNotNull
         assertThat(movie.title).isEqualTo("Titanic")
@@ -111,9 +116,9 @@ class ParseMovieTest {
 
     @Test
     fun `from should handle empty payload`() {
-        val jsonPayload = JsonObject("{}")
+        val payload = mapper.readValue<RadarrWebhookPayload>("{}")
 
-        val movie = ParseMovie.from(jsonPayload)
+        val movie = Movie.from(payload)
 
         assertThat(movie).isNotNull
         assertThat(movie.title).isEqualTo("unknown")

@@ -23,22 +23,41 @@ class NotificationSentRepository {
         return entity?.let { NotificationId(it.eventId) }
     }
 
-    suspend fun getActiveThreadForSeries(seriesId: String): NotificationId? {
+    suspend fun getThreadByMediaId(mediaId: String, mediaType: String): NotificationId? {
         val entity = Panache.withSession {
-            SeriesNotificationThreadEntity.findById(seriesId)
+            MediaNotificationThreadEntity.find("mediaId = ?1 and mediaType = ?2", mediaId, mediaType)
+                .firstResult()
         }.awaitSuspending()
-
-        if (entity == null) return null
-        val cutoff = LocalDateTime.now().minusHours(24)
-        if (entity.lastNotifiedAt.isBefore(cutoff)) return null
-
-        return NotificationId(entity.eventId)
+        return entity?.let { NotificationId(it.eventId) }
     }
 
-    suspend fun saveOrUpdateThreadForSeries(seriesId: String, notificationId: NotificationId) {
+    suspend fun getThreadByMediaKey(mediaKey: String): NotificationId? {
+        val entity = Panache.withSession {
+            MediaNotificationThreadEntity.find("mediaKey", mediaKey).firstResult()
+        }.awaitSuspending()
+        return entity?.let { NotificationId(it.eventId) }
+    }
+
+    suspend fun saveOrUpdateThread(mediaId: String, mediaType: String, mediaKey: String?, notificationId: NotificationId) {
         Panache.withTransaction {
-            val entity = SeriesNotificationThreadEntity(seriesId, notificationId.value, LocalDateTime.now())
-            Panache.getSession().flatMap { session -> session.merge(entity) }
+            MediaNotificationThreadEntity.find("mediaId = ?1 and mediaType = ?2", mediaId, mediaType)
+                .firstResult()
+                .flatMap { existing ->
+                    val entity = existing ?: MediaNotificationThreadEntity()
+                    entity.mediaId = mediaId
+                    entity.mediaType = mediaType
+                    entity.mediaKey = mediaKey
+                    entity.eventId = notificationId.value
+                    entity.lastNotifiedAt = LocalDateTime.now()
+                    Panache.getSession().flatMap { session -> session.merge(entity) }
+                }
+        }.awaitSuspending()
+    }
+
+    suspend fun deleteExpiredThreads() {
+        val cutoff = LocalDateTime.now().minusHours(48)
+        Panache.withTransaction {
+            MediaNotificationThreadEntity.delete("lastNotifiedAt < ?1", cutoff)
         }.awaitSuspending()
     }
 }

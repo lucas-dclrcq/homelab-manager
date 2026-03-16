@@ -14,6 +14,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val MATRIX_TO_PREFIX = "https://matrix.to/#/"
+private val ROOM_ID_REGEX = Regex("^![a-zA-Z0-9]+:[a-zA-Z0-9.]+\$")
+private val ROOM_ALIAS_REGEX = Regex("^#[a-zA-Z0-9_-]+:[a-zA-Z0-9._-]+\$")
 
 suspend fun <T> Flow<T>.firstWithTimeout(
     timeout: Duration = 3000.milliseconds,
@@ -41,7 +43,7 @@ fun String.syntaxOfRoomId(): Boolean {
         cleanedInput = cleanedInput.removePrefix(MATRIX_TO_PREFIX)
         cleanedInput = cleanedInput.substringBefore("?")
     }
-    return cleanedInput.matches(Regex("^![a-zA-Z0-9]+:[a-zA-Z0-9.]+\$")) || cleanedInput.matches(Regex("^#[a-zA-Z0-9_-]+:[a-zA-Z0-9._-]+\$"))
+    return cleanedInput.matches(ROOM_ID_REGEX) || cleanedInput.matches(ROOM_ALIAS_REGEX)
 }
 
 suspend fun String.toInternalRoomIdOrNull(matrixBot: MatrixBot): RoomId? {
@@ -55,7 +57,7 @@ suspend fun String.toInternalRoomIdOrNull(matrixBot: MatrixBot): RoomId? {
         return matrixBot.resolvePublicRoomIdOrNull(cleanedInput)
     }
 
-    if (cleanedInput.matches(Regex("^![a-zA-Z0-9]+:[a-zA-Z0-9.]+\$"))) {
+    if (cleanedInput.matches(ROOM_ID_REGEX)) {
         return RoomId(cleanedInput)
     }
     return null

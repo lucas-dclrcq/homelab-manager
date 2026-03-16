@@ -12,6 +12,7 @@ data class SonarrWebhookPayload(
 data class SonarrWebhookSeries(
     val id: Int? = null,
     val title: String? = null,
+    val year: Int? = null,
     val imdbId: String? = null,
     val tags: List<String>? = null,
 )

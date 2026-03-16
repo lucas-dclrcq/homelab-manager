@@ -203,10 +203,14 @@ internal class SeriesNotificationsTest {
             .`when`().post("/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        // Simulate 24h+ elapsed by updating the DB timestamp
+        // Simulate 48h+ elapsed and trigger cleanup (cron job deletes entries older than 48h)
         dataSource.connection.use { conn ->
-            conn.prepareStatement("UPDATE series_notification_thread SET last_notified_at = ? WHERE series_id = '600'").use { stmt ->
-                stmt.setObject(1, LocalDateTime.now().minusHours(25))
+            conn.prepareStatement("UPDATE media_notification_thread SET last_notified_at = ? WHERE media_id = '600' AND media_type = 'series'").use { stmt ->
+                stmt.setObject(1, LocalDateTime.now().minusHours(49))
+                stmt.executeUpdate()
+            }
+            conn.prepareStatement("DELETE FROM media_notification_thread WHERE last_notified_at < ?").use { stmt ->
+                stmt.setObject(1, LocalDateTime.now().minusHours(48))
                 stmt.executeUpdate()
             }
         }

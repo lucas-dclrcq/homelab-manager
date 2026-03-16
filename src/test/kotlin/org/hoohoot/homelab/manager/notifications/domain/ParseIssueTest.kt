@@ -1,15 +1,21 @@
 package org.hoohoot.homelab.manager.notifications.domain
 
-import io.vertx.core.json.JsonObject
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.ParseIssue
+import org.hoohoot.homelab.manager.notifications.Issue
+import org.hoohoot.homelab.manager.notifications.JellyseerrWebhookPayload
 import org.junit.jupiter.api.Test
 
 class ParseIssueTest {
+
+    private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+
     @Test
     fun `should parse message`() {
         //arrange
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -42,7 +48,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = ParseIssue.from(payload).message
+        val message = Issue.from(payload).message
 
 
         // ASSERT
@@ -52,7 +58,7 @@ class ParseIssueTest {
     @Test
     fun `should parse notification type`() {
         // ARRANGE
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -85,7 +91,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = ParseIssue.from(payload).notificationType
+        val message = Issue.from(payload).notificationType
 
         // ASSERT
         assertThat(message).isEqualTo("ISSUE_CREATED")
@@ -94,7 +100,7 @@ class ParseIssueTest {
     @Test
     fun `should parse issue id`() {
         // ARRANGE
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -127,7 +133,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = ParseIssue.from(payload).id
+        val message = Issue.from(payload).id
 
         // ASSERT
         assertThat(message).isEqualTo("24")
@@ -136,7 +142,7 @@ class ParseIssueTest {
     @Test
     fun `should parse subject`() {
         //arrange
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -168,7 +174,7 @@ class ParseIssueTest {
    """.trimIndent()
         )
 
-        val issue = ParseIssue.from(payload)
+        val issue = Issue.from(payload)
 
         // act
 
@@ -181,7 +187,7 @@ class ParseIssueTest {
     @Test
     fun `should parse the reporter`() {
         //arrange
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -213,7 +219,7 @@ class ParseIssueTest {
    """.trimIndent()
         )
 
-        val issue = ParseIssue.from(payload)
+        val issue = Issue.from(payload)
 
         // act
 
@@ -226,7 +232,7 @@ class ParseIssueTest {
     @Test
     fun `should parse the title`() {
         //arrange
-        val payload = JsonObject(
+        val payload = mapper.readValue<JellyseerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -259,7 +265,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = ParseIssue.from(payload).title
+        val message = Issue.from(payload).title
 
         // ASSERT
         assertThat(message).isEqualTo("New Video Issue Reported")

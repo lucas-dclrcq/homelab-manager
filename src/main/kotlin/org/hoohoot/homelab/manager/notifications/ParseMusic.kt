@@ -1,48 +1,60 @@
 package org.hoohoot.homelab.manager.notifications
 
-import io.vertx.core.json.JsonObject
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LidarrWebhookPayload(
+    val eventType: String? = null,
+    val artist: LidarrWebhookArtist? = null,
+    val album: LidarrWebhookAlbum? = null,
+    val downloadClient: String? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LidarrWebhookArtist(
+    val name: String? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LidarrWebhookAlbum(
+    val title: String? = null,
+    val releaseDate: String? = null,
+    val genres: List<String>? = null,
+    val images: List<LidarrWebhookImage>? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class LidarrWebhookImage(
+    val coverType: String? = null,
+    val remoteUrl: String? = null,
+)
+
 private const val DEFAULT_VALUE = "unknown"
 
-data class Album(val downloadClient: String, val artistName: String, val albumTitle: String, val coverUrl: String, val genres: List<String>, val year: String)
-
-class ParseMusic private constructor(private val payload : JsonObject) {
-
+data class Album(
+    val downloadClient: String,
+    val artistName: String,
+    val albumTitle: String,
+    val coverUrl: String,
+    val genres: List<String>,
+    val year: String
+) {
     companion object {
-        @JvmStatic
-        fun from(payload: JsonObject): Album {
-            val parseMusic = ParseMusic(payload)
-            return Album(parseMusic.downloadClient(), parseMusic.artistName(), parseMusic.albumTitle(), parseMusic.coverUrl(), parseMusic.genres(), parseMusic.year())
-        }
+        fun from(payload: LidarrWebhookPayload): Album = Album(
+            downloadClient = payload.downloadClient ?: DEFAULT_VALUE,
+            artistName = payload.artist?.name ?: DEFAULT_VALUE,
+            albumTitle = payload.album?.title ?: DEFAULT_VALUE,
+            coverUrl = payload.album?.images
+                ?.firstOrNull { it.coverType == "cover" }
+                ?.remoteUrl
+                ?: DEFAULT_VALUE,
+            genres = payload.album?.genres ?: emptyList(),
+            year = payload.album?.releaseDate
+                ?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }.getOrNull() }
+                ?.let { DateTimeFormatter.ofPattern("yyyy").format(it) }
+                ?: DEFAULT_VALUE
+        )
     }
-
-    private fun album() = payload.getJsonObject("album")
-
-    private fun albumTitle() = album()?.getString("title") ?: DEFAULT_VALUE
-
-    private fun artistName() = payload.getJsonObject("artist")?.getString("name") ?: DEFAULT_VALUE
-
-    private fun coverUrl() = album()
-        ?.getJsonArray("images")
-        ?.map { o: Any -> o as JsonObject }
-        ?.filter { image: JsonObject -> "cover" == image.getString("coverType") }
-        ?.map { image: JsonObject -> image.getString("remoteUrl") }
-        ?.firstOrNull()
-        ?: DEFAULT_VALUE
-
-    private fun genres() = album()
-        ?.getJsonArray("genres")
-        ?.map { it as String }
-        ?: emptyList()
-
-    private fun year() = album()
-        ?.getString("releaseDate")
-        ?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }.getOrNull() }
-        ?.let { DateTimeFormatter.ofPattern("yyyy").format(it) }
-        ?: DEFAULT_VALUE
-
-    private fun downloadClient() = payload.getString("downloadClient") ?: DEFAULT_VALUE
-
 }
