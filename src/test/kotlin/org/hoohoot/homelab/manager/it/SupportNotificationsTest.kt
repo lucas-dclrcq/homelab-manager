@@ -55,7 +55,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -110,7 +110,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -157,7 +157,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -206,7 +206,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -243,7 +243,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
@@ -290,7 +290,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -334,7 +334,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueComment)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
@@ -343,6 +343,173 @@ internal class SupportNotificationsTest {
         )
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
+    }
+
+    @Test
+    fun `should send issue reopened notification in thread of created issue`() {
+        val supportRoomId = synapseClient!!.roomId("support")
+
+        val issueCreated = """
+            {
+            	"notification_type": "ISSUE_CREATED",
+            	"event": "Subtitle Issue Created",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "40",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "OPEN",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/seerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+
+        val issueReopened = """
+            {
+            	"notification_type": "ISSUE_REOPENED",
+            	"event": "Subtitle Issue Reopened",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "40",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "OPEN",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueReopened)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/seerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val lastMessage = synapseClient.getLastMessage(supportRoomId)
+        assertThat(lastMessage.get("body").asText()).isEqualTo(
+            "🔄 Subtitle Issue Reopened\n📌 Subject : Bad Moms (2016)\n💬 Message : test\n👤 Reporter : lucasd"
+        )
+        assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(createdEventId)
+        assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
+    }
+
+    @Test
+    fun `should add reaction on issue created message when issue is resolved`() {
+        val supportRoomId = synapseClient!!.roomId("support")
+
+        val issueCreated = """
+            {
+            	"notification_type": "ISSUE_CREATED",
+            	"event": "Subtitle Issue Created",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "50",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "OPEN",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/seerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+
+        val issueResolved = """
+            {
+            	"notification_type": "ISSUE_RESOLVED",
+            	"event": "Subtitle Issue Resolved",
+            	"subject": "Bad Moms (2016)",
+            	"message": "test",
+            	"image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/u9q10ljhkLj0tNCjlVqe3DCjoU4.jpg",
+            	"media": {
+            		"media_type": "movie",
+            		"tmdbId": "376659",
+            		"tvdbId": "",
+            		"status": "AVAILABLE",
+            		"status4k": "UNKNOWN"
+            	},
+            	"request": null,
+            	"issue": {
+            		"issue_id": "50",
+            		"issue_type": "SUBTITLES",
+            		"issue_status": "RESOLVED",
+            		"reportedBy_email": "lucas.declercq@mailbox.org",
+            		"reportedBy_username": "lucasd",
+            		"reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            		"reportedBy_settings_discordId": "",
+            		"reportedBy_settings_telegramChatId": ""
+            	},
+            	"comment": null,
+            	"extra": []
+            }
+""".trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post("/seerr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val lastReaction = synapseClient.getLastReaction(supportRoomId)
+        val reactionContent = lastReaction.get("content").get("m.relates_to")
+        assertThat(reactionContent.get("event_id").asText()).isEqualTo(createdEventId)
+        assertThat(reactionContent.get("key").asText()).isEqualTo("✅")
+        assertThat(reactionContent.get("rel_type").asText()).isEqualTo("m.annotation")
     }
 
     @Test
@@ -380,7 +547,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/jellyseerr")
+            .`when`().post("/seerr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("support"))

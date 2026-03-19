@@ -6,6 +6,7 @@ import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.events.m.RelatesTo
+import net.folivo.trixnity.core.model.events.m.ReactionEventContent
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.notifications.Notification
 import org.hoohoot.homelab.manager.notifications.NotificationId
@@ -23,6 +24,23 @@ class MatrixNotificationSender(
 
     suspend fun sendMusicNotification(notification: Notification): NotificationId =
         sendNotification(notification, config.room().music())
+
+    suspend fun reactToSupportMessage(eventId: NotificationId, emoji: String) =
+        sendReaction(eventId, config.room().support(), emoji)
+
+    private suspend fun sendReaction(eventId: NotificationId, roomId: String, emoji: String) {
+        val content = ReactionEventContent(
+            relatesTo = RelatesTo.Annotation(
+                eventId = EventId(eventId.value),
+                key = emoji
+            )
+        )
+
+        matrixApiClient.room.sendMessageEvent(
+            roomId = RoomId(roomId),
+            eventContent = content
+        ).getOrThrow()
+    }
 
     private suspend fun sendNotification(
         notification: Notification,

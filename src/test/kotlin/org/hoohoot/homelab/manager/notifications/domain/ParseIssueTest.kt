@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.notifications.Issue
-import org.hoohoot.homelab.manager.notifications.JellyseerrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.SeerrWebhookPayload
 import org.junit.jupiter.api.Test
 
 class ParseIssueTest {
@@ -15,7 +15,7 @@ class ParseIssueTest {
     @Test
     fun `should parse message`() {
         //arrange
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -58,7 +58,7 @@ class ParseIssueTest {
     @Test
     fun `should parse notification type`() {
         // ARRANGE
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -100,7 +100,7 @@ class ParseIssueTest {
     @Test
     fun `should parse issue id`() {
         // ARRANGE
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -142,7 +142,7 @@ class ParseIssueTest {
     @Test
     fun `should parse subject`() {
         //arrange
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -187,7 +187,7 @@ class ParseIssueTest {
     @Test
     fun `should parse the reporter`() {
         //arrange
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",
@@ -232,7 +232,7 @@ class ParseIssueTest {
     @Test
     fun `should parse the title`() {
         //arrange
-        val payload = mapper.readValue<JellyseerrWebhookPayload>(
+        val payload = mapper.readValue<SeerrWebhookPayload>(
             """
     {
     	"notification_type": "ISSUE_CREATED",

@@ -102,12 +102,13 @@ class NotificationService(
         matrixSender.sendMusicNotification(notification)
     }
 
-    suspend fun handleJellyseerrEvent(issue: Issue) {
+    suspend fun handleSeerrEvent(issue: Issue) {
         when (issue.notificationType) {
             "ISSUE_CREATED" -> handleIssueCreated(issue)
             "ISSUE_RESOLVED" -> handleIssueReply(issue)
+            "ISSUE_REOPENED" -> handleIssueReopened(issue)
             "ISSUE_COMMENT" -> handleIssueComment(issue)
-            else -> Log.warn("Unhandled jellyseerr type: ${issue.notificationType}")
+            else -> Log.warn("Unhandled seerr type: ${issue.notificationType}")
         }
     }
 
@@ -155,6 +156,24 @@ class NotificationService(
 
         val notification = NotificationBuilder()
             .addTitle("✅ ${issue.title}")
+            .addInfoLine("📌 Subject : ${issue.subject}")
+            .addInfoLine("💬 Message : ${issue.message}")
+            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
+            .buildNotification()
+
+        sendSupportNotificationInThread(notification, issue.id)
+
+        val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issue.id)
+        if (issueCreatedNotificationId != null) {
+            matrixSender.reactToSupportMessage(issueCreatedNotificationId, "✅")
+        }
+    }
+
+    private suspend fun handleIssueReopened(issue: Issue) {
+        Log.info("Notifying issue reopened : ${issue.title}")
+
+        val notification = NotificationBuilder()
+            .addTitle("🔄 ${issue.title}")
             .addInfoLine("📌 Subject : ${issue.subject}")
             .addInfoLine("💬 Message : ${issue.message}")
             .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")

@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.BazarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.Issue
-import org.hoohoot.homelab.manager.notifications.JellyseerrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.SeerrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.NotificationService
 import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
@@ -61,10 +61,10 @@ class NotificationsResource(
     }
 
     @POST
-    @Path("/jellyseerr")
-    suspend fun handleJellyseerrNotification(payload: JellyseerrWebhookPayload): Response {
+    @Path("/seerr")
+    suspend fun handleSeerrNotification(payload: SeerrWebhookPayload): Response {
         val issue = Issue.Companion.from(payload)
-        notificationService.handleJellyseerrEvent(issue)
+        notificationService.handleSeerrEvent(issue)
         return Response.noContent().build()
     }
 

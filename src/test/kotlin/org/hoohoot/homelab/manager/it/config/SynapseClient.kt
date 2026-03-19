@@ -44,6 +44,28 @@ class SynapseClient(
         return messages.first()
     }
 
+    fun getReactions(roomId: String): List<JsonNode> {
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/messages?dir=b&limit=50"))
+                .header("Authorization", "Bearer $accessToken")
+                .GET().build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to get messages from room $roomId: ${response.body()}")
+        }
+        return objectMapper.readTree(response.body())
+            .get("chunk")
+            .filter { it.get("type").asText() == "m.reaction" }
+    }
+
+    fun getLastReaction(roomId: String): JsonNode {
+        val reactions = getReactions(roomId)
+        if (reactions.isEmpty()) throw RuntimeException("No reactions found in room $roomId")
+        return reactions.first()
+    }
+
     fun getMessageCount(roomId: String): Int = getMessages(roomId).size
 
     fun roomId(name: String): String = roomIds[name]
