@@ -15,13 +15,15 @@ import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.NotificationService
 import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.weeklyreport.WeeklyReportService
 
 @Path("/api/notifications")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
 class NotificationsResource(
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
+    private val weeklyReportService: WeeklyReportService
 ) {
 
     @POST
@@ -72,6 +74,13 @@ class NotificationsResource(
     @Path("/bazarr")
     suspend fun handleBazarrNotification(payload: BazarrWebhookPayload): Response {
         notificationService.notifySubtitleDownloaded(payload)
+        return Response.noContent().build()
+    }
+
+    @POST
+    @Path("/send-weekly-report")
+    suspend fun sendWeeklyReport(): Response {
+        weeklyReportService.sendWeeklyReport()
         return Response.noContent().build()
     }
 
