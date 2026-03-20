@@ -2,16 +2,12 @@ package org.hoohoot.homelab.manager.notifications
 
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.requester
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.getSeriesCalendar
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
-import org.hoohoot.homelab.manager.time.TimeService
 
 private const val DEFAULT_VALUE = "unknown"
 
@@ -19,8 +15,6 @@ private const val DEFAULT_VALUE = "unknown"
 class NotificationService(
     private val matrixSender: MatrixNotificationSender,
     private val notificationRepo: NotificationSentRepository,
-    @RestClient private val sonarrRestClient: SonarrRestClient,
-    private val timeService: TimeService
 ) {
 
     suspend fun notifyMovieDownloaded(payload: RadarrWebhookPayload) {
@@ -110,25 +104,6 @@ class NotificationService(
             "ISSUE_COMMENT" -> handleIssueComment(issue)
             else -> Log.warn("Unhandled seerr type: ${issue.notificationType}")
         }
-    }
-
-    suspend fun sendWhatsNextReport() {
-        Log.info("Sending whats next report")
-
-        val currentWeek = timeService.getCurrentWeek()
-        val seriesCalendar = sonarrRestClient.getSeriesCalendar(currentWeek.start, currentWeek.end)
-
-        val scheduledSeries = seriesCalendar
-            .map { "${it.airDate} : ${it.series?.title} - ${"S%02dE%02d".format(it.seasonNumber, it.episodeNumber)} - ${it.title}" }
-
-        val notification = NotificationBuilder()
-            .addTitle("📅 What's next report")
-            .addEmptyLine()
-            .addInfoLine("📺 Series :")
-            .addInfoLines(scheduledSeries)
-            .buildNotification()
-
-        matrixSender.sendMediaNotification(notification)
     }
 
     private suspend fun handleIssueCreated(issue: Issue) {

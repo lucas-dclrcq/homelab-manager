@@ -75,9 +75,4 @@ class NotificationsResource(
         return Response.noContent().build()
     }
 
-    @POST
-    @Path("/send-whats-next-report")
-    suspend fun sendWhatsNextReport() {
-        notificationService.sendWhatsNextReport()
-    }
 }
