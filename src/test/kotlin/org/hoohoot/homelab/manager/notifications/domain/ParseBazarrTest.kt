@@ -12,7 +12,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse movie subtitle body`() {
         val payload = BazarrWebhookPayload(
-            body = "Inception (2010) : French subtitles downloaded from opensubtitles with a score of 95%."
+            message ="Inception (2010) : French subtitles downloaded from opensubtitles with a score of 95%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -29,7 +29,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse series subtitle body`() {
         val payload = BazarrWebhookPayload(
-            body = "Breaking Bad (2008) - S01E02 - Cat's in the Bag... : English subtitles downloaded from opensubtitles with a score of 90%."
+            message ="Breaking Bad (2008) - S01E02 - Cat's in the Bag... : English subtitles downloaded from opensubtitles with a score of 90%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -46,7 +46,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse upgraded subtitle action`() {
         val payload = BazarrWebhookPayload(
-            body = "Inception (2010) : French subtitles upgraded from addic7ed with a score of 98%."
+            message ="Inception (2010) : French subtitles upgraded from addic7ed with a score of 98%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -59,7 +59,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse manually downloaded subtitle action`() {
         val payload = BazarrWebhookPayload(
-            body = "Inception (2010) : French subtitles manually downloaded from subscene with a score of 85%."
+            message ="Inception (2010) : French subtitles manually downloaded from subscene with a score of 85%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -71,7 +71,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse HI subtitle language`() {
         val payload = BazarrWebhookPayload(
-            body = "Inception (2010) : English (HI) subtitles downloaded from opensubtitles with a score of 92%."
+            message ="Inception (2010) : English (HI) subtitles downloaded from opensubtitles with a score of 92%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -82,7 +82,7 @@ class ParseBazarrTest {
     @Test
     fun `should parse forced subtitle language`() {
         val payload = BazarrWebhookPayload(
-            body = "Inception (2010) : French (forced) subtitles downloaded from opensubtitles with a score of 80%."
+            message ="Inception (2010) : French (forced) subtitles downloaded from opensubtitles with a score of 80%."
         )
 
         val subtitle = SubtitleDownload.from(payload)
@@ -92,16 +92,16 @@ class ParseBazarrTest {
 
     @Test
     fun `should throw on null body`() {
-        val payload = BazarrWebhookPayload(body = null)
+        val payload = BazarrWebhookPayload(message =null)
 
         assertThatThrownBy { SubtitleDownload.from(payload) }
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("body is missing")
+            .hasMessageContaining("message is missing")
     }
 
     @Test
     fun `should throw on unparseable body`() {
-        val payload = BazarrWebhookPayload(body = "some random text")
+        val payload = BazarrWebhookPayload(message ="some random text")
 
         assertThatThrownBy { SubtitleDownload.from(payload) }
             .isInstanceOf(IllegalArgumentException::class.java)
@@ -112,7 +112,7 @@ class ParseBazarrTest {
     fun `mediaKey should be consistent between radarr and bazarr`() {
         val radarrKey = mediaKey("Inception", "2010")
         val bazarrPayload = BazarrWebhookPayload(
-            body = "Inception (2010) : French subtitles downloaded from opensubtitles with a score of 95%."
+            message ="Inception (2010) : French subtitles downloaded from opensubtitles with a score of 95%."
         )
         val subtitle = SubtitleDownload.from(bazarrPayload)
         val bazarrKey = mediaKey(subtitle.mediaTitle, subtitle.year)

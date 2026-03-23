@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class BazarrWebhookPayload(
     val title: String? = null,
-    val body: String? = null,
+    val message: String? = null,
     val type: String? = null
 )
 
@@ -25,8 +25,8 @@ data class SubtitleDownload(
             """^(.+?) \((\d{4})\) : (.+?) subtitles (.+?) from (.+?) with a score of ([\d.]+)%\.$""".toRegex()
 
         fun from(payload: BazarrWebhookPayload): SubtitleDownload {
-            val body = payload.body
-                ?: throw IllegalArgumentException("Bazarr webhook body is missing")
+            val body = payload.message
+                ?: throw IllegalArgumentException("Bazarr webhook message is missing")
 
             val seriesMatch = SERIES_REGEX.matchEntire(body)
             if (seriesMatch != null) {

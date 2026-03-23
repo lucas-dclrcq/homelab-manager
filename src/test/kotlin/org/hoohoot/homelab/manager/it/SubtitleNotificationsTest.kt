@@ -22,10 +22,10 @@ internal class SubtitleNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
 
-    private fun bazarrNotification(body: String) = """
+    private fun bazarrNotification(message: String) = """
         {
             "title": "Bazarr",
-            "body": "$body",
+            "message": "$message",
             "type": "info"
         }
     """.trimIndent()
