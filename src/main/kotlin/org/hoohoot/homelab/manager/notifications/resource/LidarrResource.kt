@@ -7,10 +7,10 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.Album
 import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
-import org.hoohoot.homelab.manager.notifications.NotificationBuilder
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
 
 @Path("/api/notifications/lidarr")
@@ -31,15 +31,23 @@ class LidarrResource(
         val album = Album.from(payload)
         Log.info("Notifying album downloaded : ${album.albumTitle}")
 
-        val notification = NotificationBuilder()
-            .addTitle("🎵 Album downloaded")
-            .addInfoLine("${album.artistName} - ${album.albumTitle} (${album.year})")
-            .addInfoLine("🖼️ Cover: ${album.coverUrl}")
-            .addInfoLine("🎸 Genres : ${album.genres.joinToString(", ")}")
-            .addInfoLine("📥 Source : ${album.downloadClient}")
-            .buildNotification()
+        val content = RoomMessageEventContent.TextBased.Text(
+            body = """
+                🎵 Album downloaded
+                ${album.artistName} - ${album.albumTitle} (${album.year})
+                🖼️ Cover: ${album.coverUrl}
+                🎸 Genres : ${album.genres.joinToString(", ")}
+                📥 Source : ${album.downloadClient}
+            """.trimIndent(),
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>🎵 Album downloaded</h1>" +
+                "<p>${album.artistName} - ${album.albumTitle} (${album.year})" +
+                "<br>🖼️ Cover: ${album.coverUrl}" +
+                "<br>🎸 Genres : ${album.genres.joinToString(", ")}" +
+                "<br>📥 Source : ${album.downloadClient}</p>"
+        )
 
-        matrixSender.sendMusicNotification(notification)
+        matrixSender.sendMusicNotification(content)
         return Response.noContent().build()
     }
 }

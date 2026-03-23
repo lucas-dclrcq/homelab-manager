@@ -7,9 +7,9 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.Movie
-import org.hoohoot.homelab.manager.notifications.NotificationBuilder
 import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
@@ -35,13 +35,13 @@ class RadarrResource(
         val movie = Movie.from(payload)
         Log.info("Notifying movie downloaded : ${movie.title}")
 
-        val notification = NotificationBuilder()
-            .addTitle("🎬 Movie Downloaded")
-            .addInfoLine("${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}")
-            .addInfoLine("👤 Requested by : ${movie.requester}")
-            .buildNotification()
+        val content = RoomMessageEventContent.TextBased.Text(
+            body = "🎬 Movie Downloaded\n${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}\n👤 Requested by : ${movie.requester}",
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>🎬 Movie Downloaded</h1><p>${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}<br>👤 Requested by : ${movie.requester}</p>"
+        )
 
-        val sentId = matrixSender.sendMediaNotification(notification)
+        val sentId = matrixSender.sendMediaNotification(content)
 
         val movieId = payload.movie?.id?.toString()
         val title = payload.movie?.title

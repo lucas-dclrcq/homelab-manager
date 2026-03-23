@@ -33,26 +33,26 @@ class WeeklyReportNotificationBuilderTest {
 
         val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
 
-        assertThat(notification.textMessage).contains("📰 Weekly Recap")
-        assertThat(notification.textMessage).contains("🎬 Movie Releases")
-        assertThat(notification.textMessage).contains("• Mon 17 — Dune: Part Two (2024)")
-        assertThat(notification.textMessage).contains("• Wed 19 — Oppenheimer (2024)")
-        assertThat(notification.textMessage).contains("📺 TV Releases")
-        assertThat(notification.textMessage).contains("• Mon 17 — The Bear S03E01 \"Tomorrow\"")
-        assertThat(notification.textMessage).contains("🏆 Top 3 Movies This Week")
-        assertThat(notification.textMessage).contains("🥇 Dune: Part Two — 5 viewers")
-        assertThat(notification.textMessage).contains("🥈 Oppenheimer — 3 viewers")
-        assertThat(notification.textMessage).contains("🥉 Poor Things — 2 viewers")
-        assertThat(notification.textMessage).contains("🏆 Top 3 Series This Week")
-        assertThat(notification.textMessage).contains("🥇 The Bear — 8 viewers")
-        assertThat(notification.textMessage).contains("🥈 Severance — 6 viewers")
+        assertThat(notification.body).contains("📰 Weekly Recap")
+        assertThat(notification.body).contains("🎬 Movie Releases")
+        assertThat(notification.body).contains("• Mon 17 — Dune: Part Two (2024)")
+        assertThat(notification.body).contains("• Wed 19 — Oppenheimer (2024)")
+        assertThat(notification.body).contains("📺 TV Releases")
+        assertThat(notification.body).contains("• Mon 17 — The Bear S03E01 \"Tomorrow\"")
+        assertThat(notification.body).contains("🏆 Top 3 Movies This Week")
+        assertThat(notification.body).contains("🥇 Dune: Part Two — 5 viewers")
+        assertThat(notification.body).contains("🥈 Oppenheimer — 3 viewers")
+        assertThat(notification.body).contains("🥉 Poor Things — 2 viewers")
+        assertThat(notification.body).contains("🏆 Top 3 Series This Week")
+        assertThat(notification.body).contains("🥇 The Bear — 8 viewers")
+        assertThat(notification.body).contains("🥈 Severance — 6 viewers")
 
-        assertThat(notification.htmlMessage).contains("<h2>📰 Weekly Recap</h2>")
-        assertThat(notification.htmlMessage).contains("<hr>")
-        assertThat(notification.htmlMessage).contains("<b>🎬 Movie Releases</b>")
-        assertThat(notification.htmlMessage).contains("<b>📺 TV Releases</b>")
-        assertThat(notification.htmlMessage).contains("<b>🏆 Top 3 Movies This Week</b>")
-        assertThat(notification.htmlMessage).contains("<b>🏆 Top 3 Series This Week</b>")
+        assertThat(notification.formattedBody).contains("<h2>📰 Weekly Recap</h2>")
+        assertThat(notification.formattedBody).contains("<hr>")
+        assertThat(notification.formattedBody).contains("<b>🎬 Movie Releases</b>")
+        assertThat(notification.formattedBody).contains("<b>📺 TV Releases</b>")
+        assertThat(notification.formattedBody).contains("<b>🏆 Top 3 Movies This Week</b>")
+        assertThat(notification.formattedBody).contains("<b>🏆 Top 3 Series This Week</b>")
     }
 
     @Test
@@ -69,8 +69,8 @@ class WeeklyReportNotificationBuilderTest {
             emptyList(), episodes, topMovies, emptyList()
         ).build()
 
-        assertThat(notification.textMessage).doesNotContain("🎬 Movie Releases")
-        assertThat(notification.textMessage).contains("📺 TV Releases")
+        assertThat(notification.body).doesNotContain("🎬 Movie Releases")
+        assertThat(notification.body).contains("📺 TV Releases")
     }
 
     @Test
@@ -83,8 +83,8 @@ class WeeklyReportNotificationBuilderTest {
             movies, emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.textMessage).contains("🎬 Movie Releases")
-        assertThat(notification.textMessage).doesNotContain("📺 TV Releases")
+        assertThat(notification.body).contains("🎬 Movie Releases")
+        assertThat(notification.body).doesNotContain("📺 TV Releases")
     }
 
     @Test
@@ -93,9 +93,9 @@ class WeeklyReportNotificationBuilderTest {
             emptyList(), emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.textMessage).contains("📰 Weekly Recap")
-        assertThat(notification.textMessage).doesNotContain("🏆")
-        assertThat(notification.textMessage).doesNotContain("━━━━━━━━━━━━━━━━━━━━")
+        assertThat(notification.body).contains("📰 Weekly Recap")
+        assertThat(notification.body).doesNotContain("🏆")
+        assertThat(notification.body).doesNotContain("━━━━━━━━━━━━━━━━━━━━")
     }
 
     @Test
@@ -111,10 +111,10 @@ class WeeklyReportNotificationBuilderTest {
             emptyList(), emptyList(), topMovies, emptyList()
         ).build()
 
-        assertThat(notification.textMessage).contains("🥇 A — 10 viewers")
-        assertThat(notification.textMessage).contains("🥈 B — 8 viewers")
-        assertThat(notification.textMessage).contains("🥉 C — 5 viewers")
-        assertThat(notification.textMessage).doesNotContain("D — 2 viewers")
+        assertThat(notification.body).contains("🥇 A — 10 viewers")
+        assertThat(notification.body).contains("🥈 B — 8 viewers")
+        assertThat(notification.body).contains("🥉 C — 5 viewers")
+        assertThat(notification.body).doesNotContain("D — 2 viewers")
     }
 
     @Test
@@ -127,7 +127,7 @@ class WeeklyReportNotificationBuilderTest {
             movies, emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.textMessage).contains("• Thu 20 — Cinema Movie (2024)")
+        assertThat(notification.body).contains("• Thu 20 — Cinema Movie (2024)")
     }
 
     @Test
@@ -140,6 +140,6 @@ class WeeklyReportNotificationBuilderTest {
             movies, emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.textMessage).contains("• TBD — No Date Movie (2024)")
+        assertThat(notification.body).contains("• TBD — No Date Movie (2024)")
     }
 }

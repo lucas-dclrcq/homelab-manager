@@ -7,10 +7,9 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.Issue
-import org.hoohoot.homelab.manager.notifications.Notification
-import org.hoohoot.homelab.manager.notifications.NotificationBuilder
 import org.hoohoot.homelab.manager.notifications.SeerrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
@@ -42,34 +41,39 @@ class SeerrResource(
     private suspend fun handleIssueCreated(issue: Issue) {
         Log.info("Notifying issue created : ${issue.title}")
 
-        var notificationBuilder = NotificationBuilder()
-            .addTitle("🐛 ${issue.title}")
-            .addInfoLine("📌 Subject : ${issue.subject}")
-            .addInfoLine("💬 Message : ${issue.message}")
-            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
+        val additionalInfo = if (issue.additionalInfo.isNotEmpty()) {
+            val info = issue.additionalInfo.entries.joinToString("\n") { "- ${it.key} : ${it.value}" }
+            "\nℹ️ Additional infos :\n$info"
+        } else ""
 
-        if (issue.additionalInfo.isNotEmpty()) {
-            notificationBuilder = notificationBuilder
-                .addInfoLine("ℹ️ Additional infos :")
-                .addInfoLines(issue.additionalInfo.map { "- ${it.key} : ${it.value}" })
-        }
+        val additionalInfoHtml = if (issue.additionalInfo.isNotEmpty()) {
+            val info = issue.additionalInfo.entries.joinToString("<br>") { "- ${it.key} : ${it.value}" }
+            "<br>ℹ️ Additional infos :<br>$info"
+        } else ""
 
-        val notification = notificationBuilder.buildNotification()
-        val sentNotificationId = matrixSender.sendSupportNotification(notification)
+        val content = RoomMessageEventContent.TextBased.Text(
+            body = """
+                🐛 ${issue.title}
+                📌 Subject : ${issue.subject}
+                💬 Message : ${issue.message}
+                👤 Reporter : ${issue.reportedByUserName}
+            """.trimIndent() + additionalInfo,
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>🐛 ${issue.title}</h1>" +
+                "<p>📌 Subject : ${issue.subject}" +
+                "<br>💬 Message : ${issue.message}" +
+                "<br>👤 Reporter : ${issue.reportedByUserName}$additionalInfoHtml</p>"
+        )
+
+        val sentNotificationId = matrixSender.sendSupportNotification(content)
         notificationRepo.saveNotificationIdForIssue(issue.id, sentNotificationId)
     }
 
     private suspend fun handleIssueResolved(issue: Issue) {
         Log.info("Notifying issue resolved : ${issue.title}")
 
-        val notification = NotificationBuilder()
-            .addTitle("✅ ${issue.title}")
-            .addInfoLine("📌 Subject : ${issue.subject}")
-            .addInfoLine("💬 Message : ${issue.message}")
-            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
-            .buildNotification()
-
-        sendSupportNotificationInThread(notification, issue.id)
+        val content = issueContent("✅", issue)
+        sendSupportNotificationInThread(content, issue.id)
 
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issue.id)
         if (issueCreatedNotificationId != null) {
@@ -79,37 +83,52 @@ class SeerrResource(
 
     private suspend fun handleIssueReopened(issue: Issue) {
         Log.info("Notifying issue reopened : ${issue.title}")
-
-        val notification = NotificationBuilder()
-            .addTitle("🔄 ${issue.title}")
-            .addInfoLine("📌 Subject : ${issue.subject}")
-            .addInfoLine("💬 Message : ${issue.message}")
-            .addInfoLine("👤 Reporter : ${issue.reportedByUserName}")
-            .buildNotification()
-
-        sendSupportNotificationInThread(notification, issue.id)
+        sendSupportNotificationInThread(issueContent("🔄", issue), issue.id)
     }
 
     private suspend fun handleIssueComment(issue: Issue) {
         Log.info("Notifying issue commented : ${issue.title}")
 
-        val notification = NotificationBuilder()
-            .addTitle("💬 ${issue.title}")
-            .addInfoLine("📌 Subject : ${issue.subject}")
-            .addInfoLine("💬 Comment : ${issue.comment ?: "No comment"}")
-            .addInfoLine("👤 Comment by : ${issue.commentedBy ?: "No reporter"}")
-            .buildNotification()
+        val content = RoomMessageEventContent.TextBased.Text(
+            body = """
+                💬 ${issue.title}
+                📌 Subject : ${issue.subject}
+                💬 Comment : ${issue.comment ?: "No comment"}
+                👤 Comment by : ${issue.commentedBy ?: "No reporter"}
+            """.trimIndent(),
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>💬 ${issue.title}</h1>" +
+                "<p>📌 Subject : ${issue.subject}" +
+                "<br>💬 Comment : ${issue.comment ?: "No comment"}" +
+                "<br>👤 Comment by : ${issue.commentedBy ?: "No reporter"}</p>"
+        )
 
-        sendSupportNotificationInThread(notification, issue.id)
+        sendSupportNotificationInThread(content, issue.id)
     }
 
-    private suspend fun sendSupportNotificationInThread(notification: Notification, issueId: String) {
+    private fun issueContent(emoji: String, issue: Issue): RoomMessageEventContent.TextBased.Text {
+        return RoomMessageEventContent.TextBased.Text(
+            body = """
+                $emoji ${issue.title}
+                📌 Subject : ${issue.subject}
+                💬 Message : ${issue.message}
+                👤 Reporter : ${issue.reportedByUserName}
+            """.trimIndent(),
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>$emoji ${issue.title}</h1>" +
+                "<p>📌 Subject : ${issue.subject}" +
+                "<br>💬 Message : ${issue.message}" +
+                "<br>👤 Reporter : ${issue.reportedByUserName}</p>"
+        )
+    }
+
+    private suspend fun sendSupportNotificationInThread(content: RoomMessageEventContent.TextBased.Text, issueId: String) {
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issueId)
 
         if (issueCreatedNotificationId != null) {
-            matrixSender.sendSupportNotification(notification, issueCreatedNotificationId)
+            matrixSender.sendSupportNotification(content, issueCreatedNotificationId)
         } else {
-            matrixSender.sendSupportNotification(notification)
+            matrixSender.sendSupportNotification(content)
         }
     }
 }

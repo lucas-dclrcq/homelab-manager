@@ -2,8 +2,8 @@ package org.hoohoot.homelab.manager.notifications.weeklyreport
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.DayOfWeek
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.media.MostPopularMedia
-import org.hoohoot.homelab.manager.notifications.Notification
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.Episode
 
@@ -13,7 +13,7 @@ class WeeklyReportNotificationBuilder(
     private val topMovies: List<MostPopularMedia>,
     private val topSeries: List<MostPopularMedia>,
 ) {
-    fun build(): Notification {
+    fun build(): RoomMessageEventContent.TextBased.Text {
         val textLines = mutableListOf<String>()
         val htmlLines = mutableListOf<String>()
 
@@ -86,9 +86,10 @@ class WeeklyReportNotificationBuilder(
             }
         }
 
-        return Notification(
-            textMessage = textLines.joinToString("\n"),
-            htmlMessage = htmlLines.joinToString("")
+        return RoomMessageEventContent.TextBased.Text(
+            body = textLines.joinToString("\n"),
+            format = "org.matrix.custom.html",
+            formattedBody = htmlLines.joinToString("")
         )
     }
 

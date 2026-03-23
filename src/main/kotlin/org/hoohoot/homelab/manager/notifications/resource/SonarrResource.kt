@@ -7,8 +7,8 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.notifications.NotificationBuilder
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.requester
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
@@ -36,19 +36,27 @@ class SonarrResource(
 
         Log.info("Notifying series downloaded : ${payload.seriesName()}")
 
-        val notification = NotificationBuilder()
-            .addTitle("📺 Episode Downloaded")
-            .addInfoLine("📡 Series : ${payload.series?.title ?: "Unknown"} [${payload.imdbId().toImdbLink()}]")
-            .addInfoLine("🎞️ Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]")
-            .addInfoLine("👤 Series requested by : ${payload.requester()}")
-            .addInfoLine("📥 Source : ${payload.downloadClient} (${payload.indexer()})")
-            .buildNotification()
+        val content = RoomMessageEventContent.TextBased.Text(
+            body = """
+                📺 Episode Downloaded
+                📡 Series : ${payload.series?.title ?: "Unknown"} [${payload.imdbId().toImdbLink()}]
+                🎞️ Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]
+                👤 Series requested by : ${payload.requester()}
+                📥 Source : ${payload.downloadClient} (${payload.indexer()})
+            """.trimIndent(),
+            format = "org.matrix.custom.html",
+            formattedBody = "<h1>📺 Episode Downloaded</h1>" +
+                "<p>📡 Series : ${payload.series?.title ?: "Unknown"} [${payload.imdbId().toImdbLink()}]" +
+                "<br>🎞️ Episode : ${payload.seasonAndEpisodeNumber()} - ${payload.episodeName()} [${payload.quality()}]" +
+                "<br>👤 Series requested by : ${payload.requester()}" +
+                "<br>📥 Source : ${payload.downloadClient} (${payload.indexer()})</p>"
+        )
 
         val seriesId = payload.series?.id?.toString()
 
         if (seriesId != null) {
             val activeThread = notificationRepo.getThreadByMediaId(seriesId, "series")
-            val sentNotificationId = matrixSender.sendMediaNotification(notification, activeThread)
+            val sentNotificationId = matrixSender.sendMediaNotification(content, activeThread)
             val threadEventId = activeThread ?: sentNotificationId
 
             val title = payload.series.title
@@ -56,7 +64,7 @@ class SonarrResource(
             val key = if (title != null && year != null) mediaKey(title, year.toString()) else null
             notificationRepo.saveOrUpdateThread(seriesId, "series", key, threadEventId)
         } else {
-            matrixSender.sendMediaNotification(notification)
+            matrixSender.sendMediaNotification(content)
         }
 
         return Response.noContent().build()
