@@ -14,7 +14,7 @@ import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.requester
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
@@ -26,7 +26,7 @@ private const val DEFAULT_VALUE = "unknown"
 @Tag(name = "Notifications")
 class SonarrResource(
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -55,7 +55,7 @@ class SonarrResource(
                 "<br>📥 Source : ${payload.downloadClient} (${payload.indexer()})</p>"
         )
 
-        val mediaRoom = matrixConfig.room().media()
+        val mediaRoom = roomProvider.media
         val seriesId = payload.series?.id?.toString()
 
         if (seriesId != null) {

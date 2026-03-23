@@ -18,7 +18,7 @@ import org.hoohoot.homelab.manager.notifications.quality
 import org.hoohoot.homelab.manager.notifications.requester
 import org.hoohoot.homelab.manager.notifications.title
 import org.hoohoot.homelab.manager.notifications.year
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
@@ -28,7 +28,7 @@ import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRep
 @Tag(name = "Notifications")
 class RadarrResource(
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -47,7 +47,7 @@ class RadarrResource(
             formattedBody = "<h1>🎬 Movie Downloaded</h1><p>${payload.title()} (${payload.year()}) [${payload.quality()}] ${payload.imdbId().toImdbLink()}<br>👤 Requested by : ${payload.requester()}</p>"
         )
 
-        val sentId = matrixClient.sendNotification(content, matrixConfig.room().media())
+        val sentId = matrixClient.sendNotification(content, roomProvider.media)
 
         val movieId = payload.movie?.id?.toString()
         val title = payload.movie?.title

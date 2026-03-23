@@ -15,7 +15,7 @@ import org.hoohoot.homelab.manager.notifications.additionalInfo
 import org.hoohoot.homelab.manager.notifications.commentMessage
 import org.hoohoot.homelab.manager.notifications.commentedBy
 import org.hoohoot.homelab.manager.notifications.issueId
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.matrix.sendReaction
 import org.hoohoot.homelab.manager.notifications.message
@@ -31,7 +31,7 @@ import org.hoohoot.homelab.manager.notifications.title
 @Tag(name = "Notifications")
 class SeerrResource(
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -76,7 +76,7 @@ class SeerrResource(
                 "<br>👤 Reporter : ${payload.reportedByUserName()}$additionalInfoHtml</p>"
         )
 
-        val supportRoom = matrixConfig.room().support()
+        val supportRoom = roomProvider.support
         val sentNotificationId = matrixClient.sendNotification(content, supportRoom)
         notificationRepo.saveNotificationIdForIssue(payload.issueId(), sentNotificationId)
     }
@@ -89,7 +89,7 @@ class SeerrResource(
 
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(payload.issueId())
         if (issueCreatedNotificationId != null) {
-            matrixClient.sendReaction(issueCreatedNotificationId, matrixConfig.room().support(), "✅")
+            matrixClient.sendReaction(issueCreatedNotificationId, roomProvider.support, "✅")
         }
     }
 
@@ -135,7 +135,7 @@ class SeerrResource(
     }
 
     private suspend fun sendSupportNotificationInThread(content: RoomMessageEventContent.TextBased.Text, issueId: String) {
-        val supportRoom = matrixConfig.room().support()
+        val supportRoom = roomProvider.support
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issueId)
         matrixClient.sendNotification(content, supportRoom, issueCreatedNotificationId)
     }

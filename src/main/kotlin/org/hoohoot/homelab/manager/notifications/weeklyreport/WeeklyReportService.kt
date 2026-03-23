@@ -11,7 +11,7 @@ import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.getSeriesCalendar
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatMediaType
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.time.TimeService
 
@@ -21,7 +21,7 @@ class WeeklyReportService(
     @RestClient private val radarrRestClient: RadarrRestClient,
     private val jellystatService: JellystatService,
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
     private val timeService: TimeService
 ) {
     suspend fun sendWeeklyReport() {
@@ -45,7 +45,7 @@ class WeeklyReportService(
 
             val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
 
-            matrixClient.sendNotification(notification, matrixConfig.room().media())
+            matrixClient.sendNotification(notification, roomProvider.media)
             Log.info("Weekly recap report sent")
         } catch (e: Exception) {
             Log.error("Failed to send weekly recap report", e)

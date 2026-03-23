@@ -5,13 +5,16 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.SeerrResource
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -21,6 +24,17 @@ import org.junit.jupiter.api.Test
 internal class SupportNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
+
+    @Inject
+    lateinit var roomProvider: MatrixRoomProvider
+
+    private lateinit var supportRoomId: String
+
+    @BeforeEach
+    fun setUp() {
+        supportRoomId = synapseClient!!.createRoom("support-${System.nanoTime()}")
+        roomProvider.support = supportRoomId
+    }
 
     @Test
     fun `should send issue created notification`() {
@@ -58,7 +72,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        val lastMessage = synapseClient!!.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd"
@@ -113,7 +127,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        val lastMessage = synapseClient!!.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd\nℹ️ Additional infos :\n- Affected Season : 30\n- Affected Episode : 10"
@@ -160,7 +174,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
+        val lastMessage = synapseClient!!.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "✅ Subtitle Issue Resolved\n📌 Subject : Bad Moms (2016)\n💬 Message : test\n👤 Reporter : lucasd"
@@ -172,8 +186,6 @@ internal class SupportNotificationsTest {
 
     @Test
     fun `should send issue resolved notification in thread of created issue`() {
-        val supportRoomId = synapseClient!!.roomId("support")
-
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -209,7 +221,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueResolved = """
             {
@@ -256,8 +268,6 @@ internal class SupportNotificationsTest {
 
     @Test
     fun `should send issue comment notification in thread of created issue`() {
-        val supportRoomId = synapseClient!!.roomId("support")
-
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -293,7 +303,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueComment = """
             {
@@ -321,13 +331,13 @@ internal class SupportNotificationsTest {
             		"reportedBy_settings_telegramChatId": ""
             	},
             	"comment": {
-	            	"comment_message": "some comment",
-	            	"commentedBy_email": "lucas.declercq@mailbox.org",
-	            	"commentedBy_username": "michel",
-	            	"commentedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
-	            	"commentedBy_settings_discordId": "",
-	            	"commentedBy_settings_telegramChatId": ""
-	            },
+            	"comment_message": "some comment",
+            	"commentedBy_email": "lucas.declercq@mailbox.org",
+            	"commentedBy_username": "michel",
+            	"commentedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
+            	"commentedBy_settings_discordId": "",
+            	"commentedBy_settings_telegramChatId": ""
+            },
             	"extra": []
             }
 """.trimIndent()
@@ -347,8 +357,6 @@ internal class SupportNotificationsTest {
 
     @Test
     fun `should send issue reopened notification in thread of created issue`() {
-        val supportRoomId = synapseClient!!.roomId("support")
-
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -384,7 +392,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueReopened = """
             {
@@ -431,8 +439,6 @@ internal class SupportNotificationsTest {
 
     @Test
     fun `should add reaction on issue created message when issue is resolved`() {
-        val supportRoomId = synapseClient!!.roomId("support")
-
         val issueCreated = """
             {
             	"notification_type": "ISSUE_CREATED",
@@ -468,7 +474,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueResolved = """
             {
@@ -510,47 +516,5 @@ internal class SupportNotificationsTest {
         assertThat(reactionContent.get("event_id").asText()).isEqualTo(createdEventId)
         assertThat(reactionContent.get("key").asText()).isEqualTo("✅")
         assertThat(reactionContent.get("rel_type").asText()).isEqualTo("m.annotation")
-    }
-
-    @Test
-    fun `should send notification to correct room`() {
-        val notification = """{
-  "notification_type": "ISSUE_CREATED",
-  "event": "New Video Issue Reported",
-  "subject": "A Complete Unknown (2024)",
-  "message": "test",
-  "image": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/llWl3GtNoXosbvYboelmoT459NM.jpg",
-  "media": {
-    "media_type": "movie",
-    "tmdbId": "661539",
-    "tvdbId": "",
-    "status": "AVAILABLE",
-    "status4k": "UNKNOWN"
-  },
-  "request": null,
-  "issue": {
-    "issue_id": "24",
-    "issue_type": "VIDEO",
-    "issue_status": "OPEN",
-    "reportedBy_email": "lucas.declercq@mailbox.org",
-    "reportedBy_username": "lucasd",
-    "reportedBy_avatar": "/avatarproxy/9af1973a41694f5f84ca268d3a7ce8a2",
-    "reportedBy_settings_discordId": "",
-    "reportedBy_settings_telegramChatId": ""
-  },
-  "comment": null,
-  "extra": []
-}
-""".trimIndent()
-
-        val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("support"))
-
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .and().header("X-Api-Key", "secureapikey")
-            .`when`().post()
-            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("support"))
-        assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
     }
 }

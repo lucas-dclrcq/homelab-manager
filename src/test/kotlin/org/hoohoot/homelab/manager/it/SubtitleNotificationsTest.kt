@@ -4,12 +4,15 @@ import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -18,6 +21,17 @@ import org.junit.jupiter.api.Test
 internal class SubtitleNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
+
+    @Inject
+    lateinit var roomProvider: MatrixRoomProvider
+
+    private lateinit var mediaRoomId: String
+
+    @BeforeEach
+    fun setUp() {
+        mediaRoomId = synapseClient!!.createRoom("media-${System.nanoTime()}")
+        roomProvider.media = mediaRoomId
+    }
 
     private fun bazarrNotification(message: String) = """
         {
@@ -60,8 +74,6 @@ internal class SubtitleNotificationsTest {
 
     @Test
     fun `should thread movie subtitle notification under movie download notification`() {
-        val mediaRoomId = synapseClient!!.roomId("media")
-
         // 1. Radarr notifies movie downloaded
         RestAssured.given().contentType(ContentType.JSON)
             .body(radarrNotification(movieId = 900, title = "Interstellar", year = 2014))
@@ -69,7 +81,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val movieEventId = synapseClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+        val movieEventId = synapseClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         // 2. Bazarr notifies subtitle downloaded for same movie
         RestAssured.given().contentType(ContentType.JSON)
@@ -87,8 +99,6 @@ internal class SubtitleNotificationsTest {
 
     @Test
     fun `should thread series subtitle notification under episode download notification`() {
-        val mediaRoomId = synapseClient!!.roomId("media")
-
         // 1. Sonarr notifies episode downloaded
         RestAssured.given().contentType(ContentType.JSON)
             .body(sonarrNotification(seriesId = 901, title = "Breaking Bad", year = 2008, episodeNumber = 1))
@@ -96,7 +106,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val seriesEventId = synapseClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+        val seriesEventId = synapseClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         // 2. Bazarr notifies subtitle downloaded for same series
         RestAssured.given().contentType(ContentType.JSON)
@@ -114,15 +124,13 @@ internal class SubtitleNotificationsTest {
 
     @Test
     fun `should send standalone subtitle notification when no matching media exists`() {
-        val mediaRoomId = synapseClient!!.roomId("media")
-
         RestAssured.given().contentType(ContentType.JSON)
             .body(bazarrNotification("Unknown Movie (1999) : English subtitles downloaded from subscene with a score of 80%."))
             .header("X-Api-Key", "secureapikey")
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient.getLastMessage(mediaRoomId)
+        val lastMessage = synapseClient!!.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to")).isNull()
         assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("Unknown Movie (1999)")

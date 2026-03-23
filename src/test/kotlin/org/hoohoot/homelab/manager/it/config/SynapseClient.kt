@@ -8,15 +8,12 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 class SynapseClient(
-    private val synapseUrl: String,
-    private val accessToken: String,
-    private val roomIds: Map<String, String>,
+    val synapseUrl: String,
+    val accessToken: String,
     private val httpClient: HttpClient,
     private val objectMapper: ObjectMapper
 ) {
     fun getMessages(roomId: String): List<JsonNode> {
-        // Synapse accepts /messages without 'from' param when dir=b (starts from most recent).
-        // This is not strictly spec-compliant but works with pinned Synapse v1.120.2.
         val response = httpClient.send(
             HttpRequest.newBuilder()
                 .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/messages?dir=b&limit=50"))
@@ -68,6 +65,28 @@ class SynapseClient(
 
     fun getMessageCount(roomId: String): Int = getMessages(roomId).size
 
-    fun roomId(name: String): String = roomIds[name]
-        ?: throw RuntimeException("Room '$name' not found. Available: ${roomIds.keys}")
+    fun createRoom(name: String): String {
+        val body = objectMapper.writeValueAsString(
+            mapOf(
+                "name" to name,
+                "visibility" to "private"
+            )
+        )
+
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/createRoom"))
+                .header("Authorization", "Bearer $accessToken")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to create room '$name': ${response.body()}")
+        }
+
+        return objectMapper.readTree(response.body()).get("room_id").asText()
+    }
 }

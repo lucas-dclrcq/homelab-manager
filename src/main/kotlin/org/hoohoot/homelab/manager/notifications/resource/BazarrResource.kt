@@ -13,7 +13,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.BazarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.SubtitleDownload
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
@@ -23,7 +23,7 @@ import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRep
 @Tag(name = "Notifications")
 class BazarrResource(
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -43,7 +43,7 @@ class BazarrResource(
 
         val key = mediaKey(subtitle.mediaTitle, subtitle.year)
         val existingThread = notificationRepo.getThreadByMediaKey(key)
-        matrixClient.sendNotification(content, matrixConfig.room().media(), existingThread)
+        matrixClient.sendNotification(content, roomProvider.media, existingThread)
 
         return Response.noContent().build()
     }

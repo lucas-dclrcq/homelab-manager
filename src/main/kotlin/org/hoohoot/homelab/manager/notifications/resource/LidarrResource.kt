@@ -17,7 +17,7 @@ import org.hoohoot.homelab.manager.notifications.coverUrl
 import org.hoohoot.homelab.manager.notifications.source
 import org.hoohoot.homelab.manager.notifications.genres
 import org.hoohoot.homelab.manager.notifications.year
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 
 @Path("/api/notifications/lidarr")
@@ -26,7 +26,7 @@ import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 @Tag(name = "Notifications")
 class LidarrResource(
     private val matrixClient: MatrixClientServerApiClient,
-    private val matrixConfig: MatrixConfiguration,
+    private val roomProvider: MatrixRoomProvider,
 ) {
 
     @POST
@@ -54,7 +54,7 @@ class LidarrResource(
                 "<br>📥 Source : ${payload.source()}</p>"
         )
 
-        matrixClient.sendNotification(content, matrixConfig.room().music())
+        matrixClient.sendNotification(content, roomProvider.music)
         return Response.noContent().build()
     }
 }

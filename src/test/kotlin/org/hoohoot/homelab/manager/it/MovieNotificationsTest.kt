@@ -5,13 +5,16 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.RadarrResource
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -21,6 +24,17 @@ import org.junit.jupiter.api.Test
 internal class MovieNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
+
+    @Inject
+    lateinit var roomProvider: MatrixRoomProvider
+
+    private lateinit var mediaRoomId: String
+
+    @BeforeEach
+    fun setUp() {
+        mediaRoomId = synapseClient!!.createRoom("media-${System.nanoTime()}")
+        roomProvider.media = mediaRoomId
+    }
 
     private val notification = """
         {
@@ -68,7 +82,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
+        val lastMessage = synapseClient!!.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🎬 Movie Downloaded\nThe Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/\n👤 Requested by : lucasd"
@@ -76,18 +90,5 @@ internal class MovieNotificationsTest {
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
             "<h1>🎬 Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>👤 Requested by : lucasd</p>"
         )
-    }
-
-    @Test
-    fun `should send notification to configured room`() {
-        val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("media"))
-
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .and().header("X-Api-Key", "secureapikey")
-            .`when`().post()
-            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("media"))
-        assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
     }
 }

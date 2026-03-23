@@ -68,16 +68,15 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         val objectMapper = ObjectMapper()
 
         val accessToken = registerUser(synapseUrl, httpClient, objectMapper)
-        val roomIds = createRooms(synapseUrl, accessToken, httpClient, objectMapper)
 
-        synapseClient = SynapseClient(synapseUrl, accessToken, roomIds, httpClient, objectMapper)
+        synapseClient = SynapseClient(synapseUrl, accessToken, httpClient, objectMapper)
 
         return mapOf(
             "matrix.base-url" to synapseUrl,
             "matrix.access-token" to accessToken,
-            "matrix.room.media" to roomIds["media"]!!,
-            "matrix.room.music" to roomIds["music"]!!,
-            "matrix.room.support" to roomIds["support"]!!
+            "matrix.room.media" to "!placeholder:localhost",
+            "matrix.room.music" to "!placeholder:localhost",
+            "matrix.room.support" to "!placeholder:localhost"
         )
     }
 
@@ -143,44 +142,5 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         val message = "$nonce\u0000$username\u0000$password\u0000${if (admin) "admin" else "notadmin"}"
         val rawHmac = mac.doFinal(message.toByteArray())
         return rawHmac.joinToString("") { "%02x".format(it) }
-    }
-
-    private fun createRooms(
-        synapseUrl: String,
-        accessToken: String,
-        httpClient: HttpClient,
-        objectMapper: ObjectMapper
-    ): Map<String, String> {
-        val roomNames = listOf("media", "music", "support")
-        val roomIds = mutableMapOf<String, String>()
-
-        for (name in roomNames) {
-            val body = objectMapper.writeValueAsString(
-                mapOf(
-                    "name" to name,
-                    "room_alias_name" to name,
-                    "visibility" to "private"
-                )
-            )
-
-            val response = httpClient.send(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("$synapseUrl/_matrix/client/r0/createRoom"))
-                    .header("Authorization", "Bearer $accessToken")
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build(),
-                HttpResponse.BodyHandlers.ofString()
-            )
-
-            if (response.statusCode() != 200) {
-                throw RuntimeException("Failed to create room '$name': ${response.body()}")
-            }
-
-            val roomId = objectMapper.readTree(response.body()).get("room_id").asText()
-            roomIds[name] = roomId
-        }
-
-        return roomIds
     }
 }

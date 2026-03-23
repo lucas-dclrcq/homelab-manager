@@ -5,13 +5,16 @@ import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.LidarrResource
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -21,6 +24,17 @@ import org.junit.jupiter.api.Test
 internal class MusicNotificationsTest {
     @InjectSynapse
     private val synapseClient: SynapseClient? = null
+
+    @Inject
+    lateinit var roomProvider: MatrixRoomProvider
+
+    private lateinit var musicRoomId: String
+
+    @BeforeEach
+    fun setUp() {
+        musicRoomId = synapseClient!!.createRoom("music-${System.nanoTime()}")
+        roomProvider.music = musicRoomId
+    }
 
     private val notification = """
         {
@@ -265,7 +279,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("music"))
+        val lastMessage = synapseClient!!.getLastMessage(musicRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🎵 Album downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\n🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\n🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\n📥 Source : qBittorrent"
@@ -273,18 +287,5 @@ internal class MusicNotificationsTest {
         assertThat(lastMessage.get("formatted_body").asText()).isEqualTo(
             "<h1>🎵 Album downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>📥 Source : qBittorrent</p>"
         )
-    }
-
-    @Test
-    fun `should send notification to configured room`() {
-        val messageCountBefore = synapseClient!!.getMessageCount(synapseClient.roomId("music"))
-
-        RestAssured.given().contentType(ContentType.JSON).body(notification)
-            .and().header("X-Api-Key", "secureapikey")
-            .`when`().post()
-            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("music"))
-        assertThat(messageCountAfter).isGreaterThan(messageCountBefore)
     }
 }
