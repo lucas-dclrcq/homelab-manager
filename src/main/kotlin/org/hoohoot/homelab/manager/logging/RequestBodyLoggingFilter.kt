@@ -1,23 +1,23 @@
 package org.hoohoot.homelab.manager.logging
 
 import io.quarkus.logging.Log
-import jakarta.inject.Inject
 import jakarta.ws.rs.WebApplicationException
 import jakarta.ws.rs.ext.Provider
 import jakarta.ws.rs.ext.ReaderInterceptor
 import jakarta.ws.rs.ext.ReaderInterceptorContext
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import java.io.ByteArrayInputStream
 import java.io.IOException
 
 @Provider
-class RequestBodyLoggingFilter : ReaderInterceptor {
-
-    @Inject
-    lateinit var config: RequestLoggingConfiguration
+class RequestBodyLoggingFilter(
+    @ConfigProperty(name = "api.logging.log-body", defaultValue = "true")
+    private val logBody: Boolean
+) : ReaderInterceptor {
 
     @Throws(IOException::class, WebApplicationException::class)
     override fun aroundReadFrom(context: ReaderInterceptorContext): Any {
-        if (!config.logBody()) {
+        if (!logBody) {
             return context.proceed()
         }
 
