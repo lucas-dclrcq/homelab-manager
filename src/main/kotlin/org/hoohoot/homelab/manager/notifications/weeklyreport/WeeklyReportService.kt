@@ -25,26 +25,31 @@ class WeeklyReportService(
     private val timeService: TimeService
 ) {
     suspend fun sendWeeklyReport() {
-        Log.info("Sending weekly recap report")
+        try {
+            Log.info("Sending weekly recap report")
 
-        val currentWeek = timeService.getCurrentWeek()
+            val currentWeek = timeService.getCurrentWeek()
 
-        val movies = radarrRestClient.getMovieCalendar(currentWeek.start, currentWeek.end)
-        val episodes = sonarrRestClient.getSeriesCalendar(currentWeek.start, currentWeek.end)
+            val movies = radarrRestClient.getMovieCalendar(currentWeek.start, currentWeek.end)
+            val episodes = sonarrRestClient.getSeriesCalendar(currentWeek.start, currentWeek.end)
 
-        val topMovies = jellystatService.getMostPopularByType(7, JellystatMediaType.Movie)
-            .map { MostPopularMedia(it.name, it.uniqueViewers) }
-            .sortedByDescending { it.uniqueViewers }
-            .take(3)
+            val topMovies = jellystatService.getMostPopularByType(7, JellystatMediaType.Movie)
+                .map { MostPopularMedia(it.name, it.uniqueViewers) }
+                .sortedByDescending { it.uniqueViewers }
+                .take(3)
 
-        val topSeries = jellystatService.getMostPopularByType(7, JellystatMediaType.Series)
-            .map { MostPopularMedia(it.name, it.uniqueViewers) }
-            .sortedByDescending { it.uniqueViewers }
-            .take(3)
+            val topSeries = jellystatService.getMostPopularByType(7, JellystatMediaType.Series)
+                .map { MostPopularMedia(it.name, it.uniqueViewers) }
+                .sortedByDescending { it.uniqueViewers }
+                .take(3)
 
-        val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
+            val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
 
-        matrixClient.sendNotification(notification, matrixConfig.room().media())
-        Log.info("Weekly recap report sent")
+            matrixClient.sendNotification(notification, matrixConfig.room().media())
+            Log.info("Weekly recap report sent")
+        } catch (e: Exception) {
+            Log.error("Failed to send weekly recap report", e)
+            throw e
+        }
     }
 }
