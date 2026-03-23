@@ -11,11 +11,11 @@ import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.resource.SeerrResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@TestHTTPEndpoint(NotificationsResource::class)
+@TestHTTPEndpoint(SeerrResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
 @QuarkusTestResource(SynapseTestResource::class)
 internal class SupportNotificationsTest {
@@ -55,7 +55,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -110,7 +110,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -157,7 +157,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("support"))
@@ -206,7 +206,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -243,7 +243,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
@@ -290,7 +290,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -334,7 +334,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueComment)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
@@ -381,7 +381,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -418,7 +418,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueReopened)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(supportRoomId)
@@ -465,7 +465,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueCreated)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val createdEventId = synapseClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
@@ -502,7 +502,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(issueResolved)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastReaction = synapseClient.getLastReaction(supportRoomId)
@@ -547,7 +547,7 @@ internal class SupportNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/seerr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("support"))

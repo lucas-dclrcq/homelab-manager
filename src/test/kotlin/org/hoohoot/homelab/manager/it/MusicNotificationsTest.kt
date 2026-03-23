@@ -11,11 +11,11 @@ import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.resource.LidarrResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@TestHTTPEndpoint(NotificationsResource::class)
+@TestHTTPEndpoint(LidarrResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
 @QuarkusTestResource(SynapseTestResource::class)
 internal class MusicNotificationsTest {
@@ -262,7 +262,7 @@ internal class MusicNotificationsTest {
     fun `should send album downloaded notification`() {
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/lidarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("music"))
@@ -281,7 +281,7 @@ internal class MusicNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/lidarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("music"))

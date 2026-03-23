@@ -11,11 +11,11 @@ import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.resource.RadarrResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@TestHTTPEndpoint(NotificationsResource::class)
+@TestHTTPEndpoint(RadarrResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
 @QuarkusTestResource(SynapseTestResource::class)
 internal class MovieNotificationsTest {
@@ -65,7 +65,7 @@ internal class MovieNotificationsTest {
     fun `should send movie downloaded notification`() {
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/radarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
@@ -84,7 +84,7 @@ internal class MovieNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification)
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/radarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("media"))

@@ -13,12 +13,12 @@ import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.resource.NotificationsResource
+import org.hoohoot.homelab.manager.notifications.resource.SonarrResource
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 @QuarkusTest
-@TestHTTPEndpoint(NotificationsResource::class)
+@TestHTTPEndpoint(SonarrResource::class)
 @QuarkusTestResource(WiremockTestResource::class)
 @QuarkusTestResource(SynapseTestResource::class)
 internal class SeriesNotificationsTest {
@@ -147,7 +147,7 @@ internal class SeriesNotificationsTest {
     fun `should send series episode downloaded notification`() {
         RestAssured.given().contentType(ContentType.JSON).body(notification())
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient!!.getLastMessage(synapseClient.roomId("media"))
@@ -166,7 +166,7 @@ internal class SeriesNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification())
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val messageCountAfter = synapseClient.getMessageCount(synapseClient.roomId("media"))
@@ -179,14 +179,14 @@ internal class SeriesNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 500, episodeNumber = 1))
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val firstEventId = synapseClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 500, episodeNumber = 2))
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(mediaRoomId)
@@ -200,7 +200,7 @@ internal class SeriesNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 1))
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         // Simulate 48h+ elapsed and trigger cleanup (cron job deletes entries older than 48h)
@@ -217,7 +217,7 @@ internal class SeriesNotificationsTest {
 
         RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 2))
             .and().header("X-Api-Key", "secureapikey")
-            .`when`().post("/sonarr")
+            .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
         val lastMessage = synapseClient.getLastMessage(mediaRoomId)
