@@ -13,6 +13,8 @@ class WeeklyReportNotificationBuilder(
     private val topMovies: List<MostPopularMedia>,
     private val topSeries: List<MostPopularMedia>,
 ) {
+    private data class Release(val date: LocalDate?, val line: String)
+
     fun build(): RoomMessageEventContent.TextBased.Text {
         val textLines = mutableListOf<String>()
         val htmlLines = mutableListOf<String>()
@@ -28,30 +30,29 @@ class WeeklyReportNotificationBuilder(
             textLines.add("━━━━━━━━━━━━━━━━━━━━")
             htmlLines.add("<hr>")
 
-            if (movies.isNotEmpty()) {
+            val releases = buildReleaseList()
+            val grouped = releases.groupBy { it.date }
+            val dated = grouped.filterKeys { it != null }.toSortedMap(compareBy { it })
+            val undated = grouped[null]
+
+            dated.forEach { (date, items) ->
+                val header = "${date!!.dayOfWeek.toFullName()} ${date.dayOfMonth}"
                 textLines.add("")
-                textLines.add("🎬 Movie Releases")
-                htmlLines.add("<b>🎬 Movie Releases</b><br>")
-                movies.forEach { movie ->
-                    val date = formatMovieDate(movie)
-                    val line = "• $date — ${movie.title ?: "Unknown"} (${movie.year ?: "?"})"
-                    textLines.add(line)
-                    htmlLines.add("$line<br>")
+                textLines.add(header)
+                htmlLines.add("<br><b>$header</b><br>")
+                items.forEach { release ->
+                    textLines.add(release.line)
+                    htmlLines.add("${release.line}<br>")
                 }
             }
 
-            if (episodes.isNotEmpty()) {
+            if (undated != null) {
                 textLines.add("")
-                textLines.add("📺 TV Releases")
-                htmlLines.add("<b>📺 TV Releases</b><br>")
-                episodes.forEach { episode ->
-                    val date = formatEpisodeDate(episode)
-                    val seriesTitle = episode.series?.title ?: "Unknown"
-                    val epCode = "S%02dE%02d".format(episode.seasonNumber, episode.episodeNumber)
-                    val epTitle = episode.title?.let { "\"$it\"" } ?: ""
-                    val line = "• $date — $seriesTitle $epCode $epTitle"
-                    textLines.add(line)
-                    htmlLines.add("$line<br>")
+                textLines.add("TBD")
+                htmlLines.add("<br><b>TBD</b><br>")
+                undated.forEach { release ->
+                    textLines.add(release.line)
+                    htmlLines.add("${release.line}<br>")
                 }
             }
         }
@@ -64,7 +65,7 @@ class WeeklyReportNotificationBuilder(
             if (topMovies.isNotEmpty()) {
                 textLines.add("")
                 textLines.add("🏆 Top 3 Movies This Week")
-                htmlLines.add("<b>🏆 Top 3 Movies This Week</b><br>")
+                htmlLines.add("<br><b>🏆 Top 3 Movies This Week</b><br>")
                 topMovies.take(3).forEachIndexed { index, movie ->
                     val medal = medals[index]
                     val line = "$medal ${movie.name} — ${movie.uniqueViewers} viewers"
@@ -76,7 +77,7 @@ class WeeklyReportNotificationBuilder(
             if (topSeries.isNotEmpty()) {
                 textLines.add("")
                 textLines.add("🏆 Top 3 Series This Week")
-                htmlLines.add("<b>🏆 Top 3 Series This Week</b><br>")
+                htmlLines.add("<br><b>🏆 Top 3 Series This Week</b><br>")
                 topSeries.take(3).forEachIndexed { index, series ->
                     val medal = medals[index]
                     val line = "$medal ${series.name} — ${series.uniqueViewers} viewers"
@@ -93,38 +94,47 @@ class WeeklyReportNotificationBuilder(
         )
     }
 
-    private fun formatMovieDate(movie: RadarrMovie): String {
-        val dateStr = movie.digitalRelease ?: movie.physicalRelease ?: movie.inCinemas
-        return formatDateString(dateStr)
+    private fun buildReleaseList(): List<Release> {
+        val releases = mutableListOf<Release>()
+
+        movies.forEach { movie ->
+            val date = parseDate(movie.digitalRelease ?: movie.physicalRelease ?: movie.inCinemas)
+            val line = "• ${movie.title ?: "Unknown"} (${movie.year ?: "?"})"
+            releases.add(Release(date, line))
+        }
+
+        episodes.forEach { episode ->
+            val date = parseDate(episode.airDate)
+            val seriesTitle = episode.series?.title ?: "Unknown"
+            val epCode = "S%02dE%02d".format(episode.seasonNumber, episode.episodeNumber)
+            val epTitle = episode.title?.let { " \"$it\"" } ?: ""
+            val line = "• $seriesTitle $epCode$epTitle"
+            releases.add(Release(date, line))
+        }
+
+        return releases
     }
 
-    private fun formatEpisodeDate(episode: Episode): String {
-        return formatDateString(episode.airDate)
-    }
-
-    private fun formatDateString(dateStr: String?): String {
-        if (dateStr == null) return "TBD"
+    private fun parseDate(dateStr: String?): LocalDate? {
+        if (dateStr == null) return null
         return try {
-            val date = LocalDate.parse(dateStr.substring(0, 10))
-            val dayAbbr = date.dayOfWeek.toAbbreviation()
-            val dayNum = date.dayOfMonth
-            "$dayAbbr $dayNum"
+            LocalDate.parse(dateStr.substring(0, 10))
         } catch (_: Exception) {
-            "TBD"
+            null
         }
     }
 
     companion object {
         private val medals = listOf("🥇", "🥈", "🥉")
 
-        private fun DayOfWeek.toAbbreviation(): String = when (this) {
-            DayOfWeek.MONDAY -> "Mon"
-            DayOfWeek.TUESDAY -> "Tue"
-            DayOfWeek.WEDNESDAY -> "Wed"
-            DayOfWeek.THURSDAY -> "Thu"
-            DayOfWeek.FRIDAY -> "Fri"
-            DayOfWeek.SATURDAY -> "Sat"
-            DayOfWeek.SUNDAY -> "Sun"
+        private fun DayOfWeek.toFullName(): String = when (this) {
+            DayOfWeek.MONDAY -> "Monday"
+            DayOfWeek.TUESDAY -> "Tuesday"
+            DayOfWeek.WEDNESDAY -> "Wednesday"
+            DayOfWeek.THURSDAY -> "Thursday"
+            DayOfWeek.FRIDAY -> "Friday"
+            DayOfWeek.SATURDAY -> "Saturday"
+            DayOfWeek.SUNDAY -> "Sunday"
             else -> "???"
         }
     }

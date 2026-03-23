@@ -34,11 +34,13 @@ class WeeklyReportNotificationBuilderTest {
         val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
 
         assertThat(notification.body).contains("📰 Weekly Recap")
-        assertThat(notification.body).contains("🎬 Movie Releases")
-        assertThat(notification.body).contains("• Mon 17 — Dune: Part Two (2024)")
-        assertThat(notification.body).contains("• Wed 19 — Oppenheimer (2024)")
-        assertThat(notification.body).contains("📺 TV Releases")
-        assertThat(notification.body).contains("• Mon 17 — The Bear S03E01 \"Tomorrow\"")
+        // Releases grouped by day
+        assertThat(notification.body).contains("Monday 17")
+        assertThat(notification.body).contains("• Dune: Part Two (2024)")
+        assertThat(notification.body).contains("• The Bear S03E01 \"Tomorrow\"")
+        assertThat(notification.body).contains("Wednesday 19")
+        assertThat(notification.body).contains("• Oppenheimer (2024)")
+        // Stats
         assertThat(notification.body).contains("🏆 Top 3 Movies This Week")
         assertThat(notification.body).contains("🥇 Dune: Part Two — 5 viewers")
         assertThat(notification.body).contains("🥈 Oppenheimer — 3 viewers")
@@ -49,42 +51,49 @@ class WeeklyReportNotificationBuilderTest {
 
         assertThat(notification.formattedBody).contains("<h2>📰 Weekly Recap</h2>")
         assertThat(notification.formattedBody).contains("<hr>")
-        assertThat(notification.formattedBody).contains("<b>🎬 Movie Releases</b>")
-        assertThat(notification.formattedBody).contains("<b>📺 TV Releases</b>")
+        assertThat(notification.formattedBody).contains("<b>Monday 17</b>")
+        assertThat(notification.formattedBody).contains("<b>Wednesday 19</b>")
         assertThat(notification.formattedBody).contains("<b>🏆 Top 3 Movies This Week</b>")
         assertThat(notification.formattedBody).contains("<b>🏆 Top 3 Series This Week</b>")
     }
 
     @Test
-    fun `should hide movie releases section when empty`() {
+    fun `should group movies and episodes on same day together`() {
+        val movies = listOf(
+            RadarrMovie(title = "Some Movie", year = 2024, digitalRelease = "2025-03-18"),
+        )
         val episodes = listOf(
             Episode(
                 seasonNumber = 1, episodeNumber = 5, title = "Test",
                 airDate = "2025-03-18", series = Series(title = "Test Show")
             ),
         )
-        val topMovies = listOf(MostPopularMedia("Movie", 3))
 
         val notification = WeeklyReportNotificationBuilder(
-            emptyList(), episodes, topMovies, emptyList()
+            movies, episodes, emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.body).doesNotContain("🎬 Movie Releases")
-        assertThat(notification.body).contains("📺 TV Releases")
+        val body = notification.body
+        val tuesdayIndex = body.indexOf("Tuesday 18")
+        val movieIndex = body.indexOf("• Some Movie (2024)")
+        val episodeIndex = body.indexOf("• Test Show S01E05 \"Test\"")
+
+        assertThat(tuesdayIndex).isGreaterThan(-1)
+        assertThat(movieIndex).isGreaterThan(tuesdayIndex)
+        assertThat(episodeIndex).isGreaterThan(tuesdayIndex)
     }
 
     @Test
-    fun `should hide tv releases section when empty`() {
-        val movies = listOf(
-            RadarrMovie(title = "Test Movie", year = 2024, digitalRelease = "2025-03-17"),
-        )
+    fun `should hide releases section when empty`() {
+        val topMovies = listOf(MostPopularMedia("Movie", 3))
 
         val notification = WeeklyReportNotificationBuilder(
-            movies, emptyList(), emptyList(), emptyList()
+            emptyList(), emptyList(), topMovies, emptyList()
         ).build()
 
-        assertThat(notification.body).contains("🎬 Movie Releases")
-        assertThat(notification.body).doesNotContain("📺 TV Releases")
+        assertThat(notification.body).doesNotContain("Monday")
+        assertThat(notification.body).doesNotContain("Tuesday")
+        assertThat(notification.body).contains("🏆 Top 3 Movies This Week")
     }
 
     @Test
@@ -127,11 +136,12 @@ class WeeklyReportNotificationBuilderTest {
             movies, emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.body).contains("• Thu 20 — Cinema Movie (2024)")
+        assertThat(notification.body).contains("Thursday 20")
+        assertThat(notification.body).contains("• Cinema Movie (2024)")
     }
 
     @Test
-    fun `should show TBD when no date available`() {
+    fun `should show TBD group when no date available`() {
         val movies = listOf(
             RadarrMovie(title = "No Date Movie", year = 2024),
         )
@@ -140,6 +150,7 @@ class WeeklyReportNotificationBuilderTest {
             movies, emptyList(), emptyList(), emptyList()
         ).build()
 
-        assertThat(notification.body).contains("• TBD — No Date Movie (2024)")
+        assertThat(notification.body).contains("TBD")
+        assertThat(notification.body).contains("• No Date Movie (2024)")
     }
 }
