@@ -7,12 +7,14 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.BazarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.SubtitleDownload
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
 @Path("/api/notifications/bazarr")
@@ -20,7 +22,8 @@ import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRep
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
 class BazarrResource(
-    private val matrixSender: MatrixNotificationSender,
+    private val matrixClient: MatrixClientServerApiClient,
+    private val matrixConfig: MatrixConfiguration,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -40,7 +43,7 @@ class BazarrResource(
 
         val key = mediaKey(subtitle.mediaTitle, subtitle.year)
         val existingThread = notificationRepo.getThreadByMediaKey(key)
-        matrixSender.sendMediaNotification(content, existingThread)
+        matrixClient.sendNotification(content, matrixConfig.room().media(), existingThread)
 
         return Response.noContent().build()
     }

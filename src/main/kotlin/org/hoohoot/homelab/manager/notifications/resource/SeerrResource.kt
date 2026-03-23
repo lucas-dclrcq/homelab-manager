@@ -7,11 +7,14 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.Issue
 import org.hoohoot.homelab.manager.notifications.SeerrWebhookPayload
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
+import org.hoohoot.homelab.manager.notifications.matrix.sendReaction
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
 @Path("/api/notifications/seerr")
@@ -19,7 +22,8 @@ import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRep
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
 class SeerrResource(
-    private val matrixSender: MatrixNotificationSender,
+    private val matrixClient: MatrixClientServerApiClient,
+    private val matrixConfig: MatrixConfiguration,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -65,7 +69,8 @@ class SeerrResource(
                 "<br>👤 Reporter : ${issue.reportedByUserName}$additionalInfoHtml</p>"
         )
 
-        val sentNotificationId = matrixSender.sendSupportNotification(content)
+        val supportRoom = matrixConfig.room().support()
+        val sentNotificationId = matrixClient.sendNotification(content, supportRoom)
         notificationRepo.saveNotificationIdForIssue(issue.id, sentNotificationId)
     }
 
@@ -77,7 +82,7 @@ class SeerrResource(
 
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issue.id)
         if (issueCreatedNotificationId != null) {
-            matrixSender.reactToSupportMessage(issueCreatedNotificationId, "✅")
+            matrixClient.sendReaction(issueCreatedNotificationId, matrixConfig.room().support(), "✅")
         }
     }
 
@@ -123,12 +128,8 @@ class SeerrResource(
     }
 
     private suspend fun sendSupportNotificationInThread(content: RoomMessageEventContent.TextBased.Text, issueId: String) {
+        val supportRoom = matrixConfig.room().support()
         val issueCreatedNotificationId = notificationRepo.getNotificationIdForIssue(issueId)
-
-        if (issueCreatedNotificationId != null) {
-            matrixSender.sendSupportNotification(content, issueCreatedNotificationId)
-        } else {
-            matrixSender.sendSupportNotification(content)
-        }
+        matrixClient.sendNotification(content, supportRoom, issueCreatedNotificationId)
     }
 }

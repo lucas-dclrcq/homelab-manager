@@ -7,18 +7,21 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.Album
 import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 
 @Path("/api/notifications/lidarr")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
 class LidarrResource(
-    private val matrixSender: MatrixNotificationSender,
+    private val matrixClient: MatrixClientServerApiClient,
+    private val matrixConfig: MatrixConfiguration,
 ) {
 
     @POST
@@ -47,7 +50,7 @@ class LidarrResource(
                 "<br>📥 Source : ${album.downloadClient}</p>"
         )
 
-        matrixSender.sendMusicNotification(content)
+        matrixClient.sendNotification(content, matrixConfig.room().music())
         return Response.noContent().build()
     }
 }

@@ -7,13 +7,15 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.requester
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixNotificationSender
+import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
+import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 
 private const val DEFAULT_VALUE = "unknown"
@@ -23,7 +25,8 @@ private const val DEFAULT_VALUE = "unknown"
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Notifications")
 class SonarrResource(
-    private val matrixSender: MatrixNotificationSender,
+    private val matrixClient: MatrixClientServerApiClient,
+    private val matrixConfig: MatrixConfiguration,
     private val notificationRepo: NotificationSentRepository,
 ) {
 
@@ -52,11 +55,12 @@ class SonarrResource(
                 "<br>📥 Source : ${payload.downloadClient} (${payload.indexer()})</p>"
         )
 
+        val mediaRoom = matrixConfig.room().media()
         val seriesId = payload.series?.id?.toString()
 
         if (seriesId != null) {
             val activeThread = notificationRepo.getThreadByMediaId(seriesId, "series")
-            val sentNotificationId = matrixSender.sendMediaNotification(content, activeThread)
+            val sentNotificationId = matrixClient.sendNotification(content, mediaRoom, activeThread)
             val threadEventId = activeThread ?: sentNotificationId
 
             val title = payload.series.title
@@ -64,7 +68,7 @@ class SonarrResource(
             val key = if (title != null && year != null) mediaKey(title, year.toString()) else null
             notificationRepo.saveOrUpdateThread(seriesId, "series", key, threadEventId)
         } else {
-            matrixSender.sendMediaNotification(content)
+            matrixClient.sendNotification(content, mediaRoom)
         }
 
         return Response.noContent().build()
