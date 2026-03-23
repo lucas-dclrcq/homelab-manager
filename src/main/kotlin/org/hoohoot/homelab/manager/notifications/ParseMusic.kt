@@ -33,28 +33,15 @@ data class LidarrWebhookImage(
 
 private const val DEFAULT_VALUE = "unknown"
 
-data class Album(
-    val downloadClient: String,
-    val artistName: String,
-    val albumTitle: String,
-    val coverUrl: String,
-    val genres: List<String>,
-    val year: String
-) {
-    companion object {
-        fun from(payload: LidarrWebhookPayload): Album = Album(
-            downloadClient = payload.downloadClient ?: DEFAULT_VALUE,
-            artistName = payload.artist?.name ?: DEFAULT_VALUE,
-            albumTitle = payload.album?.title ?: DEFAULT_VALUE,
-            coverUrl = payload.album?.images
-                ?.firstOrNull { it.coverType == "cover" }
-                ?.remoteUrl
-                ?: DEFAULT_VALUE,
-            genres = payload.album?.genres ?: emptyList(),
-            year = payload.album?.releaseDate
-                ?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }.getOrNull() }
-                ?.let { DateTimeFormatter.ofPattern("yyyy").format(it) }
-                ?: DEFAULT_VALUE
-        )
-    }
-}
+fun LidarrWebhookPayload.artistName(): String = artist?.name ?: DEFAULT_VALUE
+fun LidarrWebhookPayload.albumTitle(): String = album?.title ?: DEFAULT_VALUE
+fun LidarrWebhookPayload.coverUrl(): String = album?.images
+    ?.firstOrNull { it.coverType == "cover" }
+    ?.remoteUrl
+    ?: DEFAULT_VALUE
+fun LidarrWebhookPayload.genres(): List<String> = album?.genres ?: emptyList()
+fun LidarrWebhookPayload.year(): String = album?.releaseDate
+    ?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }.getOrNull() }
+    ?.let { DateTimeFormatter.ofPattern("yyyy").format(it) }
+    ?: DEFAULT_VALUE
+fun LidarrWebhookPayload.source(): String = downloadClient ?: DEFAULT_VALUE

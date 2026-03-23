@@ -10,8 +10,13 @@ import jakarta.ws.rs.core.Response
 import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.notifications.Album
 import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.albumTitle
+import org.hoohoot.homelab.manager.notifications.artistName
+import org.hoohoot.homelab.manager.notifications.coverUrl
+import org.hoohoot.homelab.manager.notifications.source
+import org.hoohoot.homelab.manager.notifications.genres
+import org.hoohoot.homelab.manager.notifications.year
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 
@@ -31,23 +36,22 @@ class LidarrResource(
             return Response.noContent().build()
         }
 
-        val album = Album.from(payload)
-        Log.info("Notifying album downloaded : ${album.albumTitle}")
+        Log.info("Notifying album downloaded : ${payload.albumTitle()}")
 
         val content = RoomMessageEventContent.TextBased.Text(
             body = """
                 🎵 Album downloaded
-                ${album.artistName} - ${album.albumTitle} (${album.year})
-                🖼️ Cover: ${album.coverUrl}
-                🎸 Genres : ${album.genres.joinToString(", ")}
-                📥 Source : ${album.downloadClient}
+                ${payload.artistName()} - ${payload.albumTitle()} (${payload.year()})
+                🖼️ Cover: ${payload.coverUrl()}
+                🎸 Genres : ${payload.genres().joinToString(", ")}
+                📥 Source : ${payload.source()}
             """.trimIndent(),
             format = "org.matrix.custom.html",
             formattedBody = "<h1>🎵 Album downloaded</h1>" +
-                "<p>${album.artistName} - ${album.albumTitle} (${album.year})" +
-                "<br>🖼️ Cover: ${album.coverUrl}" +
-                "<br>🎸 Genres : ${album.genres.joinToString(", ")}" +
-                "<br>📥 Source : ${album.downloadClient}</p>"
+                "<p>${payload.artistName()} - ${payload.albumTitle()} (${payload.year()})" +
+                "<br>🖼️ Cover: ${payload.coverUrl()}" +
+                "<br>🎸 Genres : ${payload.genres().joinToString(", ")}" +
+                "<br>📥 Source : ${payload.source()}</p>"
         )
 
         matrixClient.sendNotification(content, matrixConfig.room().music())

@@ -10,10 +10,14 @@ import jakarta.ws.rs.core.Response
 import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.notifications.Movie
 import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
+import org.hoohoot.homelab.manager.notifications.imdbId
+import org.hoohoot.homelab.manager.notifications.quality
+import org.hoohoot.homelab.manager.notifications.requester
+import org.hoohoot.homelab.manager.notifications.title
+import org.hoohoot.homelab.manager.notifications.year
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixConfiguration
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
@@ -35,13 +39,12 @@ class RadarrResource(
             return Response.noContent().build()
         }
 
-        val movie = Movie.from(payload)
-        Log.info("Notifying movie downloaded : ${movie.title}")
+        Log.info("Notifying movie downloaded : ${payload.title()}")
 
         val content = RoomMessageEventContent.TextBased.Text(
-            body = "🎬 Movie Downloaded\n${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}\n👤 Requested by : ${movie.requester}",
+            body = "🎬 Movie Downloaded\n${payload.title()} (${payload.year()}) [${payload.quality()}] ${payload.imdbId().toImdbLink()}\n👤 Requested by : ${payload.requester()}",
             format = "org.matrix.custom.html",
-            formattedBody = "<h1>🎬 Movie Downloaded</h1><p>${movie.title} (${movie.year}) [${movie.quality}] ${movie.imdbId.toImdbLink()}<br>👤 Requested by : ${movie.requester}</p>"
+            formattedBody = "<h1>🎬 Movie Downloaded</h1><p>${payload.title()} (${payload.year()}) [${payload.quality()}] ${payload.imdbId().toImdbLink()}<br>👤 Requested by : ${payload.requester()}</p>"
         )
 
         val sentId = matrixClient.sendNotification(content, matrixConfig.room().media())

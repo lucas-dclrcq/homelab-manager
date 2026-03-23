@@ -4,8 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.Issue
 import org.hoohoot.homelab.manager.notifications.SeerrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.issueId
+import org.hoohoot.homelab.manager.notifications.message
+import org.hoohoot.homelab.manager.notifications.notificationType
+import org.hoohoot.homelab.manager.notifications.reportedByUserName
+import org.hoohoot.homelab.manager.notifications.subject
+import org.hoohoot.homelab.manager.notifications.title
 import org.junit.jupiter.api.Test
 
 class ParseIssueTest {
@@ -48,7 +53,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = Issue.from(payload).message
+        val message = payload.message()
 
 
         // ASSERT
@@ -91,7 +96,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = Issue.from(payload).notificationType
+        val message = payload.notificationType()
 
         // ASSERT
         assertThat(message).isEqualTo("ISSUE_CREATED")
@@ -133,7 +138,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = Issue.from(payload).id
+        val message = payload.issueId()
 
         // ASSERT
         assertThat(message).isEqualTo("24")
@@ -174,11 +179,8 @@ class ParseIssueTest {
    """.trimIndent()
         )
 
-        val issue = Issue.from(payload)
-
         // act
-
-        val message = issue.subject
+        val message = payload.subject()
 
         // assert
         assertThat(message).isEqualTo("A Complete Unknown (2024)")
@@ -219,11 +221,8 @@ class ParseIssueTest {
    """.trimIndent()
         )
 
-        val issue = Issue.from(payload)
-
         // act
-
-        val message = issue.reportedByUserName
+        val message = payload.reportedByUserName()
 
         // assert
         assertThat(message).isEqualTo("lucasd")
@@ -265,7 +264,7 @@ class ParseIssueTest {
         )
 
         // ACT
-        val message = Issue.from(payload).title
+        val message = payload.title()
 
         // ASSERT
         assertThat(message).isEqualTo("New Video Issue Reported")

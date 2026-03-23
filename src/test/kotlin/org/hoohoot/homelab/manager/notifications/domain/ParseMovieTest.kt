@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.Movie
 import org.hoohoot.homelab.manager.notifications.RadarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.imdbId
+import org.hoohoot.homelab.manager.notifications.quality
+import org.hoohoot.homelab.manager.notifications.requester
+import org.hoohoot.homelab.manager.notifications.title
+import org.hoohoot.homelab.manager.notifications.year
 import org.junit.jupiter.api.Test
 
 class ParseMovieTest {
@@ -30,14 +34,11 @@ class ParseMovieTest {
             """
         )
 
-        val movie = Movie.from(payload)
-
-        assertThat(movie).isNotNull
-        assertThat(movie.title).isEqualTo("Inception")
-        assertThat(movie.year).isEqualTo("2010")
-        assertThat(movie.imdbId).isEqualTo("tt1375666")
-        assertThat(movie.quality).isEqualTo("1080p")
-        assertThat(movie.requester).isEqualTo("john_doe")
+        assertThat(payload.title()).isEqualTo("Inception")
+        assertThat(payload.year()).isEqualTo("2010")
+        assertThat(payload.imdbId()).isEqualTo("tt1375666")
+        assertThat(payload.quality()).isEqualTo("1080p")
+        assertThat(payload.requester()).isEqualTo("john_doe")
     }
 
     @Test
@@ -52,14 +53,11 @@ class ParseMovieTest {
             """
         )
 
-        val movie = Movie.from(payload)
-
-        assertThat(movie).isNotNull
-        assertThat(movie.title).isEqualTo("unknown")
-        assertThat(movie.year).isEqualTo("unknown")
-        assertThat(movie.imdbId).isEqualTo("unknown")
-        assertThat(movie.quality).isEqualTo("720p")
-        assertThat(movie.requester).isEqualTo("unknown")
+        assertThat(payload.title()).isEqualTo("unknown")
+        assertThat(payload.year()).isEqualTo("unknown")
+        assertThat(payload.imdbId()).isEqualTo("unknown")
+        assertThat(payload.quality()).isEqualTo("720p")
+        assertThat(payload.requester()).isEqualTo("unknown")
     }
 
     @Test
@@ -77,14 +75,11 @@ class ParseMovieTest {
             """
         )
 
-        val movie = Movie.from(payload)
-
-        assertThat(movie).isNotNull
-        assertThat(movie.title).isEqualTo("Avatar")
-        assertThat(movie.year).isEqualTo("2009")
-        assertThat(movie.imdbId).isEqualTo("tt0499549")
-        assertThat(movie.quality).isEqualTo("unknown")
-        assertThat(movie.requester).isEqualTo("jane_doe")
+        assertThat(payload.title()).isEqualTo("Avatar")
+        assertThat(payload.year()).isEqualTo("2009")
+        assertThat(payload.imdbId()).isEqualTo("tt0499549")
+        assertThat(payload.quality()).isEqualTo("unknown")
+        assertThat(payload.requester()).isEqualTo("jane_doe")
     }
 
     @Test
@@ -104,27 +99,21 @@ class ParseMovieTest {
             """
         )
 
-        val movie = Movie.from(payload)
-
-        assertThat(movie).isNotNull
-        assertThat(movie.title).isEqualTo("Titanic")
-        assertThat(movie.year).isEqualTo("1997")
-        assertThat(movie.imdbId).isEqualTo("tt0120338")
-        assertThat(movie.quality).isEqualTo("4K")
-        assertThat(movie.requester).isEqualTo("unknown")
+        assertThat(payload.title()).isEqualTo("Titanic")
+        assertThat(payload.year()).isEqualTo("1997")
+        assertThat(payload.imdbId()).isEqualTo("tt0120338")
+        assertThat(payload.quality()).isEqualTo("4K")
+        assertThat(payload.requester()).isEqualTo("unknown")
     }
 
     @Test
     fun `from should handle empty payload`() {
         val payload = mapper.readValue<RadarrWebhookPayload>("{}")
 
-        val movie = Movie.from(payload)
-
-        assertThat(movie).isNotNull
-        assertThat(movie.title).isEqualTo("unknown")
-        assertThat(movie.year).isEqualTo("unknown")
-        assertThat(movie.imdbId).isEqualTo("unknown")
-        assertThat(movie.quality).isEqualTo("unknown")
-        assertThat(movie.requester).isEqualTo("unknown")
+        assertThat(payload.title()).isEqualTo("unknown")
+        assertThat(payload.year()).isEqualTo("unknown")
+        assertThat(payload.imdbId()).isEqualTo("unknown")
+        assertThat(payload.quality()).isEqualTo("unknown")
+        assertThat(payload.requester()).isEqualTo("unknown")
     }
 }

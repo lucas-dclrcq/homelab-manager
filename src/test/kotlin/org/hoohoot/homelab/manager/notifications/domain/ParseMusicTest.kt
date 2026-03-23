@@ -4,8 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.notifications.Album
 import org.hoohoot.homelab.manager.notifications.LidarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.albumTitle
+import org.hoohoot.homelab.manager.notifications.artistName
+import org.hoohoot.homelab.manager.notifications.coverUrl
+import org.hoohoot.homelab.manager.notifications.source
+import org.hoohoot.homelab.manager.notifications.genres
+import org.hoohoot.homelab.manager.notifications.year
 import org.junit.jupiter.api.Test
 
 class ParseMusicTest {
@@ -23,8 +28,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.albumTitle).isEqualTo("A Night at the Opera")
+        assertThat(payload.albumTitle()).isEqualTo("A Night at the Opera")
     }
 
     @Test
@@ -36,8 +40,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.albumTitle).isEqualTo("unknown")
+        assertThat(payload.albumTitle()).isEqualTo("unknown")
     }
 
     @Test
@@ -51,15 +54,13 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.artistName).isEqualTo("Queen")
+        assertThat(payload.artistName()).isEqualTo("Queen")
     }
 
     @Test
     fun `should fall back to default artist name when missing`() {
         val payload = mapper.readValue<LidarrWebhookPayload>("{}")
-        val album = Album.from(payload)
-        assertThat(album.artistName).isEqualTo("unknown")
+        assertThat(payload.artistName()).isEqualTo("unknown")
     }
 
     @Test
@@ -76,8 +77,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.coverUrl).isEqualTo("cover_image_url")
+        assertThat(payload.coverUrl()).isEqualTo("cover_image_url")
     }
 
     @Test
@@ -91,8 +91,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.coverUrl).isEqualTo("unknown")
+        assertThat(payload.coverUrl()).isEqualTo("unknown")
     }
 
     @Test
@@ -106,8 +105,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.genres).containsExactly("Rock", "Progressive Rock")
+        assertThat(payload.genres()).containsExactly("Rock", "Progressive Rock")
     }
 
     @Test
@@ -119,8 +117,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.genres).isEmpty()
+        assertThat(payload.genres()).isEmpty()
     }
 
     @Test
@@ -134,8 +131,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.year).isEqualTo("1975")
+        assertThat(payload.year()).isEqualTo("1975")
     }
 
     @Test
@@ -149,8 +145,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.year).isEqualTo("unknown")
+        assertThat(payload.year()).isEqualTo("unknown")
     }
 
     @Test
@@ -162,8 +157,7 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.year).isEqualTo("unknown")
+        assertThat(payload.year()).isEqualTo("unknown")
     }
 
     @Test
@@ -175,14 +169,12 @@ class ParseMusicTest {
             }
             """.trimIndent()
         )
-        val album = Album.from(payload)
-        assertThat(album.downloadClient).isEqualTo("torrent_client")
+        assertThat(payload.source()).isEqualTo("torrent_client")
     }
 
     @Test
     fun `should fall back to default download client when missing`() {
         val payload = mapper.readValue<LidarrWebhookPayload>("{}")
-        val album = Album.from(payload)
-        assertThat(album.downloadClient).isEqualTo("unknown")
+        assertThat(payload.source()).isEqualTo("unknown")
     }
 }

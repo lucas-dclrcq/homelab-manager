@@ -26,20 +26,8 @@ data class RadarrWebhookMovieFile(
 
 private const val DEFAULT_VALUE = "unknown"
 
-data class Movie(
-    val title: String,
-    val year: String,
-    val imdbId: String,
-    val quality: String,
-    val requester: String
-) {
-    companion object {
-        fun from(payload: RadarrWebhookPayload): Movie = Movie(
-            title = payload.movie?.title ?: DEFAULT_VALUE,
-            year = payload.movie?.year?.toString() ?: DEFAULT_VALUE,
-            imdbId = payload.movie?.imdbId ?: DEFAULT_VALUE,
-            quality = payload.movieFile?.quality ?: DEFAULT_VALUE,
-            requester = payload.movie?.tags?.requester() ?: DEFAULT_VALUE
-        )
-    }
-}
+fun RadarrWebhookPayload.title(): String = movie?.title ?: DEFAULT_VALUE
+fun RadarrWebhookPayload.year(): String = movie?.year?.toString() ?: DEFAULT_VALUE
+fun RadarrWebhookPayload.imdbId(): String = movie?.imdbId ?: DEFAULT_VALUE
+fun RadarrWebhookPayload.quality(): String = movieFile?.quality ?: DEFAULT_VALUE
+fun RadarrWebhookPayload.requester(): String = movie?.tags?.requester() ?: DEFAULT_VALUE
