@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import kotlinx.datetime.LocalDate
 import net.folivo.trixnity.client.room.message.text
@@ -27,6 +28,7 @@ class SkongMatrixCommand(private val timeService: TimeService) : PrefixedBotComm
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Skong command requested by ${sender.localpart} as $parameters")
         val daysSince = timeService.getDaysSince(skongOrigin)
 
         val skongMessage = when (parameters) {

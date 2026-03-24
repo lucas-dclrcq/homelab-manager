@@ -1,6 +1,7 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
 import io.ktor.http.*
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.image
 import net.folivo.trixnity.core.model.EventId
@@ -26,6 +27,7 @@ class GifMatrixCommand(private val giphyService: GiphyService) : PrefixedBotComm
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Gif command requested by ${sender.localpart} with query: $parameters")
         val gif = giphyService.searchGif(parameters)
         matrixBot.room().sendMessage(roomId) {
             image(

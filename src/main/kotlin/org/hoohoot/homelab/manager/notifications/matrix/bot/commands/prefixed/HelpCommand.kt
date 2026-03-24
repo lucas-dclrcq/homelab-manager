@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
+import io.quarkus.logging.Log
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
@@ -26,6 +27,7 @@ class HelpCommand(
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Help command requested by ${sender.localpart}")
         var helpMessage = "This is $botName. You can use the following commands:\n"
 
         for (command in commandGetter()) {

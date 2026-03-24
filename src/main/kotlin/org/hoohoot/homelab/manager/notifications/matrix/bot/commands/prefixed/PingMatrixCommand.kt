@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
@@ -23,6 +24,7 @@ class PingMatrixCommand : PrefixedBotCommand() {
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Ping command received from ${sender.localpart}, responding with Pong!")
         matrixBot.room().sendMessage(roomId) { text("Pong!") }
     }
 }

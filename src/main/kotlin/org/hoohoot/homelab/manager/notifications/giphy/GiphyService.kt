@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.giphy
 
+import io.quarkus.logging.Log
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import io.vertx.mutiny.core.Vertx
 import io.vertx.mutiny.ext.web.client.WebClient
@@ -11,6 +12,7 @@ class GiphyService(@RestClient private val restClient: GiphyRestClient, vertx: V
     private val webClient = WebClient.create(vertx)
 
     suspend fun searchGif(query: String): Gif {
+        Log.info("Searching Giphy for: $query")
         val gifResult = this.restClient.search(query)
 
         val originalGif = gifResult.data?.first()?.images?.original ?: throw NoGifFoundException(query)

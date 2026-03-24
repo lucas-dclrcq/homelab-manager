@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.regex
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
@@ -59,6 +60,7 @@ class DeadooMatrixCommand : RegexBotCommand() {
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Deadoo triggered by ${sender.localpart} with message: $parameters")
         if (!matrixBot.isSameUser(sender)) {
             val randomValue = Random.nextInt(1, totalWeight + 1)
             var currentWeight = 0

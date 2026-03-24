@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.resource
 
+import io.quarkus.logging.Log
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
@@ -19,6 +20,7 @@ class WeeklyReportResource(
 
     @POST
     suspend fun sendWeeklyReport(): Response {
+        Log.info("Manual weekly report trigger received")
         weeklyReportService.sendWeeklyReport()
         return Response.noContent().build()
     }

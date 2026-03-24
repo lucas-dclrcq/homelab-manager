@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.EventId
@@ -24,6 +25,7 @@ class TopWatchersMatrixCommand(private val jellystatService: JellystatService) :
         textEventId: EventId,
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
+        Log.info("Top-watchers command requested by ${sender.localpart}")
         val topWatchers = jellystatService.getTopWatchers(10)
 
         val message = """

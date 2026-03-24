@@ -10,7 +10,7 @@ class NotificationCleanupJob(private val repo: NotificationSentRepository) {
 
     @Scheduled(every = "15m")
     suspend fun cleanupExpiredThreads() {
-        Log.debug("Cleaning up expired media notification threads")
+        Log.info("Running cleanup of expired media notification threads")
         repo.deleteExpiredThreads()
     }
 }
