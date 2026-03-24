@@ -91,4 +91,105 @@ internal class MovieNotificationsTest {
             "<h1>🎬 Movie Downloaded</h1><p>The Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/<br>👤 Requested by : lucasd</p>"
         )
     }
+
+    @Test
+    fun `should handle missing movie object with unknown fields`() {
+        val payload = """
+            {
+                "movieFile": { "quality": "720p" },
+                "eventType": "Download"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("unknown (unknown) [720p]")
+        assertThat(body).contains("Requested by : unknown")
+    }
+
+    @Test
+    fun `should handle missing movieFile with unknown quality`() {
+        val payload = """
+            {
+                "movie": {
+                    "id": 1,
+                    "title": "Avatar",
+                    "year": 2009,
+                    "imdbId": "tt0499549",
+                    "tags": ["Adventure", "1 - jane_doe"]
+                },
+                "eventType": "Download"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("Avatar (2009) [unknown]")
+        assertThat(body).contains("Requested by : jane_doe")
+    }
+
+    @Test
+    fun `should handle missing tags with unknown requester`() {
+        val payload = """
+            {
+                "movie": {
+                    "id": 1,
+                    "title": "Titanic",
+                    "year": 1997,
+                    "imdbId": "tt0120338"
+                },
+                "movieFile": { "quality": "4K" },
+                "eventType": "Download"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("Titanic (1997) [4K]")
+        assertThat(body).contains("Requested by : unknown")
+    }
+
+    @Test
+    fun `should handle empty payload with all unknown fields`() {
+        val payload = """{"eventType": "Download"}"""
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("unknown (unknown) [unknown]")
+        assertThat(body).contains("Requested by : unknown")
+    }
+
+    @Test
+    fun `should ignore non-Download event type`() {
+        val payload = """
+            {
+                "movie": { "id": 1, "title": "Test" },
+                "eventType": "Grab"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val messageCount = synapseClient!!.getMessageCount(mediaRoomId)
+        assertThat(messageCount).isEqualTo(0)
+    }
 }

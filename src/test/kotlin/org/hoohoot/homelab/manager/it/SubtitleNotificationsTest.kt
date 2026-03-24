@@ -135,4 +135,72 @@ internal class SubtitleNotificationsTest {
         assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("Unknown Movie (1999)")
     }
+
+    @Test
+    fun `should handle upgraded subtitle action`() {
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(bazarrNotification("Inception (2010) : French subtitles upgraded from addic7ed with a score of 98%."))
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("French subtitles upgraded from addic7ed (score: 98%)")
+    }
+
+    @Test
+    fun `should handle manually downloaded subtitle action`() {
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(bazarrNotification("Inception (2010) : French subtitles manually downloaded from subscene with a score of 85%."))
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("French subtitles manually downloaded from subscene (score: 85%)")
+    }
+
+    @Test
+    fun `should handle HI subtitle language`() {
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(bazarrNotification("Inception (2010) : English (HI) subtitles downloaded from opensubtitles with a score of 92%."))
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("English (HI) subtitles downloaded")
+    }
+
+    @Test
+    fun `should handle forced subtitle language`() {
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(bazarrNotification("Inception (2010) : French (forced) subtitles downloaded from opensubtitles with a score of 80%."))
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        assertThat(body).contains("French (forced) subtitles downloaded")
+    }
+
+    @Test
+    fun `should return server error on null message`() {
+        val payload = """{"title": "Bazarr", "type": "info"}"""
+
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(payload)
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.INTERNAL_SERVER_ERROR.statusCode)
+    }
+
+    @Test
+    fun `should return server error on unparseable message`() {
+        RestAssured.given().contentType(ContentType.JSON)
+            .body(bazarrNotification("some random text"))
+            .header("X-Api-Key", "secureapikey")
+            .`when`().post("/api/notifications/bazarr")
+            .then().statusCode(Response.Status.INTERNAL_SERVER_ERROR.statusCode)
+    }
 }

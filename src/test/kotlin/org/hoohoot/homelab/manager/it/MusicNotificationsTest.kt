@@ -288,4 +288,92 @@ internal class MusicNotificationsTest {
             "<h1>🎵 Album downloaded</h1><p>General Elektriks - Cliquety Kliqk (2003)<br>🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg<br>🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop<br>📥 Source : qBittorrent</p>"
         )
     }
+
+    @Test
+    fun `should handle minimal payload with unknown values`() {
+        val minimalPayload = """{"eventType": "Download"}"""
+
+        RestAssured.given().contentType(ContentType.JSON).body(minimalPayload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        assertThat(body).contains("unknown - unknown (unknown)")
+        assertThat(body).contains("🖼️ Cover: unknown")
+        assertThat(body).contains("📥 Source : unknown")
+    }
+
+    @Test
+    fun `should handle missing cover images`() {
+        val payload = """
+            {
+                "artist": { "name": "Queen" },
+                "album": {
+                    "title": "A Night at the Opera",
+                    "releaseDate": "1975-11-21T00:00:00Z",
+                    "genres": ["Rock", "Progressive Rock"],
+                    "images": [
+                        {"coverType": "thumb", "remoteUrl": "thumb_url"}
+                    ]
+                },
+                "downloadClient": "qBittorrent",
+                "eventType": "Download"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        assertThat(body).contains("Queen - A Night at the Opera (1975)")
+        assertThat(body).contains("🖼️ Cover: unknown")
+        assertThat(body).contains("🎸 Genres : Rock, Progressive Rock")
+        assertThat(body).contains("📥 Source : qBittorrent")
+    }
+
+    @Test
+    fun `should handle empty genres and invalid release date`() {
+        val payload = """
+            {
+                "artist": { "name": "Artist" },
+                "album": {
+                    "title": "Album",
+                    "releaseDate": "invalid_date",
+                    "genres": []
+                },
+                "eventType": "Download"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        assertThat(body).contains("Artist - Album (unknown)")
+        assertThat(body).contains("🎸 Genres : ")
+        assertThat(body).doesNotContain("🎸 Genres : unknown")
+    }
+
+    @Test
+    fun `should ignore non-Download event type`() {
+        val payload = """
+            {
+                "artist": { "name": "Test" },
+                "eventType": "Grab"
+            }
+        """.trimIndent()
+
+        RestAssured.given().contentType(ContentType.JSON).body(payload)
+            .and().header("X-Api-Key", "secureapikey")
+            .`when`().post()
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val messageCount = synapseClient!!.getMessageCount(musicRoomId)
+        assertThat(messageCount).isEqualTo(0)
+    }
 }
