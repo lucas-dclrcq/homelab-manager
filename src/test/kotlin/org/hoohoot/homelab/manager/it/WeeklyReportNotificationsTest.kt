@@ -8,6 +8,9 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.*
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
@@ -39,14 +42,14 @@ internal class WeeklyReportNotificationsTest {
     @Test
     fun `should send weekly report with all sections`() {
         stubRadarrCalendar("""[
-            {"title": "Dune: Part Two", "year": 2024, "digitalRelease": "2025-03-17"},
+            {"title": "Dune: Part Two", "year": 2024, "digitalRelease": "2025-03-17T20:00:00Z"},
             {"title": "Oppenheimer", "year": 2024, "physicalRelease": "2025-03-19"}
         ]""")
 
         stubSonarrCalendar("""[
             {
                 "seasonNumber": 3, "episodeNumber": 1, "title": "Tomorrow",
-                "airDate": "2025-03-17",
+                "airDate": "2025-03-17", "airDateUtc": "2025-03-17T21:00:00Z",
                 "series": {"title": "The Bear"}
             }
         ]""")
@@ -72,10 +75,12 @@ internal class WeeklyReportNotificationsTest {
 
         assertThat(body).contains("📰 Weekly Recap")
         assertThat(body).contains("Monday 17")
-        assertThat(body).contains("• Dune: Part Two (2024)")
-        assertThat(body).contains("• The Bear S03E01 \"Tomorrow\"")
+        val duneTime = localTime("2025-03-17T20:00:00Z")
+        val bearTime = localTime("2025-03-17T21:00:00Z")
+        assertThat(body).contains("🎬 Dune: Part Two (2024) — $duneTime")
+        assertThat(body).contains("📺 The Bear S03E01 \"Tomorrow\" — $bearTime")
         assertThat(body).contains("Wednesday 19")
-        assertThat(body).contains("• Oppenheimer (2024)")
+        assertThat(body).contains("🎬 Oppenheimer (2024)")
         assertThat(body).contains("🏆 Top 3 Movies This Week")
         assertThat(body).contains("🥇 Dune: Part Two — 5 viewers")
         assertThat(body).contains("🥈 Oppenheimer — 3 viewers")
@@ -117,8 +122,8 @@ internal class WeeklyReportNotificationsTest {
 
         val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
         val tuesdayIndex = body.indexOf("Tuesday 18")
-        val movieIndex = body.indexOf("• Some Movie (2024)")
-        val episodeIndex = body.indexOf("• Test Show S01E05 \"Test\"")
+        val movieIndex = body.indexOf("🎬 Some Movie (2024)")
+        val episodeIndex = body.indexOf("📺 Test Show S01E05 \"Test\"")
 
         assertThat(tuesdayIndex).isGreaterThan(-1)
         assertThat(movieIndex).isGreaterThan(tuesdayIndex)
@@ -203,7 +208,7 @@ internal class WeeklyReportNotificationsTest {
 
         val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("Thursday 20")
-        assertThat(body).contains("• Cinema Movie (2024)")
+        assertThat(body).contains("🎬 Cinema Movie (2024)")
     }
 
     @Test
@@ -222,7 +227,7 @@ internal class WeeklyReportNotificationsTest {
 
         val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("TBD")
-        assertThat(body).contains("• No Date Movie (2024)")
+        assertThat(body).contains("🎬 No Date Movie (2024)")
     }
 
     private fun stubRadarrCalendar(responseBody: String) {
@@ -239,6 +244,11 @@ internal class WeeklyReportNotificationsTest {
                 .withQueryParam("includeSeries", equalTo("true"))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
         )
+    }
+
+    private fun localTime(utcDateTime: String): String {
+        val local = Instant.parse(utcDateTime).toLocalDateTime(TimeZone.currentSystemDefault())
+        return "%02d:%02d".format(local.hour, local.minute)
     }
 
     private fun stubJellystatMostPopular(type: String, responseBody: String) {

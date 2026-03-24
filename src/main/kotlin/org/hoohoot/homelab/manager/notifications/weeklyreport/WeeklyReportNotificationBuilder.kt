@@ -1,7 +1,10 @@
 package org.hoohoot.homelab.manager.notifications.weeklyreport
 
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.media.MostPopularMedia
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
@@ -98,17 +101,22 @@ class WeeklyReportNotificationBuilder(
         val releases = mutableListOf<Release>()
 
         movies.forEach { movie ->
-            val date = parseDate(movie.digitalRelease ?: movie.physicalRelease ?: movie.inCinemas)
-            val line = "• ${movie.title ?: "Unknown"} (${movie.year ?: "?"})"
+            val dateTimeStr = movie.digitalRelease ?: movie.physicalRelease ?: movie.inCinemas
+            val date = parseDate(dateTimeStr)
+            val time = parseTime(dateTimeStr)
+            val timeSuffix = if (time != null) " — $time" else ""
+            val line = "🎬 ${movie.title ?: "Unknown"} (${movie.year ?: "?"})$timeSuffix"
             releases.add(Release(date, line))
         }
 
         episodes.forEach { episode ->
             val date = parseDate(episode.airDate)
+            val time = parseTime(episode.airDateUtc)
             val seriesTitle = episode.series?.title ?: "Unknown"
             val epCode = "S%02dE%02d".format(episode.seasonNumber, episode.episodeNumber)
             val epTitle = episode.title?.let { " \"$it\"" } ?: ""
-            val line = "• $seriesTitle $epCode$epTitle"
+            val timeSuffix = if (time != null) " — $time" else ""
+            val line = "📺 $seriesTitle $epCode$epTitle$timeSuffix"
             releases.add(Release(date, line))
         }
 
@@ -119,6 +127,18 @@ class WeeklyReportNotificationBuilder(
         if (dateStr == null) return null
         return try {
             LocalDate.parse(dateStr.substring(0, 10))
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun parseTime(dateTimeStr: String?): String? {
+        if (dateTimeStr == null) return null
+        return try {
+            val instant = Instant.parse(dateTimeStr)
+            val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            if (local.hour == 0 && local.minute == 0) null
+            else "%02d:%02d".format(local.hour, local.minute)
         } catch (_: Exception) {
             null
         }
