@@ -27,6 +27,19 @@ class TimeService {
         return Week(now, end)
     }
 
+    fun getNextWeek(): Week {
+        val nextMonday = clock.now().toLocalDateTime(TimeZone.UTC)
+            .date
+            .let { it.plus(7 - it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
+            .atStartOfDayIn(TimeZone.UTC)
+
+        val end = nextMonday.plus(Duration.parse("P6D"))
+            .plus(23, DateTimeUnit.HOUR)
+            .plus(59, DateTimeUnit.MINUTE)
+
+        return Week(nextMonday, end)
+    }
+
     fun getDaysSince(date: LocalDate): Int {
         val currentDate = clock.now().toLocalDateTime(TimeZone.UTC).date
         return date.daysUntil(currentDate)

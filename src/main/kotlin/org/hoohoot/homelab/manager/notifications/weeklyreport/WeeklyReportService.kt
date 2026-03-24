@@ -31,11 +31,11 @@ class WeeklyReportService(
         try {
             Log.info("Sending weekly recap report")
 
-            val currentWeek = timeService.getCurrentWeek()
+            val nextWeek = timeService.getNextWeek()
 
-            val movies = radarrRestClient.getMovieCalendar(currentWeek.start, currentWeek.end)
-            val episodes = sonarrRestClient.getSeriesCalendar(currentWeek.start, currentWeek.end)
-            val albums = lidarrRestClient.getAlbumCalendar(currentWeek.start, currentWeek.end)
+            val movies = radarrRestClient.getMovieCalendar(nextWeek.start, nextWeek.end)
+            val episodes = sonarrRestClient.getSeriesCalendar(nextWeek.start, nextWeek.end)
+            val albums = lidarrRestClient.getAlbumCalendar(nextWeek.start, nextWeek.end)
 
             val topMovies = jellystatService.getMostPopularByType(7, JellystatMediaType.Movie)
                 .map { MostPopularMedia(it.name, it.uniqueViewers) }
