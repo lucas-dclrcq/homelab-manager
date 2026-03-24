@@ -7,12 +7,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.media.MostPopularMedia
+import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrAlbum
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.Episode
 
 class WeeklyReportNotificationBuilder(
     private val movies: List<RadarrMovie>,
     private val episodes: List<Episode>,
+    private val albums: List<LidarrAlbum>,
     private val topMovies: List<MostPopularMedia>,
     private val topSeries: List<MostPopularMedia>,
 ) {
@@ -25,7 +27,7 @@ class WeeklyReportNotificationBuilder(
         textLines.add("📰 Weekly Recap")
         htmlLines.add("<h2>📰 Weekly Recap</h2>")
 
-        val hasReleases = movies.isNotEmpty() || episodes.isNotEmpty()
+        val hasReleases = movies.isNotEmpty() || episodes.isNotEmpty() || albums.isNotEmpty()
         val hasStats = topMovies.isNotEmpty() || topSeries.isNotEmpty()
 
         if (hasReleases) {
@@ -117,6 +119,14 @@ class WeeklyReportNotificationBuilder(
             val epTitle = episode.title?.let { " \"$it\"" } ?: ""
             val timeSuffix = if (time != null) " — $time" else ""
             val line = "📺 $seriesTitle $epCode$epTitle$timeSuffix"
+            releases.add(Release(date, line))
+        }
+
+        albums.forEach { album ->
+            val date = parseDate(album.releaseDate)
+            val artistName = album.artist?.artistName ?: "Unknown"
+            val albumTitle = album.title ?: "Unknown"
+            val line = "🎵 $artistName — $albumTitle"
             releases.add(Release(date, line))
         }
 

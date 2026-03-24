@@ -17,7 +17,8 @@ class WiremockTestResource : QuarkusTestResourceLifecycleManager {
             "quarkus.rest-client.sonarr-api.url" to wireMockServer!!.baseUrl(),
             "quarkus.rest-client.radarr-api.url" to wireMockServer!!.baseUrl(),
             "quarkus.rest-client.jellystat-api.url" to wireMockServer!!.baseUrl(),
-            "quarkus.rest-client.jellyfin-api.url" to wireMockServer!!.baseUrl()
+            "quarkus.rest-client.jellyfin-api.url" to wireMockServer!!.baseUrl(),
+            "quarkus.rest-client.lidarr-api.url" to wireMockServer!!.baseUrl()
         )
     }
 

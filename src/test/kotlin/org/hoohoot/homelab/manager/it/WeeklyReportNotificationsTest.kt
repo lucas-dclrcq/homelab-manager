@@ -54,6 +54,10 @@ internal class WeeklyReportNotificationsTest {
             }
         ]""")
 
+        stubLidarrCalendar("""[
+            {"title": "GNX", "releaseDate": "2025-03-18", "artist": {"artistName": "Kendrick Lamar"}}
+        ]""")
+
         stubJellystatMostPopular("Movie", """[
             {"unique_viewers": "5", "Name": "Dune: Part Two"},
             {"unique_viewers": "3", "Name": "Oppenheimer"},
@@ -81,6 +85,8 @@ internal class WeeklyReportNotificationsTest {
         assertThat(body).contains("📺 The Bear S03E01 \"Tomorrow\" — $bearTime")
         assertThat(body).contains("Wednesday 19")
         assertThat(body).contains("🎬 Oppenheimer (2024)")
+        assertThat(body).contains("Tuesday 18")
+        assertThat(body).contains("🎵 Kendrick Lamar — GNX")
         assertThat(body).contains("🏆 Top 3 Movies This Week")
         assertThat(body).contains("🥇 Dune: Part Two — 5 viewers")
         assertThat(body).contains("🥈 Oppenheimer — 3 viewers")
@@ -112,6 +118,7 @@ internal class WeeklyReportNotificationsTest {
             }
         ]""")
 
+        stubLidarrCalendar("[]")
         stubJellystatMostPopular("Movie", "[]")
         stubJellystatMostPopular("Series", "[]")
 
@@ -134,6 +141,7 @@ internal class WeeklyReportNotificationsTest {
     fun `should hide releases section when empty`() {
         stubRadarrCalendar("[]")
         stubSonarrCalendar("[]")
+        stubLidarrCalendar("[]")
 
         stubJellystatMostPopular("Movie", """[{"unique_viewers": "3", "Name": "Movie"}]""")
         stubJellystatMostPopular("Series", "[]")
@@ -153,6 +161,7 @@ internal class WeeklyReportNotificationsTest {
     fun `should hide stats section when no top movies or series`() {
         stubRadarrCalendar("[]")
         stubSonarrCalendar("[]")
+        stubLidarrCalendar("[]")
         stubJellystatMostPopular("Movie", "[]")
         stubJellystatMostPopular("Series", "[]")
 
@@ -171,6 +180,7 @@ internal class WeeklyReportNotificationsTest {
     fun `should limit top lists to 3 entries`() {
         stubRadarrCalendar("[]")
         stubSonarrCalendar("[]")
+        stubLidarrCalendar("[]")
 
         stubJellystatMostPopular("Movie", """[
             {"unique_viewers": "10", "Name": "A"},
@@ -198,6 +208,7 @@ internal class WeeklyReportNotificationsTest {
             {"title": "Cinema Movie", "year": 2024, "inCinemas": "2025-03-20"}
         ]""")
         stubSonarrCalendar("[]")
+        stubLidarrCalendar("[]")
         stubJellystatMostPopular("Movie", "[]")
         stubJellystatMostPopular("Series", "[]")
 
@@ -217,6 +228,7 @@ internal class WeeklyReportNotificationsTest {
             {"title": "No Date Movie", "year": 2024}
         ]""")
         stubSonarrCalendar("[]")
+        stubLidarrCalendar("[]")
         stubJellystatMostPopular("Movie", "[]")
         stubJellystatMostPopular("Series", "[]")
 
@@ -249,6 +261,14 @@ internal class WeeklyReportNotificationsTest {
     private fun localTime(utcDateTime: String): String {
         val local = Instant.parse(utcDateTime).toLocalDateTime(TimeZone.currentSystemDefault())
         return "%02d:%02d".format(local.hour, local.minute)
+    }
+
+    private fun stubLidarrCalendar(responseBody: String) {
+        wireMock!!.stubFor(
+            get(urlPathEqualTo("/api/v1/calendar"))
+                .withHeader("X-Api-Key", equalTo("API_KEY"))
+                .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
+        )
     }
 
     private fun stubJellystatMostPopular(type: String, responseBody: String) {

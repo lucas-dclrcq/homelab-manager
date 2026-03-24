@@ -5,6 +5,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.media.MostPopularMedia
+import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrRestClient
+import org.hoohoot.homelab.manager.notifications.arr.lidarr.getAlbumCalendar
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.notifications.arr.radarr.getMovieCalendar
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
@@ -19,6 +21,7 @@ import org.hoohoot.homelab.manager.time.TimeService
 class WeeklyReportService(
     @RestClient private val sonarrRestClient: SonarrRestClient,
     @RestClient private val radarrRestClient: RadarrRestClient,
+    @RestClient private val lidarrRestClient: LidarrRestClient,
     private val jellystatService: JellystatService,
     private val matrixClient: MatrixClientServerApiClient,
     private val roomProvider: MatrixRoomProvider,
@@ -32,6 +35,7 @@ class WeeklyReportService(
 
             val movies = radarrRestClient.getMovieCalendar(currentWeek.start, currentWeek.end)
             val episodes = sonarrRestClient.getSeriesCalendar(currentWeek.start, currentWeek.end)
+            val albums = lidarrRestClient.getAlbumCalendar(currentWeek.start, currentWeek.end)
 
             val topMovies = jellystatService.getMostPopularByType(7, JellystatMediaType.Movie)
                 .map { MostPopularMedia(it.name, it.uniqueViewers) }
@@ -43,7 +47,7 @@ class WeeklyReportService(
                 .sortedByDescending { it.uniqueViewers }
                 .take(3)
 
-            val notification = WeeklyReportNotificationBuilder(movies, episodes, topMovies, topSeries).build()
+            val notification = WeeklyReportNotificationBuilder(movies, episodes, albums, topMovies, topSeries).build()
 
             matrixClient.sendNotification(notification, roomProvider.media)
             Log.info("Weekly recap report sent")
