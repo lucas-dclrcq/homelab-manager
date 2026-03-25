@@ -4,10 +4,10 @@ import com.vdurmont.emoji.EmojiManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
-import net.folivo.trixnity.client.room.message.MessageBuilder
-import net.folivo.trixnity.client.room.message.text
-import net.folivo.trixnity.core.model.RoomId
-import net.folivo.trixnity.core.model.UserId
+import de.connect2x.trixnity.client.room.message.MessageBuilder
+import de.connect2x.trixnity.client.room.message.text
+import de.connect2x.trixnity.core.model.RoomId
+import de.connect2x.trixnity.core.model.UserId
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import kotlin.time.Duration
@@ -33,7 +33,7 @@ fun MessageBuilder.markdown(markdown: String) {
     text(markdown, format = "org.matrix.custom.html", formattedBody = html)
 }
 
-fun RoomId.matrixTo(): String = "$MATRIX_TO_PREFIX${this.full}?via=${this.domain}"
+fun RoomId.matrixTo(): String = "$MATRIX_TO_PREFIX${this.full}?via=${this.full.substringAfter(":")}"
 
 fun UserId.matrixTo(): String = "${MATRIX_TO_PREFIX}${this.full}"
 

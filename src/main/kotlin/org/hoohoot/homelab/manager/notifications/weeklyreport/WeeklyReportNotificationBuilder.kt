@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
+import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.media.MostPopularMedia
 import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrAlbum
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie

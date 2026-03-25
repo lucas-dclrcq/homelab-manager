@@ -3,17 +3,17 @@ package org.hoohoot.homelab.manager.notifications.matrix.bot
 import io.ktor.http.*
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import net.folivo.trixnity.client.MatrixClient
-import net.folivo.trixnity.client.fromStore
-import net.folivo.trixnity.client.login
-import net.folivo.trixnity.client.room
-import net.folivo.trixnity.clientserverapi.model.authentication.IdentifierType
-import net.folivo.trixnity.core.model.RoomAliasId
-import net.folivo.trixnity.core.model.RoomId
-import net.folivo.trixnity.core.model.UserId
-import net.folivo.trixnity.core.model.events.StateEventContent
-import net.folivo.trixnity.core.model.events.m.room.CanonicalAliasEventContent
-import net.folivo.trixnity.core.serialization.events.contentType
+import de.connect2x.trixnity.client.MatrixClient
+import de.connect2x.trixnity.client.create
+import de.connect2x.trixnity.client.room
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientAuthProviderData
+import de.connect2x.trixnity.clientserverapi.client.classicLoginWithPassword
+import de.connect2x.trixnity.clientserverapi.model.authentication.IdentifierType
+import de.connect2x.trixnity.core.model.RoomAliasId
+import de.connect2x.trixnity.core.model.RoomId
+import de.connect2x.trixnity.core.model.UserId
+import de.connect2x.trixnity.core.model.events.StateEventContent
+import de.connect2x.trixnity.core.model.events.m.room.CanonicalAliasEventContent
 
 @ApplicationScoped
 class MatrixBotSession(private val config: MatrixBotConfiguration) {
@@ -29,16 +29,17 @@ class MatrixBotSession(private val config: MatrixBotConfiguration) {
 
     suspend fun initialize() {
         Log.info("Creating Matrix client")
-        matrixClient =
-            MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)).getOrThrow()
-                ?: MatrixClient.login(
-                    baseUrl = Url(config.baseUrl()),
-                    identifier = IdentifierType.User(config.username()),
-                    password = config.password(),
-                    repositoriesModule = createRepositoriesModule(config),
-                    mediaStore = createMediaStore(config),
-                    initialDeviceDisplayName = "An interesting bot",
-                ).getOrThrow()
+        matrixClient = MatrixClient.create(
+            repositoriesModule = createRepositoriesModule(config),
+            mediaStoreModule = createMediaStore(config),
+            cryptoDriverModule = createCryptoDriverModule(),
+            authProviderData = MatrixClientAuthProviderData.classicLoginWithPassword(
+                baseUrl = Url(config.baseUrl()),
+                identifier = IdentifierType.User(config.username()),
+                password = config.password(),
+                initialDeviceDisplayName = "An interesting bot",
+            ).getOrThrow(),
+        ).getOrThrow()
     }
 
     suspend fun resolvePublicRoomIdOrNull(publicRoomAlias: String): RoomId? {
@@ -58,8 +59,8 @@ class MatrixBotSession(private val config: MatrixBotConfiguration) {
     }
 
     private suspend inline fun <reified C : StateEventContent> getStateEvent(roomId: RoomId): Result<C> {
-        val type = roomApi.contentMappings.state.contentType(C::class)
+        val type = roomApi.contentMappings.state.first { it.kClass == C::class }.type
         @Suppress("UNCHECKED_CAST")
-        return matrixClient.api.room.getStateEvent(type, roomId) as Result<C>
+        return matrixClient.api.room.getStateEventContent(type, roomId) as Result<C>
     }
 }

@@ -3,10 +3,12 @@ package org.hoohoot.homelab.manager.notifications.matrix
 import io.ktor.http.*
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Produces
-import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
-import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClientImpl
-import net.folivo.trixnity.clientserverapi.client.MatrixAuthProvider
-import net.folivo.trixnity.clientserverapi.client.classicInMemory
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientServerApiClient
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientServerApiClientImpl
+import de.connect2x.trixnity.clientserverapi.client.ClassicMatrixClientAuthProvider
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientAuthProviderData
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientAuthProviderDataStore
+import de.connect2x.trixnity.clientserverapi.client.classic
 
 @ApplicationScoped
 class MatrixApiClientProducer(private val config: MatrixConfiguration) {
@@ -15,8 +17,16 @@ class MatrixApiClientProducer(private val config: MatrixConfiguration) {
     @ApplicationScoped
     fun matrixApiClient(): MatrixClientServerApiClient {
         return MatrixClientServerApiClientImpl(
-            baseUrl = Url(config.baseUrl()),
-            authProvider = MatrixAuthProvider.classicInMemory(config.accessToken()),
+            authProvider = ClassicMatrixClientAuthProvider(
+                baseUrl = Url(config.baseUrl()),
+                store = MatrixClientAuthProviderDataStore.inMemory(
+                    MatrixClientAuthProviderData.classic(
+                        baseUrl = Url(config.baseUrl()),
+                        accessToken = config.accessToken(),
+                    )
+                ),
+                onLogout = {},
+            ),
         )
     }
 }

@@ -2,7 +2,7 @@ package org.hoohoot.homelab.manager.notifications.weeklyreport
 
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import net.folivo.trixnity.clientserverapi.client.MatrixClientServerApiClient
+import de.connect2x.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.media.MostPopularMedia
 import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrRestClient
@@ -19,9 +19,9 @@ import org.hoohoot.homelab.manager.time.TimeService
 
 @ApplicationScoped
 class WeeklyReportService(
-    @RestClient private val sonarrRestClient: SonarrRestClient,
-    @RestClient private val radarrRestClient: RadarrRestClient,
-    @RestClient private val lidarrRestClient: LidarrRestClient,
+    @param:RestClient private val sonarrRestClient: SonarrRestClient,
+    @param:RestClient private val radarrRestClient: RadarrRestClient,
+    @param:RestClient private val lidarrRestClient: LidarrRestClient,
     private val jellystatService: JellystatService,
     private val matrixClient: MatrixClientServerApiClient,
     private val roomProvider: MatrixRoomProvider,

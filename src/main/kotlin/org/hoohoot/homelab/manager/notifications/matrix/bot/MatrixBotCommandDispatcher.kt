@@ -1,12 +1,12 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot
 
 import jakarta.enterprise.context.ApplicationScoped
-import net.folivo.trixnity.client.room.message.react
-import net.folivo.trixnity.core.model.EventId
-import net.folivo.trixnity.core.model.RoomId
-import net.folivo.trixnity.core.model.UserId
-import net.folivo.trixnity.core.model.events.*
-import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
+import de.connect2x.trixnity.client.room.message.react
+import de.connect2x.trixnity.core.model.EventId
+import de.connect2x.trixnity.core.model.RoomId
+import de.connect2x.trixnity.core.model.UserId
+import de.connect2x.trixnity.core.model.events.*
+import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.MatrixBotCommand
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed.PrefixedBotCommands
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.regex.RegexBotCommands

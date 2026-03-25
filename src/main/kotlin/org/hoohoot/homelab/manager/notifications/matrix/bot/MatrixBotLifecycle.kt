@@ -10,11 +10,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ThreadContextElement
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import net.folivo.trixnity.core.model.events.*
-import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
-import net.folivo.trixnity.core.model.events.m.room.Membership
-import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import net.folivo.trixnity.core.subscribeContent
+import de.connect2x.trixnity.core.model.events.*
+import de.connect2x.trixnity.core.model.events.m.room.MemberEventContent
+import de.connect2x.trixnity.core.model.events.m.room.Membership
+import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
+import de.connect2x.trixnity.core.subscribeContent
 import kotlin.coroutines.CoroutineContext
 
 @ApplicationScoped
