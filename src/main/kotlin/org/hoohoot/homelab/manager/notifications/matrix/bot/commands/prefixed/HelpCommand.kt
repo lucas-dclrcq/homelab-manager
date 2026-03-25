@@ -5,7 +5,7 @@ import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotConfiguration
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.MatrixBotCommand
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
@@ -20,7 +20,7 @@ class HelpCommand(
     override val help: String = "shows this help message"
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -34,6 +34,6 @@ class HelpCommand(
             helpMessage += "\n* `!${config.prefix()} ${command.name} ${command.params} - ${command.help}`"
         }
 
-        matrixBot.room().sendMessage(roomId) { markdown(helpMessage) }
+        session.room.sendMessage(roomId) { markdown(helpMessage) }
     }
 }

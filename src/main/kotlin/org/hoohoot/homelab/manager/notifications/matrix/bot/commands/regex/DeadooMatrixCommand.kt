@@ -7,7 +7,7 @@ import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.RegexBotCommand
 import kotlin.random.Random
 
@@ -53,7 +53,7 @@ class DeadooMatrixCommand : RegexBotCommand() {
     private val totalWeight = deadosWithWeights.sumOf { it.second }
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -61,7 +61,7 @@ class DeadooMatrixCommand : RegexBotCommand() {
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         Log.info("Deadoo triggered by ${sender.localpart} with message: $parameters")
-        if (!matrixBot.isSameUser(sender)) {
+        if (!session.isSameUser(sender)) {
             val randomValue = Random.nextInt(1, totalWeight + 1)
             var currentWeight = 0
 
@@ -74,7 +74,7 @@ class DeadooMatrixCommand : RegexBotCommand() {
                 }
             }
 
-            matrixBot.room().sendMessage(roomId) { text(deado) }
+            session.room.sendMessage(roomId) { text(deado) }
         }
     }
 }

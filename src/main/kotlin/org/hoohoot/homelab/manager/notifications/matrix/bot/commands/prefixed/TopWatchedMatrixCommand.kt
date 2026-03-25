@@ -9,7 +9,7 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
 import org.hoohoot.homelab.manager.media.TopWatchedPeriod
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
@@ -19,7 +19,7 @@ class TopWatchedMatrixCommand(private val jellystatService: JellystatService) : 
     override val autoAcknowledge = true
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -56,6 +56,6 @@ class TopWatchedMatrixCommand(private val jellystatService: JellystatService) : 
                 </ol>
             """.trimIndent()
 
-        matrixBot.room().sendMessage(roomId) { text(message, "org.matrix.custom.html", message) }
+        session.room.sendMessage(roomId) { text(message, "org.matrix.custom.html", message) }
     }
 }

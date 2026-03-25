@@ -13,13 +13,13 @@ import org.hoohoot.homelab.manager.notifications.jellyfin.searchSeries
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
 import org.hoohoot.homelab.manager.media.MultipleSeriesFoundException
 import org.hoohoot.homelab.manager.media.NoSeriesFoundException
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
 class WhoWatchedMatrixCommand(
     private val jellystatService: JellystatService,
-    @RestClient private val jellyfinRestClient: JellyfinRestClient
+    @param:RestClient private val jellyfinRestClient: JellyfinRestClient
 ) : PrefixedBotCommand() {
     override val name: String = "who-watched"
     override val help: String =
@@ -27,7 +27,7 @@ class WhoWatchedMatrixCommand(
     override val autoAcknowledge = true
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -56,6 +56,6 @@ class WhoWatchedMatrixCommand(
             </ol>
         """.trimIndent()
 
-        matrixBot.room().sendMessage(roomId) { text(body, "org.matrix.custom.html", body ) }
+        session.room.sendMessage(roomId) { text(body, "org.matrix.custom.html", body ) }
     }
 }

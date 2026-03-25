@@ -46,7 +46,7 @@ fun String.syntaxOfRoomId(): Boolean {
     return cleanedInput.matches(ROOM_ID_REGEX) || cleanedInput.matches(ROOM_ALIAS_REGEX)
 }
 
-suspend fun String.toInternalRoomIdOrNull(matrixBot: MatrixBot): RoomId? {
+suspend fun String.toInternalRoomIdOrNull(session: MatrixBotSession): RoomId? {
     var cleanedInput = this.trim()
     if (cleanedInput.startsWith(MATRIX_TO_PREFIX)) {
         cleanedInput = cleanedInput.removePrefix(MATRIX_TO_PREFIX)
@@ -54,7 +54,7 @@ suspend fun String.toInternalRoomIdOrNull(matrixBot: MatrixBot): RoomId? {
     }
 
     if (cleanedInput.startsWith("#")) {
-        return matrixBot.resolvePublicRoomIdOrNull(cleanedInput)
+        return session.resolvePublicRoomIdOrNull(cleanedInput)
     }
 
     if (cleanedInput.matches(ROOM_ID_REGEX)) {

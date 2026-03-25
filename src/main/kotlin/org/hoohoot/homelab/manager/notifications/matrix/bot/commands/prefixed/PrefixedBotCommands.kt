@@ -7,11 +7,11 @@ import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBot
 
 @ApplicationScoped
 class PrefixedBotCommands(
-    @All private val commands: MutableList<PrefixedBotCommand>,
+    @param:All private val commands: MutableList<PrefixedBotCommand>,
     private val config: MatrixBotConfiguration
 ) {
     fun commands(): List<PrefixedBotCommand> {
-        val help = HelpCommand(config, "Johnny Bot") { commands }
+        val help = HelpCommand(config, "Johnny Bot") { commands() }
         return listOf(help) + commands
     }
 

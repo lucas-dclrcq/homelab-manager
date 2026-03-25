@@ -11,6 +11,8 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.file.Files
+import java.nio.file.Path
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -18,10 +20,14 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
 
     private var container: GenericContainer<*>? = null
     private var synapseClient: SynapseClient? = null
+    private var botEnabled: Boolean = false
+    private var botDataDirectory: Path? = null
 
     companion object {
         private const val SHARED_SECRET = "test-shared-secret"
         private const val SYNAPSE_PORT = 8008
+        private const val BOT_USERNAME = "johnnybot"
+        private const val BOT_PASSWORD = "botpassword"
 
         private val LOG_CONFIG = """
             version: 1
@@ -67,21 +73,34 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         val httpClient = HttpClient.newHttpClient()
         val objectMapper = ObjectMapper()
 
-        val accessToken = registerUser(synapseUrl, httpClient, objectMapper)
+        val accessToken = registerUser(synapseUrl, httpClient, objectMapper, "admin", "admin")
 
         synapseClient = SynapseClient(synapseUrl, accessToken, httpClient, objectMapper)
+
+
+        registerUser(synapseUrl, httpClient, objectMapper, BOT_USERNAME, BOT_PASSWORD)
+        botDataDirectory = Files.createTempDirectory("matrix-bot-test")
 
         return mapOf(
             "matrix.base-url" to synapseUrl,
             "matrix.access-token" to accessToken,
             "matrix.room.media" to "!placeholder:localhost",
             "matrix.room.music" to "!placeholder:localhost",
-            "matrix.room.support" to "!placeholder:localhost"
+            "matrix.room.support" to "!placeholder:localhost",
+            "matrix.bot.enabled" to "true",
+            "matrix.bot.base-url" to synapseUrl,
+            "matrix.bot.username" to BOT_USERNAME,
+            "matrix.bot.password" to BOT_PASSWORD,
+            "matrix.bot.data-directory" to botDataDirectory!!.toString(),
+            "matrix.bot.prefix" to "bot",
+            "matrix.bot.users" to "localhost",
+            "matrix.bot.admins" to "@admin:localhost"
         )
     }
 
     override fun stop() {
         container?.stop()
+        botDataDirectory?.toFile()?.deleteRecursively()
     }
 
     override fun inject(testInjector: TestInjector) {
@@ -94,7 +113,9 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
     private fun registerUser(
         synapseUrl: String,
         httpClient: HttpClient,
-        objectMapper: ObjectMapper
+        objectMapper: ObjectMapper,
+        username: String,
+        password: String
     ): String {
         val nonceResponse = httpClient.send(
             HttpRequest.newBuilder()
@@ -105,8 +126,6 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         )
         val nonce = objectMapper.readTree(nonceResponse.body()).get("nonce").asText()
 
-        val username = "admin"
-        val password = "admin"
         val mac = computeHmac(nonce, username, password, admin = false)
 
         val registerBody = objectMapper.writeValueAsString(
@@ -129,7 +148,7 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         )
 
         if (registerResponse.statusCode() != 200) {
-            throw RuntimeException("Failed to register user: ${registerResponse.body()}")
+            throw RuntimeException("Failed to register user '$username': ${registerResponse.body()}")
         }
 
         return objectMapper.readTree(registerResponse.body()).get("access_token").asText()

@@ -8,7 +8,7 @@ import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 import org.hoohoot.homelab.manager.time.TimeService
 
@@ -21,7 +21,7 @@ class SkongMatrixCommand(private val timeService: TimeService) : PrefixedBotComm
     private val skongOrigin = LocalDate.parse("2019-02-14")
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -37,6 +37,6 @@ class SkongMatrixCommand(private val timeService: TimeService) : PrefixedBotComm
             else -> throw IllegalArgumentException("Unsupported skong: $parameters")
         }
 
-        matrixBot.room().sendMessage(roomId) { text(skongMessage, skongMessage, "org.matrix.custom.html") }
+        session.room.sendMessage(roomId) { text(skongMessage, skongMessage, "org.matrix.custom.html") }
     }
 }

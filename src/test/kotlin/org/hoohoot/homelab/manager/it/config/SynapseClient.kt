@@ -65,6 +65,81 @@ class SynapseClient(
 
     fun getMessageCount(roomId: String): Int = getMessages(roomId).size
 
+    fun sendMessage(roomId: String, body: String): String {
+        val msgBody = objectMapper.writeValueAsString(
+            mapOf(
+                "msgtype" to "m.text",
+                "body" to body
+            )
+        )
+
+        val txnId = System.nanoTime().toString()
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/send/m.room.message/$txnId"))
+                .header("Authorization", "Bearer $accessToken")
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(msgBody))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to send message to room $roomId: ${response.body()}")
+        }
+
+        return objectMapper.readTree(response.body()).get("event_id").asText()
+    }
+
+    fun inviteUser(roomId: String, userId: String) {
+        val body = objectMapper.writeValueAsString(mapOf("user_id" to userId))
+
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/invite"))
+                .header("Authorization", "Bearer $accessToken")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to invite user $userId to room $roomId: ${response.body()}")
+        }
+    }
+
+    fun waitForBotMessage(roomId: String, botUserId: String = "@johnnybot:localhost", timeoutMs: Long = 15000): JsonNode {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        var lastMessages: List<JsonNode> = emptyList()
+        while (System.currentTimeMillis() < deadline) {
+            val messages = getMessages(roomId)
+            lastMessages = messages
+            val botMessage = messages.firstOrNull {
+                it.get("type").asText() == "m.room.message" &&
+                    it.get("sender").asText() == botUserId
+            }
+            if (botMessage != null) {
+                return botMessage.get("content")
+            }
+            Thread.sleep(500)
+        }
+        val debugInfo = lastMessages.map { "${it.get("sender")?.asText()}: ${it.get("content")?.get("body")?.asText()}" }
+        throw RuntimeException("Timed out waiting for bot message in room $roomId. Messages found: $debugInfo")
+    }
+
+    fun waitForReaction(roomId: String, timeoutMs: Long = 15000): JsonNode {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            val reactions = getReactions(roomId)
+            if (reactions.isNotEmpty()) {
+                return reactions.first()
+            }
+            Thread.sleep(500)
+        }
+        throw RuntimeException("Timed out waiting for reaction in room $roomId")
+    }
+
     fun createRoom(name: String): String {
         val body = objectMapper.writeValueAsString(
             mapOf(

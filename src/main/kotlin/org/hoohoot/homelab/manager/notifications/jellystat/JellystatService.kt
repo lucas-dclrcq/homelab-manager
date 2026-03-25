@@ -9,7 +9,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 @ApplicationScoped
-class JellystatService(@RestClient private val jellystatRestClient: JellystatRestClient) {
+class JellystatService(@param:RestClient private val jellystatRestClient: JellystatRestClient) {
     suspend fun getMostPopularByType(
         lastNumberOfDays: Int,
         type: JellystatMediaType

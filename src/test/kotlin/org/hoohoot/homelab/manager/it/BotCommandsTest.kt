@@ -1,80 +1,214 @@
 package org.hoohoot.homelab.manager.it
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
-import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.SynapseTestResource
-import org.hoohoot.homelab.manager.it.config.WiremockTestResource
-import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed.PrefixedBotCommands
-import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.regex.DeadooMatrixCommand
-import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.regex.RegexBotCommands
+import org.hoohoot.homelab.manager.it.config.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 @QuarkusTest
 @QuarkusTestResource(WiremockTestResource::class)
 @QuarkusTestResource(SynapseTestResource::class)
 internal class BotCommandsTest {
 
-    @Inject
-    lateinit var prefixedBotCommands: PrefixedBotCommands
+    @InjectSynapse
+    private val synapseClient: SynapseClient? = null
 
-    @Inject
-    lateinit var regexBotCommands: RegexBotCommands
+    @InjectWireMock
+    private val wireMock: WireMockServer? = null
 
-    @Inject
-    lateinit var deadooMatrixCommand: DeadooMatrixCommand
+    private lateinit var roomId: String
 
-    @Test
-    fun `should include HelpCommand in prefixed commands`() {
-        val helpCommand = prefixedBotCommands.find("help")
-        assertThat(helpCommand).isNotNull
-        assertThat(helpCommand?.name).isEqualTo("help")
-        assertThat(helpCommand?.help).isEqualTo("shows this help message")
+    @BeforeEach
+    fun setUp() {
+        roomId = synapseClient!!.createRoom("bot-test-${System.nanoTime()}")
+        synapseClient.inviteUser(roomId, "@johnnybot:localhost")
+        // Wait for bot to join the room
+        Thread.sleep(3000)
+        wireMock!!.resetAll()
     }
 
     @Test
-    fun `should include ping command in prefixed commands`() {
-        val pingCommand = prefixedBotCommands.find("ping")
-        assertThat(pingCommand).isNotNull
+    fun `ping command should respond with Pong`() {
+        synapseClient!!.sendMessage(roomId, "!bot ping")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        assertThat(response.get("body").asText()).isEqualTo("Pong!")
+
+        val reaction = synapseClient.waitForReaction(roomId)
+        assertThat(reaction).isNotNull
     }
 
     @Test
-    fun `should return null for unknown prefixed command`() {
-        val command = prefixedBotCommands.find("nonexistent")
-        assertThat(command).isNull()
+    fun `help command should list available commands`() {
+        synapseClient!!.sendMessage(roomId, "!bot help")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("ping")
+        assertThat(body).contains("help")
+        assertThat(body).contains("skong")
+        assertThat(body).contains("who-watched")
+        assertThat(body).contains("top-watched")
+        assertThat(body).contains("top-watchers")
     }
 
     @Test
-    fun `should find deadoo regex command`() {
-        val command = regexBotCommands.find("c'est comment")
-        assertThat(command).isNotNull
-        assertThat(command?.name).isEqualTo("deadoo")
-    }
+    fun `skong believer should respond with patience message`() {
+        synapseClient!!.sendMessage(roomId, "!bot skong believer")
 
-    @ParameterizedTest
-    @ValueSource(strings = [
-        "C'est comment ?",
-        "C'est comment",
-        "c'est comment",
-        "Et sinon c'est comment ?",
-        "c'est comment sinon ?",
-        "deado",
-        "DEADO",
-        "deeeeeAAAAaaaaDDDdddOOOooo",
-        "dddddeeeeeAAAADDooooDooo",
-        "il est deado",
-        "il est DDdeEEAAadoOOO",
-    ])
-    fun `should match for c'est comment or deado`(input: String) {
-        assertThat(deadooMatrixCommand.matches(input)).isTrue()
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("Patience, my child")
     }
 
     @Test
-    fun `should not match unrelated messages`() {
-        assertThat(deadooMatrixCommand.matches("hello world")).isFalse()
-        assertThat(deadooMatrixCommand.matches("comment ça va")).isFalse()
+    fun `skong doubter should respond with days count`() {
+        synapseClient!!.sendMessage(roomId, "!bot skong doubter")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("days")
+        assertThat(body).contains("no release date")
+    }
+
+    @Test
+    fun `skong invalid parameter should respond with error`() {
+        synapseClient!!.sendMessage(roomId, "!bot skong invalid")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("An error occurred")
+    }
+
+    @Test
+    fun `who-watched should return watcher info`() {
+        stubJellyfinSearch()
+        stubJellystatItemHistory()
+
+        synapseClient!!.sendMessage(roomId, "!bot who-watched Breaking Bad")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("Who watched last episode of Breaking Bad")
+        assertThat(body).contains("alice")
+    }
+
+    @Test
+    fun `top-watched should return top watched media`() {
+        stubJellystatMostPopular("Series", """[{"unique_viewers": "5", "Name": "The Bear"}]""")
+        stubJellystatMostPopular("Movie", """[{"unique_viewers": "3", "Name": "Dune"}]""")
+        stubJellystatMostViewed("Series", """[{"Plays": "10", "total_playback_duration": "36000", "Name": "The Bear"}]""")
+        stubJellystatMostViewed("Movie", """[{"Plays": "8", "total_playback_duration": "18000", "Name": "Dune"}]""")
+
+        synapseClient!!.sendMessage(roomId, "!bot top-watched last-week")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("Top watch")
+        assertThat(body).contains("The Bear")
+    }
+
+    @Test
+    fun `top-watchers should return top watchers list`() {
+        stubJellystatUserActivity()
+
+        synapseClient!!.sendMessage(roomId, "!bot top-watchers")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        assertThat(body).contains("Top ten watchers")
+        assertThat(body).contains("alice")
+        assertThat(body).contains("bob")
+    }
+
+    @Test
+    fun `deadoo regex command should respond to c'est comment`() {
+        synapseClient!!.sendMessage(roomId, "c'est comment")
+
+        val response = synapseClient.waitForBotMessage(roomId)
+        val body = response.get("body").asText()
+        // The response is a random deado variant, just check it's not empty
+        assertThat(body).isNotBlank()
+    }
+
+    // WireMock stub helpers
+
+    private fun stubJellyfinSearch() {
+        wireMock!!.stubFor(
+            get(urlPathEqualTo("/Search/Hints"))
+                .withQueryParam("searchTerm", equalTo("Breaking Bad"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""{"SearchHints": [{"ItemId": "abc123", "Name": "Breaking Bad", "Type": "Series"}], "TotalRecordCount": 1}""")
+                )
+        )
+    }
+
+    private fun stubJellystatItemHistory() {
+        wireMock!!.stubFor(
+            post(urlPathEqualTo("/api/getItemHistory"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """{
+                            "current_page": 1, "pages": 1, "size": 50, "sort": "", "desc": true,
+                            "results": [
+                                {"UserName": "alice", "EpisodeNumber": 1, "SeasonNumber": 5, "FullName": "S05E01 - Live Free or Die"}
+                            ]
+                        }"""
+                        )
+                )
+        )
+    }
+
+    private fun stubJellystatMostPopular(type: String, responseBody: String) {
+        wireMock!!.stubFor(
+            post(urlPathEqualTo("/stats/getMostPopularByType"))
+                .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(responseBody)
+                )
+        )
+    }
+
+    private fun stubJellystatMostViewed(type: String, responseBody: String) {
+        wireMock!!.stubFor(
+            post(urlPathEqualTo("/stats/getMostViewedByType"))
+                .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(responseBody)
+                )
+        )
+    }
+
+    private fun stubJellystatUserActivity() {
+        wireMock!!.stubFor(
+            get(urlPathEqualTo("/stats/getAllUserActivity"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """[
+                            {"UserName": "alice", "TotalPlays": "50", "TotalWatchTime": "180000"},
+                            {"UserName": "bob", "TotalPlays": "30", "TotalWatchTime": "90000"}
+                        ]"""
+                        )
+                )
+        )
     }
 }

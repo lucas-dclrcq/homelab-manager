@@ -10,7 +10,7 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import net.folivo.trixnity.utils.toByteArrayFlow
 import org.hoohoot.homelab.manager.notifications.giphy.GiphyService
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
@@ -20,7 +20,7 @@ class GifMatrixCommand(private val giphyService: GiphyService) : PrefixedBotComm
     override val autoAcknowledge = true
 
     override suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -29,7 +29,7 @@ class GifMatrixCommand(private val giphyService: GiphyService) : PrefixedBotComm
     ) {
         Log.info("Gif command requested by ${sender.localpart} with query: $parameters")
         val gif = giphyService.searchGif(parameters)
-        matrixBot.room().sendMessage(roomId) {
+        session.room.sendMessage(roomId) {
             image(
                 body = "${parameters}.gif",
                 image = gif.file.toByteArrayFlow(),

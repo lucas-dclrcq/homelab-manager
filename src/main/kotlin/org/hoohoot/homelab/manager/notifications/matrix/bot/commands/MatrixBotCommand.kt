@@ -6,7 +6,7 @@ import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBot
+import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.emoji
 
 abstract class PrefixedBotCommand : MatrixBotCommand()
@@ -29,7 +29,7 @@ abstract class MatrixBotCommand {
     }
 
     protected abstract suspend fun handle(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -38,7 +38,7 @@ abstract class MatrixBotCommand {
     )
 
     suspend fun execute(
-        matrixBot: MatrixBot,
+        session: MatrixBotSession,
         sender: UserId,
         roomId: RoomId,
         parameters: String,
@@ -46,10 +46,10 @@ abstract class MatrixBotCommand {
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         try {
-            this.handle(matrixBot, sender, roomId, parameters, textEventId, textEvent)
+            this.handle(session, sender, roomId, parameters, textEventId, textEvent)
         } catch (e: Exception) {
             Log.error("Failed to respond to $name matrix command", e)
-            matrixBot.room().sendMessage(roomId) { text("An error occurred : ${e.message}") }
+            session.room.sendMessage(roomId) { text("An error occurred : ${e.message}") }
         }
     }
 }
