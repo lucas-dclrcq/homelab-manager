@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 @QuarkusTestResource(SynapseTestResource::class)
 internal class WeeklyReportNotificationsTest {
     @InjectSynapse
-    private val synapseClient: SynapseClient? = null
+    private val synapseTestClient: SynapseTestClient? = null
 
     @InjectWireMock
     private val wireMock: WireMockServer? = null
@@ -34,7 +34,7 @@ internal class WeeklyReportNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        mediaRoomId = synapseClient!!.createRoom("media-${System.nanoTime()}")
+        mediaRoomId = synapseTestClient!!.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
         wireMock!!.resetAll()
     }
@@ -74,7 +74,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
         val body = lastMessage.get("body").asText()
 
         assertThat(body).contains("📰 Weekly Recap")
@@ -127,7 +127,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         val tuesdayIndex = body.indexOf("Tuesday 18")
         val movieIndex = body.indexOf("🎬 Some Movie (2024)")
         val episodeIndex = body.indexOf("📺 Test Show S01E05 \"Test\"")
@@ -151,7 +151,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).doesNotContain("Monday")
         assertThat(body).doesNotContain("Tuesday")
         assertThat(body).contains("🏆 Top 3 Movies This Week")
@@ -170,7 +170,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("📰 Weekly Recap")
         assertThat(body).doesNotContain("🏆")
         assertThat(body).doesNotContain("━━━━━━━━━━━━━━━━━━━━")
@@ -195,7 +195,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("🥇 A — 10 viewers")
         assertThat(body).contains("🥈 B — 8 viewers")
         assertThat(body).contains("🥉 C — 5 viewers")
@@ -217,7 +217,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("Thursday 20")
         assertThat(body).contains("🎬 Cinema Movie (2024)")
     }
@@ -237,7 +237,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("TBD")
         assertThat(body).contains("🎬 No Date Movie (2024)")
     }

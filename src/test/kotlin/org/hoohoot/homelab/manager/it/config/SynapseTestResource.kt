@@ -19,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec
 class SynapseTestResource : QuarkusTestResourceLifecycleManager {
 
     private var container: GenericContainer<*>? = null
-    private var synapseClient: SynapseClient? = null
+    private var synapseTestClient: SynapseTestClient? = null
     private var botEnabled: Boolean = false
     private var botDataDirectory: Path? = null
 
@@ -76,7 +76,7 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         val accessToken = registerUser(synapseUrl, httpClient, objectMapper, "admin", "admin")
         disableRateLimit(synapseUrl, httpClient, objectMapper, accessToken, "@admin:localhost")
 
-        synapseClient = SynapseClient(synapseUrl, accessToken, httpClient, objectMapper)
+        synapseTestClient = SynapseTestClient(synapseUrl, accessToken, httpClient, objectMapper)
 
         registerUser(synapseUrl, httpClient, objectMapper, BOT_USERNAME, BOT_PASSWORD)
         disableRateLimit(synapseUrl, httpClient, objectMapper, accessToken, "@$BOT_USERNAME:localhost")
@@ -106,8 +106,8 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
 
     override fun inject(testInjector: TestInjector) {
         testInjector.injectIntoFields(
-            synapseClient,
-            AnnotatedAndMatchesType(InjectSynapse::class.java, SynapseClient::class.java)
+            synapseTestClient,
+            AnnotatedAndMatchesType(InjectSynapse::class.java, SynapseTestClient::class.java)
         )
     }
 

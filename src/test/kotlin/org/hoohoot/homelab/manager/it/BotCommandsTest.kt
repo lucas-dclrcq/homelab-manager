@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 internal class BotCommandsTest {
 
     @InjectSynapse
-    private val synapseClient: SynapseClient? = null
+    private val synapseTestClient: SynapseTestClient? = null
 
     @InjectWireMock
     private val wireMock: WireMockServer? = null
@@ -24,29 +24,27 @@ internal class BotCommandsTest {
 
     @BeforeEach
     fun setUp() {
-        roomId = synapseClient!!.createRoom("bot-test-${System.nanoTime()}")
-        synapseClient.inviteUser(roomId, "@johnnybot:localhost")
-        // Wait for bot to join the room
-        Thread.sleep(3000)
+        roomId = synapseTestClient!!.createRoom("bot-test-${System.nanoTime()}")
+        synapseTestClient.inviteUser(roomId, "@johnnybot:localhost")
         wireMock!!.resetAll()
     }
 
     @Test
     fun `ping command should respond with Pong`() {
-        synapseClient!!.sendMessage(roomId, "!bot ping")
+        synapseTestClient!!.sendMessage(roomId, "!bot ping")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         assertThat(response.get("body").asText()).isEqualTo("Pong!")
 
-        val reaction = synapseClient.waitForReaction(roomId)
+        val reaction = synapseTestClient.waitForReaction(roomId)
         assertThat(reaction).isNotNull
     }
 
     @Test
     fun `help command should list available commands`() {
-        synapseClient!!.sendMessage(roomId, "!bot help")
+        synapseTestClient!!.sendMessage(roomId, "!bot help")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("ping")
         assertThat(body).contains("help")
@@ -58,18 +56,18 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong believer should respond with patience message`() {
-        synapseClient!!.sendMessage(roomId, "!bot skong believer")
+        synapseTestClient!!.sendMessage(roomId, "!bot skong believer")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("Patience, my child")
     }
 
     @Test
     fun `skong doubter should respond with days count`() {
-        synapseClient!!.sendMessage(roomId, "!bot skong doubter")
+        synapseTestClient!!.sendMessage(roomId, "!bot skong doubter")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("days")
         assertThat(body).contains("no release date")
@@ -77,9 +75,9 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong invalid parameter should respond with error`() {
-        synapseClient!!.sendMessage(roomId, "!bot skong invalid")
+        synapseTestClient!!.sendMessage(roomId, "!bot skong invalid")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("An error occurred")
     }
@@ -89,9 +87,9 @@ internal class BotCommandsTest {
         stubJellyfinSearch()
         stubJellystatItemHistory()
 
-        synapseClient!!.sendMessage(roomId, "!bot who-watched Breaking Bad")
+        synapseTestClient!!.sendMessage(roomId, "!bot who-watched Breaking Bad")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("Who watched last episode of Breaking Bad")
         assertThat(body).contains("alice")
@@ -104,9 +102,9 @@ internal class BotCommandsTest {
         stubJellystatMostViewed("Series", """[{"Plays": "10", "total_playback_duration": "36000", "Name": "The Bear"}]""")
         stubJellystatMostViewed("Movie", """[{"Plays": "8", "total_playback_duration": "18000", "Name": "Dune"}]""")
 
-        synapseClient!!.sendMessage(roomId, "!bot top-watched last-week")
+        synapseTestClient!!.sendMessage(roomId, "!bot top-watched last-week")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("Top watch")
         assertThat(body).contains("The Bear")
@@ -116,9 +114,9 @@ internal class BotCommandsTest {
     fun `top-watchers should return top watchers list`() {
         stubJellystatUserActivity()
 
-        synapseClient!!.sendMessage(roomId, "!bot top-watchers")
+        synapseTestClient!!.sendMessage(roomId, "!bot top-watchers")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         assertThat(body).contains("Top ten watchers")
         assertThat(body).contains("alice")
@@ -127,9 +125,9 @@ internal class BotCommandsTest {
 
     @Test
     fun `deadoo regex command should respond to c'est comment`() {
-        synapseClient!!.sendMessage(roomId, "c'est comment")
+        synapseTestClient!!.sendMessage(roomId, "c'est comment")
 
-        val response = synapseClient.waitForBotMessage(roomId)
+        val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
         // The response is a random deado variant, just check it's not empty
         assertThat(body).isNotBlank()

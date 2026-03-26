@@ -8,7 +8,7 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
-import org.hoohoot.homelab.manager.it.config.SynapseClient
+import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 @QuarkusTestResource(SynapseTestResource::class)
 internal class SubtitleNotificationsTest {
     @InjectSynapse
-    private val synapseClient: SynapseClient? = null
+    private val synapseTestClient: SynapseTestClient? = null
 
     @Inject
     lateinit var roomProvider: MatrixRoomProvider
@@ -29,7 +29,7 @@ internal class SubtitleNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        mediaRoomId = synapseClient!!.createRoom("media-${System.nanoTime()}")
+        mediaRoomId = synapseTestClient!!.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
     }
 
@@ -81,7 +81,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/radarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val movieEventId = synapseClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+        val movieEventId = synapseTestClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         // 2. Bazarr notifies subtitle downloaded for same movie
         RestAssured.given().contentType(ContentType.JSON)
@@ -90,7 +90,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(movieEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
         assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
@@ -106,7 +106,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/sonarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val seriesEventId = synapseClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+        val seriesEventId = synapseTestClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         // 2. Bazarr notifies subtitle downloaded for same series
         RestAssured.given().contentType(ContentType.JSON)
@@ -115,7 +115,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(seriesEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
         assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
@@ -130,7 +130,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("m.relates_to")).isNull()
         assertThat(lastMessage.get("body").asText()).contains("💬 Subtitle Downloaded")
         assertThat(lastMessage.get("body").asText()).contains("Unknown Movie (1999)")
@@ -144,7 +144,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("French subtitles upgraded from addic7ed (score: 98%)")
     }
 
@@ -156,7 +156,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("French subtitles manually downloaded from subscene (score: 85%)")
     }
 
@@ -168,7 +168,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("English (HI) subtitles downloaded")
     }
 
@@ -180,7 +180,7 @@ internal class SubtitleNotificationsTest {
             .`when`().post("/api/notifications/bazarr")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("French (forced) subtitles downloaded")
     }
 

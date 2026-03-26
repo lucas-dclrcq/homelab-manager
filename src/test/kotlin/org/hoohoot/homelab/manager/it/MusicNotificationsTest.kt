@@ -9,7 +9,7 @@ import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.InjectSynapse
-import org.hoohoot.homelab.manager.it.config.SynapseClient
+import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.it.config.SynapseTestResource
 import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 @QuarkusTestResource(SynapseTestResource::class)
 internal class MusicNotificationsTest {
     @InjectSynapse
-    private val synapseClient: SynapseClient? = null
+    private val synapseTestClient: SynapseTestClient? = null
 
     @Inject
     lateinit var roomProvider: MatrixRoomProvider
@@ -32,7 +32,7 @@ internal class MusicNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        musicRoomId = synapseClient!!.createRoom("music-${System.nanoTime()}")
+        musicRoomId = synapseTestClient!!.createRoom("music-${System.nanoTime()}")
         roomProvider.music = musicRoomId
     }
 
@@ -279,7 +279,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseClient!!.getLastMessage(musicRoomId)
+        val lastMessage = synapseTestClient!!.getLastMessage(musicRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🎵 Album downloaded\nGeneral Elektriks - Cliquety Kliqk (2003)\n🖼️ Cover: https://imagecache.lidarr.audio/v1/caa/84282cd1-aa02-4363-95f0-5bf824fec528/15449764515-1200.jpg\n🎸 Genres : Downtempo, Electro, Electronic, Hip Hop, Synth-Pop\n📥 Source : qBittorrent"
@@ -298,7 +298,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(musicRoomId).get("body").asText()
         assertThat(body).contains("unknown - unknown (unknown)")
         assertThat(body).contains("🖼️ Cover: unknown")
         assertThat(body).contains("📥 Source : unknown")
@@ -327,7 +327,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(musicRoomId).get("body").asText()
         assertThat(body).contains("Queen - A Night at the Opera (1975)")
         assertThat(body).contains("🖼️ Cover: unknown")
         assertThat(body).contains("🎸 Genres : Rock, Progressive Rock")
@@ -353,7 +353,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseClient!!.getLastMessage(musicRoomId).get("body").asText()
+        val body = synapseTestClient!!.getLastMessage(musicRoomId).get("body").asText()
         assertThat(body).contains("Artist - Album (unknown)")
         assertThat(body).contains("🎸 Genres : ")
         assertThat(body).doesNotContain("🎸 Genres : unknown")
@@ -373,7 +373,7 @@ internal class MusicNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val messageCount = synapseClient!!.getMessageCount(musicRoomId)
+        val messageCount = synapseTestClient!!.getMessageCount(musicRoomId)
         assertThat(messageCount).isEqualTo(0)
     }
 }

@@ -2,12 +2,15 @@ package org.hoohoot.homelab.manager.it.config
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
-class SynapseClient(
+class SynapseTestClient(
     val synapseUrl: String,
     val accessToken: String,
     private val httpClient: HttpClient,
@@ -107,6 +110,12 @@ class SynapseClient(
         if (response.statusCode() != 200) {
             throw RuntimeException("Failed to invite user $userId to room $roomId: ${response.body()}")
         }
+
+        await().atMost(Duration.ofSeconds(10))
+            .pollInterval(Duration.ofMillis(500))
+            .untilAsserted {
+                assertThat(this.getRoomMembers(roomId)).contains(userId)
+            }
     }
 
     fun waitForBotMessage(roomId: String, botUserId: String = "@johnnybot:localhost", timeoutMs: Long = 15000): JsonNode {
@@ -138,6 +147,23 @@ class SynapseClient(
             Thread.sleep(500)
         }
         throw RuntimeException("Timed out waiting for reaction in room $roomId")
+    }
+
+    fun getRoomMembers(roomId: String): List<String> {
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/members"))
+                .header("Authorization", "Bearer $accessToken")
+                .GET().build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to get members of room $roomId: ${response.body()}")
+        }
+        return objectMapper.readTree(response.body())
+            .get("chunk")
+            .filter { it.get("content")?.get("membership")?.asText() == "join" }
+            .map { it.get("state_key").asText() }
     }
 
     fun createRoom(name: String): String {
