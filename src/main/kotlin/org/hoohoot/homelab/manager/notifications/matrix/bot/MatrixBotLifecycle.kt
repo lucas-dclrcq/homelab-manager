@@ -15,6 +15,8 @@ import de.connect2x.trixnity.core.model.events.m.room.MemberEventContent
 import de.connect2x.trixnity.core.model.events.m.room.Membership
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.core.subscribeContent
+import org.hoohoot.homelab.manager.leader.LeadershipAcquired
+import org.hoohoot.homelab.manager.leader.LeadershipLost
 import kotlin.coroutines.CoroutineContext
 
 @ApplicationScoped
@@ -26,6 +28,10 @@ class MatrixBotLifecycle(
 
     private val runningTimestamp = Clock.System.now()
     private lateinit var quarkusClassLoader: ClassLoader
+
+    @Volatile
+    private var syncRunning = false
+    private var initialized = false
 
     fun onStart(@Observes event: StartupEvent) {
         if (!config.enabled()) return
@@ -49,9 +55,30 @@ class MatrixBotLifecycle(
                 }
             }
 
+            initialized = true
+            Log.info("Matrix bot initialized, waiting for leader election to start sync.")
+        }
+    }
+
+    fun onLeadershipAcquired(@Observes event: LeadershipAcquired) {
+        if (!config.enabled() || !initialized || syncRunning) return
+
+        runBlocking {
             Log.info("Starting Sync!")
             session.client.startSync()
-            Log.info("Matrix bot started.")
+            syncRunning = true
+            Log.info("Matrix bot sync started (leader).")
+        }
+    }
+
+    fun onLeadershipLost(@Observes event: LeadershipLost) {
+        if (!syncRunning) return
+
+        runBlocking {
+            Log.info("Stopping Matrix bot sync (no longer leader)...")
+            session.client.stopSync()
+            syncRunning = false
+            Log.info("Matrix bot sync stopped.")
         }
     }
 
@@ -59,9 +86,12 @@ class MatrixBotLifecycle(
         if (!config.enabled()) return
 
         runBlocking {
-            Log.info("Stopping Matrix bot sync...")
-            session.client.stopSync()
-            Log.info("Matrix bot stopped.")
+            if (syncRunning) {
+                Log.info("Stopping Matrix bot sync...")
+                session.client.stopSync()
+                syncRunning = false
+                Log.info("Matrix bot stopped.")
+            }
         }
     }
 
