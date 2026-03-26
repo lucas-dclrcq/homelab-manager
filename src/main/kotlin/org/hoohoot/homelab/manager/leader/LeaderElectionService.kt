@@ -34,8 +34,8 @@ class LeaderElectionService(
 
             val renewed = Panache.withTransaction {
                 LeaderElectionEntity.update(
-                    "lastHeartbeat = ?1 where lockKey = 'MAIN' and instanceId = ?2",
-                    now, instanceId
+                    "lastHeartbeat = ?1 where lockKey = 'MAIN' and instanceId = ?2 and status = ?3",
+                    now, instanceId, LeaderStatus.ACTIVE
                 )
             }.awaitSuspending()
 
@@ -49,8 +49,8 @@ class LeaderElectionService(
 
             val claimed = Panache.withTransaction {
                 LeaderElectionEntity.update(
-                    "instanceId = ?1, electedAt = ?2, lastHeartbeat = ?2 where lockKey = 'MAIN' and lastHeartbeat < ?3",
-                    instanceId, now, expiry
+                    "instanceId = ?1, electedAt = ?2, lastHeartbeat = ?2, status = ?3 where lockKey = 'MAIN' and (status = ?4 or lastHeartbeat < ?5)",
+                    instanceId, now, LeaderStatus.ACTIVE, LeaderStatus.RELEASED, expiry
                 )
             }.awaitSuspending()
 
@@ -69,17 +69,32 @@ class LeaderElectionService(
 
     fun onStop(@Observes event: ShutdownEvent) {
         try {
-            val pastHeartbeat = LocalDateTime.now().minusHours(1)
             Panache.withTransaction {
                 LeaderElectionEntity.update(
-                    "lastHeartbeat = ?1 where lockKey = 'MAIN' and instanceId = ?2",
-                    pastHeartbeat, instanceId
+                    "status = ?1 where lockKey = 'MAIN' and instanceId = ?2",
+                    LeaderStatus.RELEASED, instanceId
                 )
             }.await().indefinitely()
             Log.info("Released leader lease (instance=$instanceId)")
         } catch (e: Exception) {
             Log.warn("Failed to release leader lease on shutdown", e)
         }
+    }
+
+    fun releaseLeadership() {
+        if (!_isLeader) return
+        try {
+            Panache.withTransaction {
+                LeaderElectionEntity.update(
+                    "status = ?1 where lockKey = 'MAIN' and instanceId = ?2",
+                    LeaderStatus.RELEASED, instanceId
+                )
+            }.await().indefinitely()
+            Log.info("Voluntarily released leader lease (instance=$instanceId)")
+        } catch (e: Exception) {
+            Log.warn("Failed to release leader lease", e)
+        }
+        setLeader(false)
     }
 
     private fun setLeader(leader: Boolean) {

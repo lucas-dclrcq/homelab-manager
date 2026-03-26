@@ -16,6 +16,7 @@ import de.connect2x.trixnity.core.model.events.m.room.Membership
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.core.subscribeContent
 import org.hoohoot.homelab.manager.leader.LeadershipAcquired
+import org.hoohoot.homelab.manager.leader.LeaderElectionService
 import org.hoohoot.homelab.manager.leader.LeadershipLost
 import kotlin.coroutines.CoroutineContext
 
@@ -24,7 +25,7 @@ class MatrixBotLifecycle(
     private val session: MatrixBotSession,
     private val dispatcher: MatrixBotCommandDispatcher,
     private val config: MatrixBotConfiguration,
-    private val leadershipLost: jakarta.enterprise.event.Event<LeadershipLost>
+    private val leaderElection: LeaderElectionService
 ) {
 
     private val runningTimestamp = Clock.System.now()
@@ -65,8 +66,8 @@ class MatrixBotLifecycle(
                     initialized = true
                     Log.info("Matrix bot initialized.")
                 } catch (e: Exception) {
-                    leadershipLost.fire(LeadershipLost)
-                    Log.error("Failed to initialize Matrix bot, will retry on next leadership event.", e)
+                    Log.error("Failed to initialize Matrix bot, releasing leadership.", e)
+                    leaderElection.releaseLeadership()
                     return@runBlocking
                 }
             }
