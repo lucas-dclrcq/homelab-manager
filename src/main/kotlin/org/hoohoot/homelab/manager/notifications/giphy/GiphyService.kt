@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
 @ApplicationScoped
-class GiphyService(@RestClient private val restClient: GiphyRestClient, vertx: Vertx) {
+class GiphyService(@param:RestClient private val restClient: GiphyRestClient, vertx: Vertx) {
     private val webClient = WebClient.create(vertx)
 
     suspend fun searchGif(query: String): Gif {

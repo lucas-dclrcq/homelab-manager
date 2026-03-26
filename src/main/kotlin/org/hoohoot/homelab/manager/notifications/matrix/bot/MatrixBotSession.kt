@@ -16,7 +16,7 @@ import de.connect2x.trixnity.core.model.events.StateEventContent
 import de.connect2x.trixnity.core.model.events.m.room.CanonicalAliasEventContent
 
 @ApplicationScoped
-class MatrixBotSession(private val config: MatrixBotConfiguration) {
+class MatrixBotSession(private val config: MatrixBotConfiguration, private val dataSource: javax.sql.DataSource) {
 
     private lateinit var matrixClient: MatrixClient
 
@@ -30,7 +30,7 @@ class MatrixBotSession(private val config: MatrixBotConfiguration) {
     suspend fun initialize() {
         Log.info("Creating Matrix client")
         matrixClient = MatrixClient.create(
-            repositoriesModule = createRepositoriesModule(config),
+            repositoriesModule = createRepositoriesModule(dataSource),
             mediaStoreModule = createMediaStore(config),
             cryptoDriverModule = createCryptoDriverModule(),
             authProviderData = MatrixClientAuthProviderData.classicLoginWithPassword(

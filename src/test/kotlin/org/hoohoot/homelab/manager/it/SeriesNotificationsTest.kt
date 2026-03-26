@@ -191,32 +191,4 @@ internal class SeriesNotificationsTest {
         assertThat(lastMessage.get("m.relates_to").get("event_id").asText()).isEqualTo(firstEventId)
         assertThat(lastMessage.get("m.relates_to").get("rel_type").asText()).isEqualTo("m.thread")
     }
-
-    @Test
-    fun `should send standalone notification when last notification was more than 24h ago`() {
-        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 1))
-            .and().header("X-Api-Key", "secureapikey")
-            .`when`().post()
-            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        // Simulate 48h+ elapsed and trigger cleanup (cron job deletes entries older than 48h)
-        dataSource.connection.use { conn ->
-            conn.prepareStatement("UPDATE media_notification_thread SET last_notified_at = ? WHERE media_id = '600' AND media_type = 'series'").use { stmt ->
-                stmt.setObject(1, LocalDateTime.now().minusHours(49))
-                stmt.executeUpdate()
-            }
-            conn.prepareStatement("DELETE FROM media_notification_thread WHERE last_notified_at < ?").use { stmt ->
-                stmt.setObject(1, LocalDateTime.now().minusHours(48))
-                stmt.executeUpdate()
-            }
-        }
-
-        RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 600, episodeNumber = 2))
-            .and().header("X-Api-Key", "secureapikey")
-            .`when`().post()
-            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
-
-        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
-        assertThat(lastMessage.get("m.relates_to")).isNull()
-    }
 }

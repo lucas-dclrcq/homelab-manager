@@ -5,21 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PopularMediaStatisticsDTO(
-    @JsonProperty("unique_viewers")
+    @param:JsonProperty("unique_viewers")
     val uniqueViewers: String? = null,
 
-    @JsonProperty("latest_activity_date")
+    @param:JsonProperty("latest_activity_date")
     val latestActivityDate: String? = null,
 
-    @JsonProperty("Name")
+    @param:JsonProperty("Name")
     val name: String? = null,
 
-    @JsonProperty("Id")
+    @param:JsonProperty("Id")
     val id: String? = null,
 
-    @JsonProperty("PrimaryImageHash")
+    @param:JsonProperty("PrimaryImageHash")
     val primaryImageHash: String? = null,
 
-    @JsonProperty("archived")
+    @param:JsonProperty("archived")
     val archived: Boolean? = null
 )

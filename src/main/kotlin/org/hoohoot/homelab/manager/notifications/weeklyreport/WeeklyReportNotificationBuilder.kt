@@ -1,15 +1,11 @@
 package org.hoohoot.homelab.manager.notifications.weeklyreport
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.media.MostPopularMedia
+import kotlinx.datetime.*
 import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrAlbum
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.Episode
+import org.hoohoot.homelab.manager.notifications.jellystat.MostPopularMedia
 
 class WeeklyReportNotificationBuilder(
     private val movies: List<RadarrMovie>,
@@ -165,7 +161,6 @@ class WeeklyReportNotificationBuilder(
             DayOfWeek.FRIDAY -> "Friday"
             DayOfWeek.SATURDAY -> "Saturday"
             DayOfWeek.SUNDAY -> "Sunday"
-            else -> "???"
         }
     }
 }

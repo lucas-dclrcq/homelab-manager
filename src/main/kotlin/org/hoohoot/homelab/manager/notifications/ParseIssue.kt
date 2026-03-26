@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SeerrWebhookPayload(
-    @JsonProperty("notification_type") val notificationType: String? = null,
+    @param:JsonProperty("notification_type") val notificationType: String? = null,
     val event: String? = null,
     val subject: String? = null,
     val message: String? = null,
@@ -16,14 +16,14 @@ data class SeerrWebhookPayload(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SeerrWebhookIssue(
-    @JsonProperty("issue_id") val issueId: String? = null,
-    @JsonProperty("reportedBy_username") val reportedByUsername: String? = null,
+    @param:JsonProperty("issue_id") val issueId: String? = null,
+    @param:JsonProperty("reportedBy_username") val reportedByUsername: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SeerrWebhookComment(
-    @JsonProperty("comment_message") val commentMessage: String? = null,
-    @JsonProperty("commentedBy_username") val commentedByUsername: String? = null,
+    @param:JsonProperty("comment_message") val commentMessage: String? = null,
+    @param:JsonProperty("commentedBy_username") val commentedByUsername: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

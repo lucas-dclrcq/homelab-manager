@@ -1,14 +1,14 @@
 package org.hoohoot.homelab.manager.notifications.matrix.bot.commands.prefixed
 
-import io.quarkus.logging.Log
-import jakarta.enterprise.context.ApplicationScoped
 import de.connect2x.trixnity.client.room.message.text
 import de.connect2x.trixnity.core.model.EventId
 import de.connect2x.trixnity.core.model.RoomId
 import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
+import io.quarkus.logging.Log
+import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
-import org.hoohoot.homelab.manager.media.TopWatchedPeriod
+import org.hoohoot.homelab.manager.notifications.jellystat.TopWatchedPeriod
 import org.hoohoot.homelab.manager.notifications.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.notifications.matrix.bot.commands.PrefixedBotCommand
 
