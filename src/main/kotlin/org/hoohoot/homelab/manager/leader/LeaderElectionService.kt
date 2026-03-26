@@ -85,7 +85,7 @@ class LeaderElectionService(
     private fun setLeader(leader: Boolean) {
         val wasLeader = _isLeader
         _isLeader = leader
-        if (leader && !wasLeader) leadershipAcquired.fire(LeadershipAcquired(instanceId))
-        if (!leader && wasLeader) leadershipLost.fire(LeadershipLost(instanceId))
+        if (leader && !wasLeader) leadershipAcquired.fire(LeadershipAcquired)
+        if (!leader && wasLeader) leadershipLost.fire(LeadershipLost)
     }
 }

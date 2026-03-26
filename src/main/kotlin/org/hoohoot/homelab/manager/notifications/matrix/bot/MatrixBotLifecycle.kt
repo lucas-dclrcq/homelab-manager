@@ -23,7 +23,8 @@ import kotlin.coroutines.CoroutineContext
 class MatrixBotLifecycle(
     private val session: MatrixBotSession,
     private val dispatcher: MatrixBotCommandDispatcher,
-    private val config: MatrixBotConfiguration
+    private val config: MatrixBotConfiguration,
+    private val leadershipLost: jakarta.enterprise.event.Event<LeadershipLost>
 ) {
 
     private val runningTimestamp = Clock.System.now()
@@ -64,6 +65,7 @@ class MatrixBotLifecycle(
                     initialized = true
                     Log.info("Matrix bot initialized.")
                 } catch (e: Exception) {
+                    leadershipLost.fire(LeadershipLost)
                     Log.error("Failed to initialize Matrix bot, will retry on next leadership event.", e)
                     return@runBlocking
                 }
