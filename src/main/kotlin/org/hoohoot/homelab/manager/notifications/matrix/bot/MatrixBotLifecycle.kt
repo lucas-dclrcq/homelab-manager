@@ -37,33 +37,38 @@ class MatrixBotLifecycle(
         if (!config.enabled()) return
 
         quarkusClassLoader = Thread.currentThread().contextClassLoader
-
-        runBlocking {
-            session.initialize()
-
-            session.client.api.sync.subscribeContent<MemberEventContent> { event ->
-                withQuarkusClassLoader {
-                    handleJoinEvent(event)
-                }
-            }
-
-            session.client.api.sync.subscribeContent<RoomMessageEventContent> { event ->
-                withQuarkusClassLoader {
-                    if (isValidEventFromUser(event)) {
-                        dispatcher.dispatch(event)
-                    }
-                }
-            }
-
-            initialized = true
-            Log.info("Matrix bot initialized, waiting for leader election to start sync.")
-        }
     }
 
     fun onLeadershipAcquired(@Observes event: LeadershipAcquired) {
-        if (!config.enabled() || !initialized || syncRunning) return
+        if (!config.enabled() || syncRunning) return
 
         runBlocking {
+            if (!initialized) {
+                try {
+                    session.initialize()
+
+                    session.client.api.sync.subscribeContent<MemberEventContent> { event ->
+                        withQuarkusClassLoader {
+                            handleJoinEvent(event)
+                        }
+                    }
+
+                    session.client.api.sync.subscribeContent<RoomMessageEventContent> { event ->
+                        withQuarkusClassLoader {
+                            if (isValidEventFromUser(event)) {
+                                dispatcher.dispatch(event)
+                            }
+                        }
+                    }
+
+                    initialized = true
+                    Log.info("Matrix bot initialized.")
+                } catch (e: Exception) {
+                    Log.error("Failed to initialize Matrix bot, will retry on next leadership event.", e)
+                    return@runBlocking
+                }
+            }
+
             Log.info("Starting Sync!")
             session.client.startSync()
             syncRunning = true
