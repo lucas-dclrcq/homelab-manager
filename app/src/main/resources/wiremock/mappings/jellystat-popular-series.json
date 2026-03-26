@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/stats/getMostPopularByType",
+    "bodyPatterns": [
+      { "matchesJsonPath": { "expression": "$.type", "equalTo": "Series" } }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "unique_viewers": "8", "Name": "The Bear" },
+      { "unique_viewers": "6", "Name": "Severance" }
+    ]
+  }
+}

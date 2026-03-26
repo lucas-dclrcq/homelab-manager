@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/gifs/search"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "data": [
+        {
+          "id": "example-gif-1",
+          "images": {
+            "original": {
+              "url": "https://media.giphy.com/example.gif",
+              "width": "480",
+              "height": "270"
+            }
+          },
+          "title": "Example GIF"
+        }
+      ],
+      "pagination": { "total_count": 1, "count": 1, "offset": 0 }
+    }
+  }
+}

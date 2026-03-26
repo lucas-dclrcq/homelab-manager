@@ -1,0 +1,24 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/calendar",
+    "queryParameters": {
+      "includeSeries": { "equalTo": "true" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "seasonNumber": 3,
+        "episodeNumber": 1,
+        "title": "Tomorrow",
+        "airDate": "2025-03-17",
+        "airDateUtc": "2025-03-17T21:00:00Z",
+        "series": { "title": "The Bear" }
+      }
+    ]
+  }
+}

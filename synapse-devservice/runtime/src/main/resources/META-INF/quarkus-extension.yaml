@@ -1,0 +1,8 @@
+name: Synapse DevService
+description: Starts Synapse + Element Web containers in dev mode
+artifact: org.hoohoot:synapse-devservice::jar:${project.version}
+metadata:
+  keywords:
+    - matrix
+    - synapse
+    - element

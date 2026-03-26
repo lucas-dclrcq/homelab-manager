@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/stats/getMostPopularByType",
+    "bodyPatterns": [
+      { "matchesJsonPath": { "expression": "$.type", "equalTo": "Movie" } }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "unique_viewers": "5", "Name": "Dune: Part Two" },
+      { "unique_viewers": "3", "Name": "Oppenheimer" },
+      { "unique_viewers": "2", "Name": "Poor Things" }
+    ]
+  }
+}

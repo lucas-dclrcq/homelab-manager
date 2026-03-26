@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/stats/getAllUserActivity"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "UserName": "alice", "TotalPlays": "50", "TotalWatchTime": "180000" },
+      { "UserName": "bob", "TotalPlays": "30", "TotalWatchTime": "90000" },
+      { "UserName": "charlie", "TotalPlays": "15", "TotalWatchTime": "45000" }
+    ]
+  }
+}

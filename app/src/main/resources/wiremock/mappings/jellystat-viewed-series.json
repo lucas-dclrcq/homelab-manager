@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/stats/getMostViewedByType",
+    "bodyPatterns": [
+      { "matchesJsonPath": { "expression": "$.type", "equalTo": "Series" } }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "Plays": "10", "total_playback_duration": "36000", "Name": "The Bear" },
+      { "Plays": "6", "total_playback_duration": "21600", "Name": "Severance" }
+    ]
+  }
+}

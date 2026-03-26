@@ -1,6 +1,6 @@
 package org.hoohoot.homelab.manager.notifications.persistence
 
-import io.quarkus.hibernate.reactive.panache.Panache
+import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.notifications.NotificationId

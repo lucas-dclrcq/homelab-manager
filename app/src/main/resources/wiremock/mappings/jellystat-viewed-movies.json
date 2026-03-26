@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/stats/getMostViewedByType",
+    "bodyPatterns": [
+      { "matchesJsonPath": { "expression": "$.type", "equalTo": "Movie" } }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "Plays": "8", "total_playback_duration": "18000", "Name": "Dune: Part Two" },
+      { "Plays": "5", "total_playback_duration": "12000", "Name": "Oppenheimer" }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v1/calendar"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "title": "GNX",
+        "releaseDate": "2025-03-18",
+        "artist": { "artistName": "Kendrick Lamar" }
+      }
+    ]
+  }
+}

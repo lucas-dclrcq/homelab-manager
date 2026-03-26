@@ -1,0 +1,58 @@
+server_name: "localhost"
+pid_file: /data/homeserver.pid
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    resources:
+      - names: [client]
+        compress: false
+
+database:
+  name: sqlite3
+  args:
+    database: /data/homeserver.db
+
+log_config: "/data/localhost.log.config"
+
+media_store_path: /data/media_store
+registration_shared_secret: "test-shared-secret"
+report_stats: false
+macaroon_secret_key: "test-macaroon-secret"
+form_secret: "test-form-secret"
+signing_key_path: "/data/localhost.signing.key"
+
+enable_registration: true
+enable_registration_without_verification: true
+
+rc_message:
+  per_second: 10000
+  burst_count: 10000
+rc_registration:
+  per_second: 10000
+  burst_count: 10000
+rc_login:
+  address:
+    per_second: 10000
+    burst_count: 10000
+  account:
+    per_second: 10000
+    burst_count: 10000
+  failed_attempts:
+    per_second: 10000
+    burst_count: 10000
+rc_joins:
+  local:
+    per_second: 10000
+    burst_count: 10000
+rc_invites:
+  per_room:
+    per_second: 10000
+    burst_count: 10000
+  per_user:
+    per_second: 10000
+    burst_count: 10000
+  per_issuer:
+    per_second: 10000
+    burst_count: 10000

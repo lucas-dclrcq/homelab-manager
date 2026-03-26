@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/getItemHistory"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "current_page": 1,
+      "pages": 1,
+      "size": 50,
+      "sort": "",
+      "desc": true,
+      "results": [
+        { "UserName": "alice", "EpisodeNumber": 1, "SeasonNumber": 5, "FullName": "S05E01 - Live Free or Die" },
+        { "UserName": "bob", "EpisodeNumber": 1, "SeasonNumber": 5, "FullName": "S05E01 - Live Free or Die" }
+      ]
+    }
+  }
+}

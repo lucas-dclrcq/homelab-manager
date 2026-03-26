@@ -1,6 +1,6 @@
 package org.hoohoot.homelab.manager.leader
 
-import io.quarkus.hibernate.reactive.panache.Panache
+import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.quarkus.logging.Log
 import io.quarkus.runtime.ShutdownEvent
 import io.quarkus.scheduler.Scheduled
@@ -81,7 +81,7 @@ class LeaderElectionService(
         }
     }
 
-    fun releaseLeadership() {
+    suspend fun releaseLeadership() {
         if (!_isLeader) return
         try {
             Panache.withTransaction {

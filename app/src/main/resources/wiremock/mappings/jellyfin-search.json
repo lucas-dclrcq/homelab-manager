@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/Search/Hints"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "SearchHints": [
+        { "ItemId": "abc123", "Name": "Example Media", "Type": "Series" }
+      ],
+      "TotalRecordCount": 1
+    }
+  }
+}

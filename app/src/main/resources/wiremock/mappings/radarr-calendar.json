@@ -1,0 +1,23 @@
+{
+  "priority": 2,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/calendar"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "title": "Dune: Part Two",
+        "year": 2024,
+        "digitalRelease": "2025-03-17T20:00:00Z"
+      },
+      {
+        "title": "Oppenheimer",
+        "year": 2024,
+        "physicalRelease": "2025-03-19"
+      }
+    ]
+  }
+}
