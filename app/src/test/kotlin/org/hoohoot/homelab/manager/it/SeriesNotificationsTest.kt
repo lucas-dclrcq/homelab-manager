@@ -1,7 +1,6 @@
 package org.hoohoot.homelab.manager.it
 
 import io.agroal.api.AgroalDataSource
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
@@ -9,10 +8,7 @@ import io.restassured.http.ContentType
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
-import org.hoohoot.homelab.manager.it.config.SynapseTestResource
-import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.SonarrResource
 import org.junit.jupiter.api.BeforeEach
@@ -21,11 +17,9 @@ import java.time.LocalDateTime
 
 @QuarkusTest
 @TestHTTPEndpoint(SonarrResource::class)
-@QuarkusTestResource(WiremockTestResource::class)
-@QuarkusTestResource(SynapseTestResource::class)
 internal class SeriesNotificationsTest {
-    @InjectSynapse
-    private val synapseTestClient: SynapseTestClient? = null
+    @Inject
+    lateinit var synapseTestClient: SynapseTestClient
 
     @Inject
     lateinit var dataSource: AgroalDataSource
@@ -37,7 +31,7 @@ internal class SeriesNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        mediaRoomId = synapseTestClient!!.createRoom("media-${System.nanoTime()}")
+        mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
     }
 
@@ -163,7 +157,7 @@ internal class SeriesNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "📺 Episode Downloaded\n📡 Series : Australian Survivor [https://www.imdb.com/title/tt0310416/]\n🎞️ Episode : S12E06 - Episode 6 [WEBDL-720p]\n👤 Series requested by : flo\n📥 Source : SABnzbd (NZBFinder)"
@@ -180,7 +174,7 @@ internal class SeriesNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val firstEventId = synapseTestClient!!.getLastMessageEvent(mediaRoomId).get("event_id").asText()
+        val firstEventId = synapseTestClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
         RestAssured.given().contentType(ContentType.JSON).body(notification(seriesId = 500, episodeNumber = 2))
             .and().header("X-Api-Key", "secureapikey")

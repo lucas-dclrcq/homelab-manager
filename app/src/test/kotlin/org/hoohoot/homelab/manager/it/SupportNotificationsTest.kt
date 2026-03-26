@@ -1,6 +1,5 @@
 package org.hoohoot.homelab.manager.it
 
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
@@ -8,10 +7,7 @@ import io.restassured.http.ContentType
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
-import org.hoohoot.homelab.manager.it.config.SynapseTestResource
-import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.SeerrResource
 import org.junit.jupiter.api.BeforeEach
@@ -19,11 +15,9 @@ import org.junit.jupiter.api.Test
 
 @QuarkusTest
 @TestHTTPEndpoint(SeerrResource::class)
-@QuarkusTestResource(WiremockTestResource::class)
-@QuarkusTestResource(SynapseTestResource::class)
 internal class SupportNotificationsTest {
-    @InjectSynapse
-    private val synapseTestClient: SynapseTestClient? = null
+    @Inject
+    lateinit var synapseTestClient: SynapseTestClient
 
     @Inject
     lateinit var roomProvider: MatrixRoomProvider
@@ -32,7 +26,7 @@ internal class SupportNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        supportRoomId = synapseTestClient!!.createRoom("support-${System.nanoTime()}")
+        supportRoomId = synapseTestClient.createRoom("support-${System.nanoTime()}")
         roomProvider.support = supportRoomId
     }
 
@@ -72,7 +66,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(supportRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd"
@@ -127,7 +121,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(supportRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🐛 New Video Issue Reported\n📌 Subject : A Complete Unknown (2024)\n💬 Message : test\n👤 Reporter : lucasd\nℹ️ Additional infos :\n- Affected Season : 30\n- Affected Episode : 10"
@@ -174,7 +168,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(supportRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "✅ Subtitle Issue Resolved\n📌 Subject : Bad Moms (2016)\n💬 Message : test\n👤 Reporter : lucasd"
@@ -221,7 +215,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseTestClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseTestClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueResolved = """
             {
@@ -303,7 +297,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseTestClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseTestClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueComment = """
             {
@@ -392,7 +386,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseTestClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseTestClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueReopened = """
             {
@@ -474,7 +468,7 @@ internal class SupportNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val createdEventId = synapseTestClient!!.getLastMessageEvent(supportRoomId).get("event_id").asText()
+        val createdEventId = synapseTestClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         val issueResolved = """
             {

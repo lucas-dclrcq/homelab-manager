@@ -1,37 +1,35 @@
 package org.hoohoot.homelab.manager.it
 
-import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.*
+import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@QuarkusTestResource(WiremockTestResource::class)
-@QuarkusTestResource(SynapseTestResource::class)
 internal class BotCommandsTest {
 
-    @InjectSynapse
-    private val synapseTestClient: SynapseTestClient? = null
+    @Inject
+    lateinit var synapseTestClient: SynapseTestClient
 
-    @InjectWireMock
-    private val wireMock: WireMockServer? = null
+    @Inject
+    lateinit var wireMock: WireMock
 
     private lateinit var roomId: String
 
     @BeforeEach
     fun setUp() {
-        roomId = synapseTestClient!!.createRoom("bot-test-${System.nanoTime()}")
+        roomId = synapseTestClient.createRoom("bot-test-${System.nanoTime()}")
         synapseTestClient.inviteUser(roomId, "@johnnybot:localhost")
-        wireMock!!.resetAll()
+        wireMock.resetMappings()
     }
 
     @Test
     fun `ping command should respond with Pong`() {
-        synapseTestClient!!.sendMessage(roomId, "!bot ping")
+        synapseTestClient.sendMessage(roomId, "!bot ping")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         assertThat(response.get("body").asText()).isEqualTo("Pong!")
@@ -42,7 +40,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `help command should list available commands`() {
-        synapseTestClient!!.sendMessage(roomId, "!bot help")
+        synapseTestClient.sendMessage(roomId, "!bot help")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -56,7 +54,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong believer should respond with patience message`() {
-        synapseTestClient!!.sendMessage(roomId, "!bot skong believer")
+        synapseTestClient.sendMessage(roomId, "!bot skong believer")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -65,7 +63,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong doubter should respond with days count`() {
-        synapseTestClient!!.sendMessage(roomId, "!bot skong doubter")
+        synapseTestClient.sendMessage(roomId, "!bot skong doubter")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -75,7 +73,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong invalid parameter should respond with error`() {
-        synapseTestClient!!.sendMessage(roomId, "!bot skong invalid")
+        synapseTestClient.sendMessage(roomId, "!bot skong invalid")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -87,7 +85,7 @@ internal class BotCommandsTest {
         stubJellyfinSearch()
         stubJellystatItemHistory()
 
-        synapseTestClient!!.sendMessage(roomId, "!bot who-watched Breaking Bad")
+        synapseTestClient.sendMessage(roomId, "!bot who-watched Breaking Bad")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -102,7 +100,7 @@ internal class BotCommandsTest {
         stubJellystatMostViewed("Series", """[{"Plays": "10", "total_playback_duration": "36000", "Name": "The Bear"}]""")
         stubJellystatMostViewed("Movie", """[{"Plays": "8", "total_playback_duration": "18000", "Name": "Dune"}]""")
 
-        synapseTestClient!!.sendMessage(roomId, "!bot top-watched last-week")
+        synapseTestClient.sendMessage(roomId, "!bot top-watched last-week")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -114,7 +112,7 @@ internal class BotCommandsTest {
     fun `top-watchers should return top watchers list`() {
         stubJellystatUserActivity()
 
-        synapseTestClient!!.sendMessage(roomId, "!bot top-watchers")
+        synapseTestClient.sendMessage(roomId, "!bot top-watchers")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -125,7 +123,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `deadoo regex command should respond to c'est comment`() {
-        synapseTestClient!!.sendMessage(roomId, "c'est comment")
+        synapseTestClient.sendMessage(roomId, "c'est comment")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -136,7 +134,7 @@ internal class BotCommandsTest {
     // WireMock stub helpers
 
     private fun stubJellyfinSearch() {
-        wireMock!!.stubFor(
+        wireMock.register(
             get(urlPathEqualTo("/Search/Hints"))
                 .withQueryParam("searchTerm", equalTo("Breaking Bad"))
                 .willReturn(
@@ -149,7 +147,7 @@ internal class BotCommandsTest {
     }
 
     private fun stubJellystatItemHistory() {
-        wireMock!!.stubFor(
+        wireMock.register(
             post(urlPathEqualTo("/api/getItemHistory"))
                 .willReturn(
                     aResponse()
@@ -168,7 +166,7 @@ internal class BotCommandsTest {
     }
 
     private fun stubJellystatMostPopular(type: String, responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             post(urlPathEqualTo("/stats/getMostPopularByType"))
                 .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
                 .willReturn(
@@ -181,7 +179,7 @@ internal class BotCommandsTest {
     }
 
     private fun stubJellystatMostViewed(type: String, responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             post(urlPathEqualTo("/stats/getMostViewedByType"))
                 .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
                 .willReturn(
@@ -194,7 +192,7 @@ internal class BotCommandsTest {
     }
 
     private fun stubJellystatUserActivity() {
-        wireMock!!.stubFor(
+        wireMock.register(
             get(urlPathEqualTo("/stats/getAllUserActivity"))
                 .willReturn(
                     aResponse()

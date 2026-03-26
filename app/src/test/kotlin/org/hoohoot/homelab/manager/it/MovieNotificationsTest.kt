@@ -1,6 +1,5 @@
 package org.hoohoot.homelab.manager.it
 
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
@@ -8,10 +7,7 @@ import io.restassured.http.ContentType
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.InjectSynapse
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
-import org.hoohoot.homelab.manager.it.config.SynapseTestResource
-import org.hoohoot.homelab.manager.it.config.WiremockTestResource
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.resource.RadarrResource
 import org.junit.jupiter.api.BeforeEach
@@ -19,11 +15,9 @@ import org.junit.jupiter.api.Test
 
 @QuarkusTest
 @TestHTTPEndpoint(RadarrResource::class)
-@QuarkusTestResource(WiremockTestResource::class)
-@QuarkusTestResource(SynapseTestResource::class)
 internal class MovieNotificationsTest {
-    @InjectSynapse
-    private val synapseTestClient: SynapseTestClient? = null
+    @Inject
+    lateinit var synapseTestClient: SynapseTestClient
 
     @Inject
     lateinit var roomProvider: MatrixRoomProvider
@@ -32,7 +26,7 @@ internal class MovieNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        mediaRoomId = synapseTestClient!!.createRoom("media-${System.nanoTime()}")
+        mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
     }
 
@@ -82,7 +76,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(mediaRoomId)
         assertThat(lastMessage.get("msgtype").asText()).isEqualTo("m.text")
         assertThat(lastMessage.get("body").asText()).isEqualTo(
             "🎬 Movie Downloaded\nThe Wild Robot (2024) [WEBDL-720p] https://www.imdb.com/title/tt29623480/\n👤 Requested by : lucasd"
@@ -106,7 +100,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("unknown (unknown) [720p]")
         assertThat(body).contains("Requested by : unknown")
     }
@@ -131,7 +125,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("Avatar (2009) [unknown]")
         assertThat(body).contains("Requested by : jane_doe")
     }
@@ -156,7 +150,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("Titanic (1997) [4K]")
         assertThat(body).contains("Requested by : unknown")
     }
@@ -170,7 +164,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("unknown (unknown) [unknown]")
         assertThat(body).contains("Requested by : unknown")
     }
@@ -189,7 +183,7 @@ internal class MovieNotificationsTest {
             .`when`().post()
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val messageCount = synapseTestClient!!.getMessageCount(mediaRoomId)
+        val messageCount = synapseTestClient.getMessageCount(mediaRoomId)
         assertThat(messageCount).isEqualTo(0)
     }
 }

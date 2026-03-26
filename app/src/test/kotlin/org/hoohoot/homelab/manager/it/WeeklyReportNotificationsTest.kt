@@ -1,8 +1,7 @@
 package org.hoohoot.homelab.manager.it
 
-import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -12,20 +11,18 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.it.config.*
+import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@QuarkusTestResource(WiremockTestResource::class)
-@QuarkusTestResource(SynapseTestResource::class)
 internal class WeeklyReportNotificationsTest {
-    @InjectSynapse
-    private val synapseTestClient: SynapseTestClient? = null
+    @Inject
+    lateinit var synapseTestClient: SynapseTestClient
 
-    @InjectWireMock
-    private val wireMock: WireMockServer? = null
+    @Inject
+    lateinit var wireMock: WireMock
 
     @Inject
     lateinit var roomProvider: MatrixRoomProvider
@@ -34,9 +31,9 @@ internal class WeeklyReportNotificationsTest {
 
     @BeforeEach
     fun setUp() {
-        mediaRoomId = synapseTestClient!!.createRoom("media-${System.nanoTime()}")
+        mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
-        wireMock!!.resetAll()
+        wireMock.resetMappings()
     }
 
     @Test
@@ -74,7 +71,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val lastMessage = synapseTestClient!!.getLastMessage(mediaRoomId)
+        val lastMessage = synapseTestClient.getLastMessage(mediaRoomId)
         val body = lastMessage.get("body").asText()
 
         assertThat(body).contains("📰 Weekly Recap")
@@ -127,7 +124,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         val tuesdayIndex = body.indexOf("Tuesday 18")
         val movieIndex = body.indexOf("🎬 Some Movie (2024)")
         val episodeIndex = body.indexOf("📺 Test Show S01E05 \"Test\"")
@@ -151,7 +148,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).doesNotContain("Monday")
         assertThat(body).doesNotContain("Tuesday")
         assertThat(body).contains("🏆 Top 3 Movies This Week")
@@ -170,7 +167,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("📰 Weekly Recap")
         assertThat(body).doesNotContain("🏆")
         assertThat(body).doesNotContain("━━━━━━━━━━━━━━━━━━━━")
@@ -195,7 +192,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("🥇 A — 10 viewers")
         assertThat(body).contains("🥈 B — 8 viewers")
         assertThat(body).contains("🥉 C — 5 viewers")
@@ -217,7 +214,7 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("Thursday 20")
         assertThat(body).contains("🎬 Cinema Movie (2024)")
     }
@@ -237,13 +234,13 @@ internal class WeeklyReportNotificationsTest {
             .`when`().post("/api/notifications/send-weekly-report")
             .then().statusCode(Response.Status.NO_CONTENT.statusCode)
 
-        val body = synapseTestClient!!.getLastMessage(mediaRoomId).get("body").asText()
+        val body = synapseTestClient.getLastMessage(mediaRoomId).get("body").asText()
         assertThat(body).contains("TBD")
         assertThat(body).contains("🎬 No Date Movie (2024)")
     }
 
     private fun stubRadarrCalendar(responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             get(urlPathEqualTo("/api/v3/calendar"))
                 .withHeader("X-Api-Key", equalTo("API_KEY"))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
@@ -251,7 +248,7 @@ internal class WeeklyReportNotificationsTest {
     }
 
     private fun stubSonarrCalendar(responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             get(urlPathEqualTo("/api/v3/calendar"))
                 .withQueryParam("includeSeries", equalTo("true"))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
@@ -264,7 +261,7 @@ internal class WeeklyReportNotificationsTest {
     }
 
     private fun stubLidarrCalendar(responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             get(urlPathEqualTo("/api/v1/calendar"))
                 .withHeader("X-Api-Key", equalTo("API_KEY"))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
@@ -272,7 +269,7 @@ internal class WeeklyReportNotificationsTest {
     }
 
     private fun stubJellystatMostPopular(type: String, responseBody: String) {
-        wireMock!!.stubFor(
+        wireMock.register(
             post(urlPathEqualTo("/stats/getMostPopularByType"))
                 .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
