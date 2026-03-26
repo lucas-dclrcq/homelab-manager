@@ -56,7 +56,7 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
             exec python3 -m synapse.app.homeserver --config-path /data/homeserver.yaml
         """.trimIndent()
 
-        container = GenericContainer("matrixdotorg/synapse:v1.120.2")
+        container = GenericContainer("matrixdotorg/synapse:v1.150.0")
             .withExposedPorts(SYNAPSE_PORT)
             .withCopyToContainer(Transferable.of(homeserverYaml), "/conf/homeserver.yaml")
             .withCopyToContainer(Transferable.of(LOG_CONFIG), "/conf/localhost.log.config")
@@ -74,11 +74,12 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         val objectMapper = ObjectMapper()
 
         val accessToken = registerUser(synapseUrl, httpClient, objectMapper, "admin", "admin")
+        disableRateLimit(synapseUrl, httpClient, objectMapper, accessToken, "@admin:localhost")
 
         synapseClient = SynapseClient(synapseUrl, accessToken, httpClient, objectMapper)
 
-
         registerUser(synapseUrl, httpClient, objectMapper, BOT_USERNAME, BOT_PASSWORD)
+        disableRateLimit(synapseUrl, httpClient, objectMapper, accessToken, "@$BOT_USERNAME:localhost")
         botDataDirectory = Files.createTempDirectory("matrix-bot-test")
 
         return mapOf(
@@ -126,14 +127,15 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         )
         val nonce = objectMapper.readTree(nonceResponse.body()).get("nonce").asText()
 
-        val mac = computeHmac(nonce, username, password, admin = false)
+        val isAdmin = username == "admin"
+        val mac = computeHmac(nonce, username, password, admin = isAdmin)
 
         val registerBody = objectMapper.writeValueAsString(
             mapOf(
                 "nonce" to nonce,
                 "username" to username,
                 "password" to password,
-                "admin" to false,
+                "admin" to isAdmin,
                 "mac" to mac
             )
         )
@@ -152,6 +154,32 @@ class SynapseTestResource : QuarkusTestResourceLifecycleManager {
         }
 
         return objectMapper.readTree(registerResponse.body()).get("access_token").asText()
+    }
+
+    private fun disableRateLimit(
+        synapseUrl: String,
+        httpClient: HttpClient,
+        objectMapper: ObjectMapper,
+        adminAccessToken: String,
+        userId: String
+    ) {
+        val body = objectMapper.writeValueAsString(
+            mapOf("messages_per_second" to 0, "burst_count" to 0)
+        )
+
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_synapse/admin/v1/users/$userId/override_ratelimit"))
+                .header("Authorization", "Bearer $adminAccessToken")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to disable rate limit for $userId: ${response.body()}")
+        }
     }
 
     private fun computeHmac(nonce: String, username: String, password: String, admin: Boolean): String {
