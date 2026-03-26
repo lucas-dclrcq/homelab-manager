@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SynapseDevServiceProcessor {
@@ -74,6 +75,7 @@ public class SynapseDevServiceProcessor {
         props.put("matrix.room.media", result.mediaRoomId());
         props.put("matrix.room.music", result.musicRoomId());
         props.put("matrix.room.support", result.supportRoomId());
+        props.put("element.base-url", elementUrl);
 
         devServiceProperties = props;
 
@@ -86,8 +88,24 @@ public class SynapseDevServiceProcessor {
     }
 
     @BuildStep(onlyIfNot = IsNormal.class)
-    public CardPageBuildItem devUICard() {
+    public CardPageBuildItem devUICard(List<DevServicesResultBuildItem> devServices) {
         CardPageBuildItem card = new CardPageBuildItem();
+
+        String synapseUrl = "Not available";
+        String elementUrl = "Not available";
+
+        for (DevServicesResultBuildItem ds : devServices) {
+            Map<String, String> config = ds.getConfig();
+            if (config.containsKey("matrix.base-url")) {
+                synapseUrl = config.getOrDefault("matrix.base-url", synapseUrl);
+                elementUrl = config.getOrDefault("element.base-url", elementUrl);
+                break;
+            }
+        }
+
+        card.addBuildTimeData("synapseUrl", synapseUrl);
+        card.addBuildTimeData("elementUrl", elementUrl);
+
         card.addPage(Page.webComponentPageBuilder()
                 .title("Synapse")
                 .icon("font-awesome-solid:message")
