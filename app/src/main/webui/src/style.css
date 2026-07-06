@@ -1,19 +1,40 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Patrick Hand', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Caveat', 'Patrick Hand', cursive;
 
-  /* Palette du design system : accent principal du portail */
-  --color-brand-50: #f4f1ff;
-  --color-brand-100: #ece5ff;
-  --color-brand-300: #c4b0ff;
-  --color-brand-400: #a684ff;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-900: #4c1d95;
+  /* Papier & encre : fond crème, texte brun chaud */
+  --color-paper: #faf5ea;
+  --color-card: #fffcf4;
+  --color-ink: #3f3729;
+
+  /* Palette du design system : accent principal du portail (vert sauge) */
+  --color-brand-50: #f3f6ee;
+  --color-brand-100: #e3ecd9;
+  --color-brand-300: #b3c9a0;
+  --color-brand-400: #94b37d;
+  --color-brand-500: #78a05e;
+  --color-brand-600: #5f854a;
+  --color-brand-700: #4c6b3c;
+  --color-brand-900: #33482a;
+
+  /* Ombre décalée façon feutre */
+  --shadow-doodle: 3px 4px 0 0 rgb(63 55 41 / 0.12);
+}
+
+/* Coins irréguliers, comme tracés à la main */
+@utility sketchy {
+  border-radius: 18px 25px 20px 28px / 26px 18px 28px 20px;
+}
+
+@utility sketchy-sm {
+  border-radius: 10px 16px 12px 18px / 16px 10px 18px 12px;
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 antialiased;
+  @apply bg-paper text-stone-800 antialiased;
+  /* Grille de points façon carnet bullet journal */
+  background-image: radial-gradient(rgb(63 55 41 / 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
 }

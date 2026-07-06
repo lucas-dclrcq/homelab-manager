@@ -7,14 +7,14 @@ withDefaults(
 
 <template>
   <span
-    class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+    class="sketchy-sm inline-flex items-center gap-1 border px-2.5 py-0.5 text-xs font-medium"
     :class="{
-      'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30': color === 'violet',
-      'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30': color === 'cyan',
-      'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30': color === 'amber',
-      'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30': color === 'rose',
-      'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30': color === 'emerald',
-      'bg-slate-500/15 text-slate-300 ring-1 ring-slate-500/30': color === 'slate',
+      'border-violet-300 bg-violet-100 text-violet-700': color === 'violet',
+      'border-cyan-300 bg-cyan-100 text-cyan-800': color === 'cyan',
+      'border-amber-300 bg-amber-100 text-amber-800': color === 'amber',
+      'border-rose-300 bg-rose-100 text-rose-700': color === 'rose',
+      'border-emerald-300 bg-emerald-100 text-emerald-800': color === 'emerald',
+      'border-stone-300 bg-stone-100 text-stone-600': color === 'slate',
     }"
   >
     <slot />

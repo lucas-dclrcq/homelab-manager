@@ -23,13 +23,13 @@ const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage
 const events = computed<TimelineEventDto[]>(() => data.value?.pages.flatMap((page) => page.items) ?? [])
 
 const eventPresentation: Record<string, { icon: string; accent: string; label: string }> = {
-  movie_downloaded: { icon: '🎬', accent: '#8b5cf6', label: 'Film téléchargé' },
-  episode_downloaded: { icon: '📺', accent: '#06b6d4', label: 'Épisode téléchargé' },
-  subtitles_downloaded: { icon: '💬', accent: '#f59e0b', label: 'Sous-titres téléchargés' },
+  movie_downloaded: { icon: '🎬', accent: '#c1663f', label: 'Film téléchargé' },
+  episode_downloaded: { icon: '📺', accent: '#5d84a6', label: 'Épisode téléchargé' },
+  subtitles_downloaded: { icon: '💬', accent: '#c99a2e', label: 'Sous-titres téléchargés' },
 }
 
 function presentationFor(event: TimelineEventDto) {
-  return eventPresentation[event.eventType] ?? { icon: '📦', accent: '#64748b', label: event.eventType }
+  return eventPresentation[event.eventType] ?? { icon: '📦', accent: '#8a7f6c', label: event.eventType }
 }
 
 function detailsFor(event: TimelineEventDto): string {
@@ -51,11 +51,17 @@ function detailsFor(event: TimelineEventDto): string {
 <template>
   <section aria-label="Activité récente">
     <BaseSpinner v-if="isPending" />
-    <p v-else-if="isError" class="rounded-xl bg-rose-500/10 p-4 text-sm text-rose-300">
+    <p
+      v-else-if="isError"
+      class="sketchy-sm border-2 border-dashed border-rose-300 bg-rose-50 p-4 text-sm text-rose-700"
+    >
       Impossible de récupérer la timeline.
     </p>
     <template v-else>
-      <p v-if="events.length === 0" class="rounded-xl bg-slate-900 p-6 text-sm text-slate-400">
+      <p
+        v-if="events.length === 0"
+        class="sketchy border-2 border-dashed border-stone-300 bg-card p-6 text-sm text-stone-500"
+      >
         Rien à signaler pour l'instant — les téléchargements apparaîtront ici.
       </p>
       <BaseTimeline v-else>
@@ -66,7 +72,7 @@ function detailsFor(event: TimelineEventDto): string {
           :accent="presentationFor(event).accent"
           :timestamp="formatDateTime(event.occurredAt)"
         >
-          <span class="text-sm font-semibold text-slate-100">{{ event.title }}</span>
+          <span class="text-sm font-semibold text-stone-800">{{ event.title }}</span>
           <span
             class="text-xs font-medium"
             :style="{ color: presentationFor(event).accent }"

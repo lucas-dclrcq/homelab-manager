@@ -62,8 +62,8 @@ function submit() {
 </script>
 
 <template>
-  <BaseCard accent="#f59e0b">
-    <h2 class="mb-5 text-lg font-bold">Ajouter une application</h2>
+  <BaseCard accent="#c99a2e">
+    <h2 class="font-display mb-5 text-2xl font-bold text-stone-800">Ajouter une application</h2>
 
     <form class="flex flex-col gap-4" @submit.prevent="submit">
       <div class="grid gap-4 sm:grid-cols-2">
@@ -109,10 +109,10 @@ function submit() {
 
       <div class="flex items-center gap-4">
         <BaseButton type="submit" :loading="isPending">Ajouter</BaseButton>
-        <p v-if="successMessage" class="text-sm font-medium text-emerald-400">
+        <p v-if="successMessage" class="text-sm font-medium text-brand-700">
           {{ successMessage }}
         </p>
-        <p v-if="isError" class="text-sm font-medium text-rose-400">
+        <p v-if="isError" class="text-sm font-medium text-rose-600">
           L'ajout a échoué — vérifiez les champs et le logo.
         </p>
       </div>

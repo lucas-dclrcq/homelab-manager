@@ -20,19 +20,19 @@ defineExpose({ clear })
 
 <template>
   <label class="block">
-    <span class="mb-1.5 block text-sm font-medium text-slate-300">{{ label }}</span>
+    <span class="mb-1.5 block text-sm font-medium text-stone-600">{{ label }}</span>
     <div class="flex items-center gap-3">
       <input
         ref="inputRef"
         type="file"
         :accept="accept"
-        class="block w-full cursor-pointer text-sm text-slate-400 file:mr-3 file:cursor-pointer file:rounded-xl file:border-0 file:bg-slate-800 file:px-3.5 file:py-2 file:text-sm file:font-medium file:text-slate-200 hover:file:bg-slate-700"
+        class="block w-full cursor-pointer text-sm text-stone-500 file:sketchy-sm file:mr-3 file:cursor-pointer file:border-2 file:border-stone-400 file:bg-card file:px-3.5 file:py-1.5 file:text-sm file:font-medium file:text-stone-700 hover:file:bg-stone-100"
         @change="onChange"
       />
       <button
         v-if="model"
         type="button"
-        class="cursor-pointer text-xs text-slate-500 hover:text-slate-300"
+        class="cursor-pointer text-xs text-stone-400 hover:text-stone-600"
         @click="clear"
       >
         ✕

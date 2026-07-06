@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <li class="relative pb-6 last:pb-0">
     <span
-      class="absolute -start-[37px] flex size-6 items-center justify-center rounded-full text-xs ring-4 ring-slate-950"
+      class="absolute -start-[38px] flex size-6 items-center justify-center rounded-full text-xs ring-4 ring-paper"
       :style="{ backgroundColor: accent + '33', color: accent }"
       aria-hidden="true"
     >
@@ -17,9 +17,9 @@ defineProps<{
     </span>
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <slot />
-      <time class="text-xs text-slate-500">{{ timestamp }}</time>
+      <time class="text-xs text-stone-400">{{ timestamp }}</time>
     </div>
-    <div class="mt-0.5 text-sm text-slate-400">
+    <div class="mt-0.5 text-sm text-stone-500">
       <slot name="details" />
     </div>
   </li>

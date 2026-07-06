@@ -21,18 +21,21 @@ const byCategory = computed<Map<string, ApplicationDto[]>>(() => {
 
 <template>
   <BaseSpinner v-if="isPending" />
-  <p v-else-if="isError" class="rounded-xl bg-rose-500/10 p-4 text-sm text-rose-300">
+  <p
+    v-else-if="isError"
+    class="sketchy-sm border-2 border-dashed border-rose-300 bg-rose-50 p-4 text-sm text-rose-700"
+  >
     Impossible de récupérer les applications.
   </p>
   <p
     v-else-if="byCategory.size === 0"
-    class="rounded-xl bg-slate-900 p-6 text-sm text-slate-400"
+    class="sketchy border-2 border-dashed border-stone-300 bg-card p-6 text-sm text-stone-500"
   >
     Aucune application pour l'instant.
   </p>
   <div v-else class="flex flex-col gap-8">
     <section v-for="[category, apps] in byCategory" :key="category" :aria-label="category">
-      <h2 class="mb-4 flex items-center gap-2 text-lg font-bold">
+      <h2 class="font-display mb-4 flex items-center gap-2 text-2xl font-bold text-stone-800">
         <span
           class="inline-block size-2.5 rounded-full"
           :style="{ backgroundColor: colorFromName(category) }"
