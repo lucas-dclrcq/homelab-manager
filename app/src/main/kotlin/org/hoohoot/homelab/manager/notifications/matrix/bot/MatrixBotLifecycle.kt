@@ -15,17 +15,13 @@ import de.connect2x.trixnity.core.model.events.m.room.MemberEventContent
 import de.connect2x.trixnity.core.model.events.m.room.Membership
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.core.subscribeContent
-import org.hoohoot.homelab.manager.leader.LeadershipAcquired
-import org.hoohoot.homelab.manager.leader.LeaderElectionService
-import org.hoohoot.homelab.manager.leader.LeadershipLost
 import kotlin.coroutines.CoroutineContext
 
 @ApplicationScoped
 class MatrixBotLifecycle(
     private val session: MatrixBotSession,
     private val dispatcher: MatrixBotCommandDispatcher,
-    private val config: MatrixBotConfiguration,
-    private val leaderElection: LeaderElectionService
+    private val config: MatrixBotConfiguration
 ) {
 
     private val runningTimestamp = Clock.System.now()
@@ -36,13 +32,9 @@ class MatrixBotLifecycle(
     private var initialized = false
 
     fun onStart(@Observes event: StartupEvent) {
-        if (!config.enabled()) return
+        if (!config.enabled() || syncRunning) return
 
         quarkusClassLoader = Thread.currentThread().contextClassLoader
-    }
-
-    fun onLeadershipAcquired(@Observes event: LeadershipAcquired) {
-        if (!config.enabled() || syncRunning) return
 
         runBlocking {
             if (!initialized) {
@@ -66,8 +58,7 @@ class MatrixBotLifecycle(
                     initialized = true
                     Log.info("Matrix bot initialized.")
                 } catch (e: Exception) {
-                    Log.error("Failed to initialize Matrix bot, releasing leadership.", e)
-                    leaderElection.releaseLeadership()
+                    Log.error("Failed to initialize Matrix bot.", e)
                     return@runBlocking
                 }
             }
@@ -75,18 +66,7 @@ class MatrixBotLifecycle(
             Log.info("Starting Sync!")
             session.client.startSync()
             syncRunning = true
-            Log.info("Matrix bot sync started (leader).")
-        }
-    }
-
-    fun onLeadershipLost(@Observes event: LeadershipLost) {
-        if (!syncRunning) return
-
-        runBlocking {
-            Log.info("Stopping Matrix bot sync (no longer leader)...")
-            session.client.stopSync()
-            syncRunning = false
-            Log.info("Matrix bot sync stopped.")
+            Log.info("Matrix bot sync started.")
         }
     }
 
