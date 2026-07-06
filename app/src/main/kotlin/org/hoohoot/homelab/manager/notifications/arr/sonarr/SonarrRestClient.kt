@@ -10,6 +10,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
+import org.hoohoot.homelab.manager.notifications.arr.DiskSpace
 
 @Path("/api/v3")
 @RegisterRestClient(configKey = "sonarr-api")
@@ -23,6 +24,14 @@ interface SonarrRestClient {
         @QueryParam("end") end: String?,
         @QueryParam("includeSeries") includeSeries: Boolean?
     ): List<Episode>?
+
+    @GET
+    @Path("/series")
+    suspend fun getSeries(): List<Series>?
+
+    @GET
+    @Path("/diskspace")
+    suspend fun getDiskSpace(): List<DiskSpace>?
 }
 
 suspend fun SonarrRestClient.getSeriesCalendar(start: Instant, end: Instant): List<Episode> =

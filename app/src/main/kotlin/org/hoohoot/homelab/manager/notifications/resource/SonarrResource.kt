@@ -17,6 +17,8 @@ import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
+import org.hoohoot.homelab.manager.portal.HomelabEventRecorder
+import org.hoohoot.homelab.manager.portal.HomelabEventTypes
 
 private const val DEFAULT_VALUE = "unknown"
 
@@ -28,6 +30,7 @@ class SonarrResource(
     private val matrixClient: MatrixClientServerApiClient,
     private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
+    private val eventRecorder: HomelabEventRecorder,
 ) {
 
     @POST
@@ -71,7 +74,34 @@ class SonarrResource(
             matrixClient.sendNotification(content, mediaRoom)
         }
 
+        recordEpisodeEvents(payload)
+
         return Response.noContent().build()
+    }
+
+    private suspend fun recordEpisodeEvents(payload: SonarrWebhookPayload) {
+        val seriesTitle = payload.seriesName()
+        val episodes = payload.episodes.orEmpty()
+        if (episodes.isEmpty()) {
+            eventRecorder.record(
+                HomelabEventTypes.EPISODE_DOWNLOADED,
+                seriesTitle,
+                mapOf("quality" to payload.quality())
+            )
+            return
+        }
+        for (episode in episodes) {
+            eventRecorder.record(
+                HomelabEventTypes.EPISODE_DOWNLOADED,
+                seriesTitle,
+                mapOf(
+                    "seasonNumber" to episode.seasonNumber?.toString(),
+                    "episodeNumber" to episode.episodeNumber?.toString(),
+                    "episodeTitle" to episode.title,
+                    "quality" to payload.quality(),
+                )
+            )
+        }
     }
 }
 

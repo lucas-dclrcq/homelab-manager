@@ -1,0 +1,26 @@
+export function formatBytes(bytes: number): string {
+  if (bytes <= 0) return '0 o'
+  const units = ['o', 'Ko', 'Mo', 'Go', 'To', 'Po']
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+  const value = bytes / 1024 ** exponent
+  return `${value.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} ${units[exponent]}`
+}
+
+export function formatDateTime(isoDate: string): string {
+  return new Date(isoDate).toLocaleString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** Couleur stable dérivée du nom, pour les fallbacks de logo et les accents de catégorie */
+export function colorFromName(name: string): string {
+  const palette = ['#8b5cf6', '#06b6d4', '#f59e0b', '#f43f5e', '#10b981', '#3b82f6', '#d946ef']
+  let hash = 0
+  for (const char of name) {
+    hash = (hash * 31 + char.codePointAt(0)!) >>> 0
+  }
+  return palette[hash % palette.length]
+}

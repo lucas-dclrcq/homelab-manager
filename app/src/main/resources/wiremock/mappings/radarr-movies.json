@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/movie"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "id": 1, "title": "Dune: Part Two", "year": 2024 },
+      { "id": 2, "title": "Oppenheimer", "year": 2023 },
+      { "id": 3, "title": "The Substance", "year": 2024 }
+    ]
+  }
+}

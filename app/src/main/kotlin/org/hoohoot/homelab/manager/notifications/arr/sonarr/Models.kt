@@ -52,7 +52,16 @@ data class Series(
     val added: String? = null,
     val ratings: Rating? = null,
     val languageProfileId: Int? = null,
+    val statistics: SeriesStatistics? = null,
     val id: Int? = null
+)
+
+data class SeriesStatistics(
+    val seasonCount: Int? = null,
+    val episodeFileCount: Int? = null,
+    val episodeCount: Int? = null,
+    val totalEpisodeCount: Int? = null,
+    val sizeOnDisk: Long? = null
 )
 
 data class Image(

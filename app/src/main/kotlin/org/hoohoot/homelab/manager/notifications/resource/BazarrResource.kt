@@ -16,6 +16,8 @@ import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
+import org.hoohoot.homelab.manager.portal.HomelabEventRecorder
+import org.hoohoot.homelab.manager.portal.HomelabEventTypes
 
 @Path("/api/notifications/bazarr")
 @Produces(MediaType.APPLICATION_JSON)
@@ -25,6 +27,7 @@ class BazarrResource(
     private val matrixClient: MatrixClientServerApiClient,
     private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
+    private val eventRecorder: HomelabEventRecorder,
 ) {
 
     @POST
@@ -44,6 +47,16 @@ class BazarrResource(
         val key = mediaKey(subtitle.mediaTitle, subtitle.year)
         val existingThread = notificationRepo.getThreadByMediaKey(key)
         matrixClient.sendNotification(content, roomProvider.media, existingThread)
+
+        eventRecorder.record(
+            HomelabEventTypes.SUBTITLES_DOWNLOADED,
+            "${subtitle.mediaTitle} (${subtitle.year})",
+            mapOf(
+                "language" to subtitle.language,
+                "provider" to subtitle.provider,
+                "episodeInfo" to subtitle.episodeInfo,
+            )
+        )
 
         return Response.noContent().build()
     }

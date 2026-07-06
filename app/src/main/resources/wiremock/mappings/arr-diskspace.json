@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/diskspace"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "path": "/data", "label": "data", "freeSpace": 500000000000, "totalSpace": 2000000000000 }
+    ]
+  }
+}

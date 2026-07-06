@@ -1,0 +1,659 @@
+---
+openapi: 3.1.0
+info:
+  contact:
+    name: ldclrcq
+  title: Homelab Manager API
+  version: 0.0.1
+tags:
+- name: Notifications
+  description: Notification System
+- name: Portal
+components:
+  schemas:
+    ApplicationDto:
+      type: object
+      required:
+      - id
+      - name
+      - category
+      - description
+      - url
+      - requiresVpn
+      - hasLogo
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        requiresVpn:
+          type: boolean
+        hasLogo:
+          type: boolean
+    BazarrWebhookPayload:
+      type: object
+      properties:
+        title:
+          type:
+          - string
+          - "null"
+        message:
+          type:
+          - string
+          - "null"
+        type:
+          type:
+          - string
+          - "null"
+    LibraryStats:
+      type: object
+      required:
+      - movieCount
+      - seriesCount
+      - episodeCount
+      - diskUsedBytes
+      - diskFreeBytes
+      - diskTotalBytes
+      properties:
+        movieCount:
+          type: integer
+          format: int32
+        seriesCount:
+          type: integer
+          format: int32
+        episodeCount:
+          type: integer
+          format: int32
+        diskUsedBytes:
+          type: integer
+          format: int64
+        diskFreeBytes:
+          type: integer
+          format: int64
+        diskTotalBytes:
+          type: integer
+          format: int64
+    LidarrWebhookAlbum:
+      type: object
+      properties:
+        title:
+          type:
+          - string
+          - "null"
+        releaseDate:
+          type:
+          - string
+          - "null"
+        genres:
+          type:
+          - array
+          - "null"
+          items:
+            type: string
+        images:
+          type:
+          - array
+          - "null"
+          items:
+            $ref: "#/components/schemas/LidarrWebhookImage"
+    LidarrWebhookArtist:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - "null"
+    LidarrWebhookImage:
+      type: object
+      properties:
+        coverType:
+          type:
+          - string
+          - "null"
+        remoteUrl:
+          type:
+          - string
+          - "null"
+    LidarrWebhookPayload:
+      type: object
+      properties:
+        eventType:
+          type:
+          - string
+          - "null"
+        artist:
+          anyOf:
+          - $ref: "#/components/schemas/LidarrWebhookArtist"
+          - type: "null"
+        album:
+          anyOf:
+          - $ref: "#/components/schemas/LidarrWebhookAlbum"
+          - type: "null"
+        downloadClient:
+          type:
+          - string
+          - "null"
+    LocalDateTime:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T12:15:50
+    MeDto:
+      type: object
+      required:
+      - username
+      - roles
+      properties:
+        username:
+          type: string
+        roles:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    RadarrWebhookMovie:
+      type: object
+      properties:
+        id:
+          type:
+          - integer
+          - "null"
+          format: int32
+        title:
+          type:
+          - string
+          - "null"
+        year:
+          type:
+          - integer
+          - "null"
+          format: int32
+        imdbId:
+          type:
+          - string
+          - "null"
+        tags:
+          type:
+          - array
+          - "null"
+          items:
+            type: string
+    RadarrWebhookMovieFile:
+      type: object
+      properties:
+        quality:
+          type:
+          - string
+          - "null"
+    RadarrWebhookPayload:
+      type: object
+      properties:
+        eventType:
+          type:
+          - string
+          - "null"
+        movie:
+          anyOf:
+          - $ref: "#/components/schemas/RadarrWebhookMovie"
+          - type: "null"
+        movieFile:
+          anyOf:
+          - $ref: "#/components/schemas/RadarrWebhookMovieFile"
+          - type: "null"
+    SeerrWebhookComment:
+      type: object
+      properties:
+        commentMessage:
+          type:
+          - string
+          - "null"
+        commentedByUsername:
+          type:
+          - string
+          - "null"
+    SeerrWebhookExtra:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - "null"
+        value:
+          type:
+          - string
+          - "null"
+    SeerrWebhookIssue:
+      type: object
+      properties:
+        issueId:
+          type:
+          - string
+          - "null"
+        reportedByUsername:
+          type:
+          - string
+          - "null"
+    SeerrWebhookPayload:
+      type: object
+      properties:
+        notificationType:
+          type:
+          - string
+          - "null"
+        event:
+          type:
+          - string
+          - "null"
+        subject:
+          type:
+          - string
+          - "null"
+        message:
+          type:
+          - string
+          - "null"
+        issue:
+          anyOf:
+          - $ref: "#/components/schemas/SeerrWebhookIssue"
+          - type: "null"
+        comment:
+          anyOf:
+          - $ref: "#/components/schemas/SeerrWebhookComment"
+          - type: "null"
+        extra:
+          type:
+          - array
+          - "null"
+          items:
+            $ref: "#/components/schemas/SeerrWebhookExtra"
+    SonarrWebhookEpisode:
+      type: object
+      properties:
+        episodeNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+        seasonNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+        title:
+          type:
+          - string
+          - "null"
+    SonarrWebhookEpisodeFile:
+      type: object
+      properties:
+        quality:
+          type:
+          - string
+          - "null"
+    SonarrWebhookPayload:
+      type: object
+      properties:
+        eventType:
+          type:
+          - string
+          - "null"
+        series:
+          anyOf:
+          - $ref: "#/components/schemas/SonarrWebhookSeries"
+          - type: "null"
+        episodes:
+          type:
+          - array
+          - "null"
+          items:
+            $ref: "#/components/schemas/SonarrWebhookEpisode"
+        episodeFile:
+          anyOf:
+          - $ref: "#/components/schemas/SonarrWebhookEpisodeFile"
+          - type: "null"
+        release:
+          anyOf:
+          - $ref: "#/components/schemas/SonarrWebhookRelease"
+          - type: "null"
+        downloadClient:
+          type:
+          - string
+          - "null"
+    SonarrWebhookRelease:
+      type: object
+      properties:
+        indexer:
+          type:
+          - string
+          - "null"
+    SonarrWebhookSeries:
+      type: object
+      properties:
+        id:
+          type:
+          - integer
+          - "null"
+          format: int32
+        title:
+          type:
+          - string
+          - "null"
+        year:
+          type:
+          - integer
+          - "null"
+          format: int32
+        imdbId:
+          type:
+          - string
+          - "null"
+        tags:
+          type:
+          - array
+          - "null"
+          items:
+            type: string
+    TimelineEventDto:
+      type: object
+      required:
+      - id
+      - eventType
+      - title
+      - details
+      - occurredAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        eventType:
+          type: string
+        title:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            type: string
+        occurredAt:
+          $ref: "#/components/schemas/LocalDateTime"
+    TimelinePageDto:
+      type: object
+      required:
+      - items
+      - page
+      - pageSize
+      - totalPages
+      - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimelineEventDto"
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int64
+    UUID:
+      type: string
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+paths:
+  /api/applications:
+    get:
+      tags:
+      - Portal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApplicationDto"
+      summary: List Applications
+    post:
+      tags:
+      - Portal
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - name
+              - category
+              - description
+              - url
+              - requiresVpn
+              - logo
+              properties:
+                name:
+                  type:
+                  - string
+                  - "null"
+                category:
+                  type:
+                  - string
+                  - "null"
+                description:
+                  type:
+                  - string
+                  - "null"
+                url:
+                  type:
+                  - string
+                  - "null"
+                requiresVpn:
+                  type: boolean
+                logo:
+                  type:
+                  - string
+                  - "null"
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Create Application
+      security:
+      - SecurityScheme:
+        - admin
+  /api/applications/{id}/logo:
+    get:
+      tags:
+      - Portal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*': {}
+      summary: Get Logo
+  /api/me:
+    get:
+      tags:
+      - Portal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeDto"
+      summary: Get Current User
+  /api/notifications/bazarr:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BazarrWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Bazarr Notification
+  /api/notifications/lidarr:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LidarrWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Lidarr Notification
+  /api/notifications/radarr:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RadarrWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Radarr Notification
+  /api/notifications/seerr:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeerrWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Seerr Notification
+  /api/notifications/send-weekly-report:
+    post:
+      tags:
+      - Notifications
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Send Weekly Report
+  /api/notifications/sonarr:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SonarrWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Sonarr Notification
+  /api/stats:
+    get:
+      tags:
+      - Portal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LibraryStats"
+      summary: Get Stats
+  /api/timeline:
+    get:
+      tags:
+      - Portal
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+        required: true
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimelinePageDto"
+      summary: Get Timeline
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value

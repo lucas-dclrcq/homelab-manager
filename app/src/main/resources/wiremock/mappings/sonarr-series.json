@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/series"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "id": 10,
+        "title": "The Bear",
+        "year": 2022,
+        "statistics": { "seasonCount": 3, "episodeFileCount": 28, "episodeCount": 28, "sizeOnDisk": 45000000000 }
+      },
+      {
+        "id": 11,
+        "title": "Severance",
+        "year": 2022,
+        "statistics": { "seasonCount": 2, "episodeFileCount": 19, "episodeCount": 19, "sizeOnDisk": 60000000000 }
+      }
+    ]
+  }
+}
