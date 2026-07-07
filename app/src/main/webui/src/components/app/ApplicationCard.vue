@@ -25,7 +25,7 @@ const hostname = computed(() => {
     <div class="flex size-13 items-center justify-center rounded-xl bg-cream">
       <img
         v-if="application.hasLogo"
-        :src="`/api/applications/${application.id}/logo`"
+        :src="`/api/applications/${application.id}/logo?v=${application.updatedAt ?? ''}`"
         :alt="`Logo de ${application.name}`"
         class="size-8 object-contain"
       />

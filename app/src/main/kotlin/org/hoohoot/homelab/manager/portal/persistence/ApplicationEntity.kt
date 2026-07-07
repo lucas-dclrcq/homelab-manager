@@ -39,5 +39,8 @@ class ApplicationEntity : PanacheEntityBase {
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: LocalDateTime
 
+    @Column(name = "updated_at")
+    var updatedAt: LocalDateTime? = null
+
     companion object : PanacheCompanionBase<ApplicationEntity, UUID>
 }

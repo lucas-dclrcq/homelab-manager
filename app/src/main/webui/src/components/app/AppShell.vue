@@ -39,7 +39,12 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
           >
             Le coin technique
           </div>
-          <SideNavItem to="/admin" label="Atelier" icon="wrench" />
+          <SideNavItem
+            to="/admin/applications"
+            label="Applications"
+            icon="package"
+          />
+          <SideNavItem to="/admin/jobs" label="Tâches" icon="clock" />
         </template>
 
         <template #footer>

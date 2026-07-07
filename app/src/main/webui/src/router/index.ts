@@ -16,8 +16,18 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      name: 'admin',
-      component: () => import('../pages/AdminPage.vue'),
+      redirect: { name: 'admin-applications' },
+    },
+    {
+      path: '/admin/applications',
+      name: 'admin-applications',
+      component: () => import('../pages/AdminApplicationsPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/jobs',
+      name: 'admin-jobs',
+      component: () => import('../pages/AdminJobsPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

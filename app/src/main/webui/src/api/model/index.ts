@@ -6,6 +6,7 @@
  */
 
 export * from "./applicationDto";
+export * from "./applicationDtoUpdatedAt";
 export * from "./bazarrWebhookPayload";
 export * from "./bazarrWebhookPayloadMessage";
 export * from "./bazarrWebhookPayloadTitle";
@@ -43,6 +44,12 @@ export * from "./postApiApplicationsBodyDescription";
 export * from "./postApiApplicationsBodyLogo";
 export * from "./postApiApplicationsBodyName";
 export * from "./postApiApplicationsBodyUrl";
+export * from "./putApiApplicationsIdBody";
+export * from "./putApiApplicationsIdBodyCategory";
+export * from "./putApiApplicationsIdBodyDescription";
+export * from "./putApiApplicationsIdBodyLogo";
+export * from "./putApiApplicationsIdBodyName";
+export * from "./putApiApplicationsIdBodyUrl";
 export * from "./radarrWebhookMovie";
 export * from "./radarrWebhookMovieFile";
 export * from "./radarrWebhookMovieFileQuality";

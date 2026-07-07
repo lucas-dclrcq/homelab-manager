@@ -17,7 +17,7 @@
     "schemas" : {
       "ApplicationDto" : {
         "type" : "object",
-        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo" ],
+        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "updatedAt" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -39,6 +39,13 @@
           },
           "hasLogo" : {
             "type" : "boolean"
+          },
+          "updatedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -712,6 +719,102 @@
           }
         },
         "summary" : "Create Application",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/applications/{id}" : {
+      "put" : {
+        "tags" : [ "Portal" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "required" : [ "name", "category", "description", "url", "requiresVpn", "logo" ],
+                "properties" : {
+                  "name" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "category" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "description" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "url" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "requiresVpn" : {
+                    "type" : "boolean"
+                  },
+                  "logo" : {
+                    "type" : [ "string", "null" ],
+                    "format" : "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Update Application",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Portal" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Delete Application",
         "security" : [ {
           "SecurityScheme" : [ "admin" ]
         } ]

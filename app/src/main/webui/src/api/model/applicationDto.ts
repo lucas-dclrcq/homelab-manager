@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 import type { Uuid } from "./uuid";
+import type { ApplicationDtoUpdatedAt } from "./applicationDtoUpdatedAt";
 
 export interface ApplicationDto {
   id: Uuid;
@@ -14,4 +15,5 @@ export interface ApplicationDto {
   url: string;
   requiresVpn: boolean;
   hasLogo: boolean;
+  updatedAt: ApplicationDtoUpdatedAt;
 }

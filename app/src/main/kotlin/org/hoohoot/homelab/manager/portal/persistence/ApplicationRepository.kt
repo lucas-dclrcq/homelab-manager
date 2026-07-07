@@ -3,6 +3,7 @@ package org.hoohoot.homelab.manager.portal.persistence
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class ApplicationSummary(
@@ -13,6 +14,7 @@ data class ApplicationSummary(
     val url: String,
     val requiresVpn: Boolean,
     val hasLogo: Boolean,
+    val updatedAt: LocalDateTime?,
 )
 
 data class ApplicationLogo(val content: ByteArray, val contentType: String)
@@ -26,7 +28,7 @@ class ApplicationRepository {
                 session.createQuery(
                     """select new org.hoohoot.homelab.manager.portal.persistence.ApplicationSummary(
                            a.id, a.name, a.category, a.description, a.url, a.requiresVpn,
-                           case when a.logo is null then false else true end)
+                           case when a.logo is null then false else true end, a.updatedAt)
                        from ApplicationEntity a
                        order by a.category, a.name""",
                     ApplicationSummary::class.java
@@ -37,6 +39,16 @@ class ApplicationRepository {
     suspend fun save(entity: ApplicationEntity): ApplicationEntity =
         Panache.withTransaction {
             entity.persist<ApplicationEntity>()
+        }.awaitSuspending()
+
+    suspend fun update(id: UUID, mutate: (ApplicationEntity) -> Unit): ApplicationEntity? =
+        Panache.withTransaction {
+            ApplicationEntity.findById(id).invoke { entity -> entity?.let(mutate) }
+        }.awaitSuspending()
+
+    suspend fun delete(id: UUID): Boolean =
+        Panache.withTransaction {
+            ApplicationEntity.deleteById(id)
         }.awaitSuspending()
 
     suspend fun findLogo(id: UUID): ApplicationLogo? {

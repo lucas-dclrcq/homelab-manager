@@ -97,6 +97,152 @@ internal class ApplicationsTest {
             .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
 
+    private fun createApplication(name: String, withLogo: Boolean = false): String {
+        val request = RestAssured.given()
+            .multiPart("name", name)
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "desc")
+            .multiPart("url", "https://$name.example.org".lowercase())
+            .multiPart("requiresVpn", "false")
+        if (withLogo) {
+            request.multiPart("logo", "logo.png", pngBytes, "image/png")
+        }
+        return request
+            .`when`().post()
+            .then().statusCode(Response.Status.CREATED.statusCode)
+            .extract().jsonPath().getString("id")
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `admin can update an application with a new logo`() {
+        val id = createApplication("Immich", withLogo = false)
+
+        val newLogo = pngBytes + byteArrayOf(0x01, 0x02)
+        RestAssured.given()
+            .multiPart("name", "Immich Photos")
+            .multiPart(utf8Part("category", "Photos"))
+            .multiPart("description", "Sauvegarde de photos")
+            .multiPart("url", "https://photos.example.org")
+            .multiPart("requiresVpn", "true")
+            .multiPart("logo", "logo.png", newLogo, "image/png")
+            .`when`().put("/{id}", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+
+        val applications = RestAssured.given()
+            .`when`().get()
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        val updated = applications.getList<Map<String, Any>>("").first { it["id"] == id }
+        assertThat(updated["name"]).isEqualTo("Immich Photos")
+        assertThat(updated["category"]).isEqualTo("Photos")
+        assertThat(updated["requiresVpn"]).isEqualTo(true)
+        assertThat(updated["hasLogo"]).isEqualTo(true)
+        assertThat(updated["updatedAt"]).isNotNull()
+
+        val logoResponse = RestAssured.given()
+            .`when`().get("/{id}/logo", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().asByteArray()
+        assertThat(logoResponse).isEqualTo(newLogo)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `updating without a logo keeps the existing logo`() {
+        val id = createApplication("Paperless", withLogo = true)
+
+        RestAssured.given()
+            .multiPart("name", "Paperless-ngx")
+            .multiPart(utf8Part("category", "Documents"))
+            .multiPart("description", "GED")
+            .multiPart("url", "https://paperless.example.org")
+            .multiPart("requiresVpn", "false")
+            .`when`().put("/{id}", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+
+        val logoResponse = RestAssured.given()
+            .`when`().get("/{id}/logo", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+            .contentType("image/png")
+            .extract().asByteArray()
+        assertThat(logoResponse).isEqualTo(pngBytes)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `updating an unknown application returns 404`() {
+        RestAssured.given()
+            .multiPart("name", "Ghost")
+            .multiPart("category", "Médias")
+            .multiPart("description", "desc")
+            .multiPart("url", "https://ghost.example.org")
+            .multiPart("requiresVpn", "false")
+            .`when`().put("/{id}", "00000000-0000-0000-0000-000000000000")
+            .then().statusCode(Response.Status.NOT_FOUND.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `admin cannot update an application with missing fields`() {
+        val id = createApplication("Vaultwarden")
+
+        RestAssured.given()
+            .multiPart("name", "Vaultwarden")
+            .`when`().put("/{id}", id)
+            .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "bob", roles = ["user"])
+    fun `regular user cannot update an application`() {
+        RestAssured.given()
+            .multiPart("name", "Nope")
+            .multiPart("category", "Médias")
+            .multiPart("description", "desc")
+            .multiPart("url", "https://nope.example.org")
+            .multiPart("requiresVpn", "false")
+            .`when`().put("/{id}", "00000000-0000-0000-0000-000000000000")
+            .then().statusCode(Response.Status.FORBIDDEN.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `admin can delete an application`() {
+        val id = createApplication("Uptime", withLogo = true)
+
+        RestAssured.given()
+            .`when`().delete("/{id}", id)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+
+        val applications = RestAssured.given()
+            .`when`().get()
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+        assertThat(applications.getList<Map<String, Any>>("").none { it["id"] == id }).isTrue()
+
+        RestAssured.given()
+            .`when`().get("/{id}/logo", id)
+            .then().statusCode(Response.Status.NOT_FOUND.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `deleting an unknown application returns 404`() {
+        RestAssured.given()
+            .`when`().delete("/{id}", "00000000-0000-0000-0000-000000000000")
+            .then().statusCode(Response.Status.NOT_FOUND.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "bob", roles = ["user"])
+    fun `regular user cannot delete an application`() {
+        RestAssured.given()
+            .`when`().delete("/{id}", "00000000-0000-0000-0000-000000000000")
+            .then().statusCode(Response.Status.FORBIDDEN.statusCode)
+    }
+
     @Test
     @TestSecurity(user = "bob", roles = ["user"])
     fun `regular user cannot create an application`() {

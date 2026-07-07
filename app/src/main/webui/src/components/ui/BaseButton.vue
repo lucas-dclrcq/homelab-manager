@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    variant?: 'primary' | 'secondary' | 'ghost'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
     type?: 'button' | 'submit'
     disabled?: boolean
     loading?: boolean
@@ -19,6 +19,7 @@ withDefaults(
       'border-ink bg-amber text-ink hover:bg-amber-deep': variant === 'primary',
       'border-ink bg-ink text-amber hover:bg-ink-deep': variant === 'secondary',
       'border-line bg-transparent text-ink hover:bg-paper': variant === 'ghost',
+      'border-ink bg-berry text-cream hover:opacity-90': variant === 'danger',
     }"
   >
     <span

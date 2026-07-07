@@ -29,6 +29,7 @@ import type {
   LidarrWebhookPayload,
   MeDto,
   PostApiApplicationsBody,
+  PutApiApplicationsIdBody,
   RadarrWebhookPayload,
   SeerrWebhookPayload,
   SonarrWebhookPayload,
@@ -586,6 +587,201 @@ export const usePostApiApplications = <TError = void, TContext = unknown>(
   TContext
 > => {
   const mutationOptions = getPostApiApplicationsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Application
+ */
+export const putApiApplicationsId = (
+  id: MaybeRef<Uuid>,
+  putApiApplicationsIdBody: MaybeRef<PutApiApplicationsIdBody>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+  putApiApplicationsIdBody = unref(putApiApplicationsIdBody);
+  const formData = new FormData();
+  if (putApiApplicationsIdBody.name !== null) {
+    formData.append("name", putApiApplicationsIdBody.name);
+  }
+  if (putApiApplicationsIdBody.category !== null) {
+    formData.append("category", putApiApplicationsIdBody.category);
+  }
+  if (putApiApplicationsIdBody.description !== null) {
+    formData.append("description", putApiApplicationsIdBody.description);
+  }
+  if (putApiApplicationsIdBody.url !== null) {
+    formData.append("url", putApiApplicationsIdBody.url);
+  }
+  formData.append(
+    "requiresVpn",
+    putApiApplicationsIdBody.requiresVpn.toString(),
+  );
+  if (putApiApplicationsIdBody.logo !== null) {
+    formData.append("logo", putApiApplicationsIdBody.logo);
+  }
+
+  return customInstance<unknown>(
+    {
+      url: `/api/applications/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
+    },
+    options,
+  );
+};
+
+export const getPutApiApplicationsIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putApiApplicationsId>>,
+    TError,
+    { id: Uuid; data: PutApiApplicationsIdBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putApiApplicationsId>>,
+  TError,
+  { id: Uuid; data: PutApiApplicationsIdBody },
+  TContext
+> => {
+  const mutationKey = ["putApiApplicationsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putApiApplicationsId>>,
+    { id: Uuid; data: PutApiApplicationsIdBody }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putApiApplicationsId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutApiApplicationsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putApiApplicationsId>>
+>;
+export type PutApiApplicationsIdMutationBody = PutApiApplicationsIdBody;
+export type PutApiApplicationsIdMutationError = void;
+
+/**
+ * @summary Update Application
+ */
+export const usePutApiApplicationsId = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putApiApplicationsId>>,
+      TError,
+      { id: Uuid; data: PutApiApplicationsIdBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof putApiApplicationsId>>,
+  TError,
+  { id: Uuid; data: PutApiApplicationsIdBody },
+  TContext
+> => {
+  const mutationOptions = getPutApiApplicationsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Application
+ */
+export const deleteApiApplicationsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<unknown>(
+    { url: `/api/applications/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiApplicationsIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiApplicationsId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiApplicationsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiApplicationsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiApplicationsId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiApplicationsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiApplicationsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiApplicationsId>>
+>;
+
+export type DeleteApiApplicationsIdMutationError = void;
+
+/**
+ * @summary Delete Application
+ */
+export const useDeleteApiApplicationsId = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiApplicationsId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiApplicationsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions = getDeleteApiApplicationsIdMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
