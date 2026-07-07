@@ -51,6 +51,63 @@ components:
           type:
           - string
           - "null"
+    JobExecutionDto:
+      type: object
+      required:
+      - runAt
+      - status
+      - durationMs
+      - error
+      - manual
+      properties:
+        runAt:
+          $ref: "#/components/schemas/LocalDateTime"
+        status:
+          type: string
+        durationMs:
+          type:
+          - integer
+          - "null"
+          format: int64
+        error:
+          type:
+          - string
+          - "null"
+        manual:
+          type: boolean
+    JobStatusDto:
+      type: object
+      required:
+      - identity
+      - displayName
+      - schedule
+      - nextFireTime
+      - paused
+      - runnable
+      - lastExecution
+      properties:
+        identity:
+          type: string
+        displayName:
+          type:
+          - string
+          - "null"
+        schedule:
+          type:
+          - string
+          - "null"
+        nextFireTime:
+          anyOf:
+          - $ref: "#/components/schemas/LocalDateTime"
+          - type: "null"
+        paused:
+          type: boolean
+        runnable:
+          type: boolean
+        lastExecution:
+          anyOf:
+          - $ref: "#/components/schemas/JobExecutionDto"
+          - type: "null"
     LibraryStats:
       type: object
       required:
@@ -411,6 +468,99 @@ components:
       format: uuid
       pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
 paths:
+  /api/admin/jobs:
+    get:
+      tags:
+      - Portal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobStatusDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List Jobs
+      security:
+      - SecurityScheme:
+        - admin
+  /api/admin/jobs/{identity}/pause:
+    post:
+      tags:
+      - Portal
+      parameters:
+      - name: identity
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Pause Job
+      security:
+      - SecurityScheme:
+        - admin
+  /api/admin/jobs/{identity}/resume:
+    post:
+      tags:
+      - Portal
+      parameters:
+      - name: identity
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Resume Job
+      security:
+      - SecurityScheme:
+        - admin
+  /api/admin/jobs/{identity}/run:
+    post:
+      tags:
+      - Portal
+      parameters:
+      - name: identity
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Run Job
+      security:
+      - SecurityScheme:
+        - admin
   /api/applications:
     get:
       tags:

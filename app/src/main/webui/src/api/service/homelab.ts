@@ -24,6 +24,7 @@ import type {
   ApplicationDto,
   BazarrWebhookPayload,
   GetApiTimelineParams,
+  JobStatusDto,
   LibraryStats,
   LidarrWebhookPayload,
   MeDto,
@@ -38,6 +39,357 @@ import type {
 import { customInstance } from "../axios-instance";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary List Jobs
+ */
+export const getApiAdminJobs = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<JobStatusDto[]>(
+    { url: `/api/admin/jobs`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminJobsQueryKey = () => {
+  return ["api", "admin", "jobs"] as const;
+};
+
+export const getGetApiAdminJobsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminJobs>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiAdminJobs>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminJobsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiAdminJobs>>> = ({
+    signal,
+  }) => getApiAdminJobs(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminJobs>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminJobsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminJobs>>
+>;
+export type GetApiAdminJobsQueryError = void;
+
+/**
+ * @summary List Jobs
+ */
+
+export function useGetApiAdminJobs<
+  TData = Awaited<ReturnType<typeof getApiAdminJobs>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminJobs>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminJobsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Pause Job
+ */
+export const postApiAdminJobsIdentityPause = (
+  identity: MaybeRef<string>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  identity = unref(identity);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/jobs/${identity}/pause`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiAdminJobsIdentityPauseMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>,
+    TError,
+    { identity: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminJobsIdentityPause"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>,
+    { identity: string }
+  > = (props) => {
+    const { identity } = props ?? {};
+
+    return postApiAdminJobsIdentityPause(identity, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminJobsIdentityPauseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>
+>;
+
+export type PostApiAdminJobsIdentityPauseMutationError = void;
+
+/**
+ * @summary Pause Job
+ */
+export const usePostApiAdminJobsIdentityPause = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>,
+      TError,
+      { identity: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityPause>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminJobsIdentityPauseMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Resume Job
+ */
+export const postApiAdminJobsIdentityResume = (
+  identity: MaybeRef<string>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  identity = unref(identity);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/jobs/${identity}/resume`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiAdminJobsIdentityResumeMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>,
+    TError,
+    { identity: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminJobsIdentityResume"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>,
+    { identity: string }
+  > = (props) => {
+    const { identity } = props ?? {};
+
+    return postApiAdminJobsIdentityResume(identity, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminJobsIdentityResumeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>
+>;
+
+export type PostApiAdminJobsIdentityResumeMutationError = void;
+
+/**
+ * @summary Resume Job
+ */
+export const usePostApiAdminJobsIdentityResume = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>,
+      TError,
+      { identity: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityResume>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminJobsIdentityResumeMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Run Job
+ */
+export const postApiAdminJobsIdentityRun = (
+  identity: MaybeRef<string>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  identity = unref(identity);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/jobs/${identity}/run`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiAdminJobsIdentityRunMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>,
+    TError,
+    { identity: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminJobsIdentityRun"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>,
+    { identity: string }
+  > = (props) => {
+    const { identity } = props ?? {};
+
+    return postApiAdminJobsIdentityRun(identity, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminJobsIdentityRunMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>
+>;
+
+export type PostApiAdminJobsIdentityRunMutationError = void;
+
+/**
+ * @summary Run Job
+ */
+export const usePostApiAdminJobsIdentityRun = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>,
+      TError,
+      { identity: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminJobsIdentityRun>>,
+  TError,
+  { identity: string },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminJobsIdentityRunMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * @summary List Applications

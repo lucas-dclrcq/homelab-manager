@@ -4,13 +4,16 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
+import io.quarkus.vertx.VertxContextSupport
 import io.restassured.RestAssured
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
+import org.hoohoot.homelab.manager.portal.persistence.StatsSnapshotEntity
 import org.hoohoot.homelab.manager.portal.resource.StatsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +27,11 @@ internal class StatsTest {
 
     @BeforeEach
     fun setUp() {
+        // Other tests may have persisted snapshots: remove them so stats are computed live from the stubs
+        VertxContextSupport.subscribeAndAwait {
+            Panache.withTransaction { StatsSnapshotEntity.deleteAll() }
+        }
+
         wireMock.resetMappings()
         wireMock.register(
             get(urlPathEqualTo("/api/v3/movie")).willReturn(
