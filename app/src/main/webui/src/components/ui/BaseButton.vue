@@ -14,19 +14,16 @@ withDefaults(
   <button
     :type="type"
     :disabled="disabled || loading"
-    class="sketchy-sm inline-flex cursor-pointer items-center justify-center gap-2 border-2 px-4 py-1.5 text-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-[1.5px] px-5 py-2.5 font-display text-sm font-bold transition-[background-color,transform] duration-150 ease-out focus-visible:ring-[3px] focus-visible:ring-amber/45 focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
     :class="{
-      'border-brand-700 bg-brand-500 text-white shadow-doodle hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-600 hover:shadow-none':
-        variant === 'primary',
-      'border-stone-400 bg-card text-stone-700 shadow-doodle hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-stone-100 hover:shadow-none':
-        variant === 'secondary',
-      'border-transparent text-stone-500 hover:bg-stone-200/60 hover:text-stone-800':
-        variant === 'ghost',
+      'border-ink bg-amber text-ink hover:bg-amber-deep': variant === 'primary',
+      'border-ink bg-ink text-amber hover:bg-ink-deep': variant === 'secondary',
+      'border-line bg-transparent text-ink hover:bg-paper': variant === 'ghost',
     }"
   >
     <span
       v-if="loading"
-      class="size-4 animate-spin rounded-full border-2 border-stone-300 border-t-current"
+      class="size-4 animate-spin rounded-full border-2 border-current border-t-transparent opacity-70"
       aria-hidden="true"
     />
     <slot />

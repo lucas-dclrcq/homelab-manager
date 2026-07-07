@@ -6,13 +6,12 @@ import JobsPanel from '../components/app/JobsPanel.vue'
 <template>
   <div class="flex max-w-4xl flex-col gap-8">
     <header>
-      <h1
-        class="font-display text-4xl font-bold tracking-tight text-stone-900 underline decoration-brand-400/70 decoration-wavy underline-offset-8"
-      >
-        Administration
+      <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
+        Atelier
       </h1>
-      <p class="mt-3 text-sm text-stone-500">
-        Gérez le catalogue d'applications et les tâches planifiées du portail.
+      <p class="mt-2 text-ink-soft">
+        Le coin technique de la maison : le catalogue d'applis et les tâches
+        planifiées.
       </p>
     </header>
 

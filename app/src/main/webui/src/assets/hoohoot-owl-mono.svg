@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Hoohoot owl (mono)">
+  <path d="M40 30 L28 9 L52 24 Z" fill="#2E2933"></path>
+  <path d="M80 30 L92 9 L68 24 Z" fill="#2E2933"></path>
+  <path d="M60 15 C88 15 104 40 104 71 C104 98 85 113 60 113 C35 113 16 98 16 71 C16 40 32 15 60 15 Z" fill="#2E2933"></path>
+  <path d="M60 66 C78 66 90 78 90 93 C90 105 78 111 60 111 C42 111 30 105 30 93 C30 78 42 66 60 66 Z" fill="none" stroke="#FBF7F0" stroke-width="3"></path>
+  <circle cx="44" cy="58" r="21" fill="#FBF7F0"></circle>
+  <circle cx="76" cy="58" r="21" fill="#FBF7F0"></circle>
+  <circle cx="47" cy="60" r="9" fill="#2E2933"></circle>
+  <circle cx="73" cy="60" r="9" fill="#2E2933"></circle>
+  <path d="M60 66 L53 75 L67 75 Z" fill="#2E2933"></path>
+</svg>

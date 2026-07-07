@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120" role="img" aria-label="Hoohoot">
+  <g transform="translate(6 6) scale(0.9)">
+    <path d="M40 30 L28 9 L52 24 Z" fill="#2E2933"></path>
+    <path d="M80 30 L92 9 L68 24 Z" fill="#2E2933"></path>
+    <path d="M60 15 C88 15 104 40 104 71 C104 98 85 113 60 113 C35 113 16 98 16 71 C16 40 32 15 60 15 Z" fill="#E8973A"></path>
+    <path d="M60 66 C78 66 90 78 90 93 C90 105 78 111 60 111 C42 111 30 105 30 93 C30 78 42 66 60 66 Z" fill="#FBEAD1"></path>
+    <circle cx="44" cy="58" r="21" fill="#FFFDFA"></circle>
+    <circle cx="76" cy="58" r="21" fill="#FFFDFA"></circle>
+    <circle cx="44" cy="58" r="21" fill="none" stroke="#2E2933" stroke-width="3.5"></circle>
+    <circle cx="76" cy="58" r="21" fill="none" stroke="#2E2933" stroke-width="3.5"></circle>
+    <circle cx="47" cy="60" r="9" fill="#2E2933"></circle>
+    <circle cx="73" cy="60" r="9" fill="#2E2933"></circle>
+    <circle cx="50" cy="57" r="3" fill="#FFFDFA"></circle>
+    <circle cx="76" cy="57" r="3" fill="#FFFDFA"></circle>
+    <path d="M60 66 L53 75 L67 75 Z" fill="#C87C1F"></path>
+    <path d="M48 111 l-5 7 M48 111 l0 8 M48 111 l5 7" stroke="#C87C1F" stroke-width="3" stroke-linecap="round" fill="none"></path>
+    <path d="M72 111 l-5 7 M72 111 l0 8 M72 111 l5 7" stroke="#C87C1F" stroke-width="3" stroke-linecap="round" fill="none"></path>
+  </g>
+  <text x="132" y="76" font-family="&#39;Baloo 2&#39;,&#39;Trebuchet MS&#39;,sans-serif" font-size="52" font-weight="800" fill="#2E2933" letter-spacing="-0.5">Hoohoot</text>
+  <circle cx="352" cy="43" r="4" fill="#E8973A"></circle>
+</svg>

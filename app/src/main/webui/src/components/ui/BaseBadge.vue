@@ -1,20 +1,22 @@
 <script setup lang="ts">
 withDefaults(
-  defineProps<{ color?: 'violet' | 'cyan' | 'amber' | 'rose' | 'emerald' | 'slate' }>(),
-  { color: 'slate' },
+  defineProps<{
+    color?: 'sage' | 'berry' | 'sky' | 'amber' | 'dusk' | 'neutral'
+  }>(),
+  { color: 'neutral' },
 )
 </script>
 
 <template>
   <span
-    class="sketchy-sm inline-flex items-center gap-1 border px-2.5 py-0.5 text-xs font-medium"
+    class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
     :class="{
-      'border-violet-300 bg-violet-100 text-violet-700': color === 'violet',
-      'border-cyan-300 bg-cyan-100 text-cyan-800': color === 'cyan',
-      'border-amber-300 bg-amber-100 text-amber-800': color === 'amber',
-      'border-rose-300 bg-rose-100 text-rose-700': color === 'rose',
-      'border-emerald-300 bg-emerald-100 text-emerald-800': color === 'emerald',
-      'border-stone-300 bg-stone-100 text-stone-600': color === 'slate',
+      'bg-sage-soft text-sage': color === 'sage',
+      'bg-berry-soft text-berry': color === 'berry',
+      'bg-sky-soft text-sky': color === 'sky',
+      'bg-amber-soft text-amber-deep': color === 'amber',
+      'bg-dusk-soft text-dusk-deep': color === 'dusk',
+      'bg-line/60 text-ink-soft': color === 'neutral',
     }"
   >
     <slot />

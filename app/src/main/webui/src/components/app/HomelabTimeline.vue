@@ -11,26 +11,59 @@ import BaseSpinner from '../ui/BaseSpinner.vue'
 
 const PAGE_SIZE = 20
 
-const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
-  useInfiniteQuery({
-    queryKey: ['timeline'],
-    queryFn: ({ pageParam }) => getApiTimeline({ page: pageParam, pageSize: PAGE_SIZE }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) =>
-      lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined,
-  })
+const {
+  data,
+  isPending,
+  isError,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useInfiniteQuery({
+  queryKey: ['timeline'],
+  queryFn: ({ pageParam }) =>
+    getApiTimeline({ page: pageParam, pageSize: PAGE_SIZE }),
+  initialPageParam: 0,
+  getNextPageParam: (lastPage) =>
+    lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined,
+})
 
-const events = computed<TimelineEventDto[]>(() => data.value?.pages.flatMap((page) => page.items) ?? [])
+const events = computed<TimelineEventDto[]>(
+  () => data.value?.pages.flatMap((page) => page.items) ?? [],
+)
 
-const eventPresentation: Record<string, { icon: string; accent: string; label: string }> = {
-  movie_downloaded: { icon: '🎬', accent: '#c1663f', label: 'Film téléchargé' },
-  episode_downloaded: { icon: '📺', accent: '#5d84a6', label: 'Épisode téléchargé' },
-  subtitles_downloaded: { icon: '💬', accent: '#c99a2e', label: 'Sous-titres téléchargés' },
-  album_downloaded: { icon: '🎵', accent: '#7a9a65', label: 'Album téléchargé' },
+type Tone = 'amber' | 'dusk' | 'sage' | 'sky' | 'berry' | 'neutral'
+
+const eventPresentation: Record<
+  string,
+  { icon: string; tone: Tone; label: string }
+> = {
+  movie_downloaded: { icon: 'film', tone: 'amber', label: 'Film téléchargé' },
+  episode_downloaded: { icon: 'tv', tone: 'sky', label: 'Épisode téléchargé' },
+  subtitles_downloaded: {
+    icon: 'message-square',
+    tone: 'dusk',
+    label: 'Sous-titres téléchargés',
+  },
+  album_downloaded: { icon: 'music', tone: 'sage', label: 'Album téléchargé' },
 }
 
 function presentationFor(event: TimelineEventDto) {
-  return eventPresentation[event.eventType] ?? { icon: '📦', accent: '#8a7f6c', label: event.eventType }
+  return (
+    eventPresentation[event.eventType] ?? {
+      icon: 'package',
+      tone: 'neutral' as Tone,
+      label: event.eventType,
+    }
+  )
+}
+
+const toneText: Record<Tone, string> = {
+  amber: 'text-amber-deep',
+  dusk: 'text-dusk',
+  sage: 'text-sage',
+  sky: 'text-sky',
+  berry: 'text-berry',
+  neutral: 'text-ink-soft',
 }
 
 function detailsFor(event: TimelineEventDto): string {
@@ -39,7 +72,9 @@ function detailsFor(event: TimelineEventDto): string {
   if (details.seasonNumber && details.episodeNumber) {
     const season = String(details.seasonNumber).padStart(2, '0')
     const episode = String(details.episodeNumber).padStart(2, '0')
-    parts.push(`S${season}E${episode}${details.episodeTitle ? ` – ${details.episodeTitle}` : ''}`)
+    parts.push(
+      `S${season}E${episode}${details.episodeTitle ? ` – ${details.episodeTitle}` : ''}`,
+    )
   }
   if (details.artist) parts.push(details.artist)
   if (details.language) parts.push(details.language)
@@ -55,29 +90,29 @@ function detailsFor(event: TimelineEventDto): string {
     <BaseSpinner v-if="isPending" />
     <p
       v-else-if="isError"
-      class="sketchy-sm border-2 border-dashed border-rose-300 bg-rose-50 p-4 text-sm text-rose-700"
+      class="rounded-card border-[1.5px] border-berry/30 bg-berry-soft p-4 text-sm text-berry"
     >
-      Impossible de récupérer la timeline.
+      La timeline fait la sieste — on réessaie dans un instant ?
     </p>
     <template v-else>
       <p
         v-if="events.length === 0"
-        class="sketchy border-2 border-dashed border-stone-300 bg-card p-6 text-sm text-stone-500"
+        class="rounded-tile border-[1.5px] border-line bg-paper p-6 text-sm text-ink-soft"
       >
-        Rien à signaler pour l'instant — les téléchargements apparaîtront ici.
+        Tout est calme à la maison 🦉 — les téléchargements apparaîtront ici.
       </p>
       <BaseTimeline v-else>
         <BaseTimelineItem
           v-for="event in events"
           :key="event.id"
           :icon="presentationFor(event).icon"
-          :accent="presentationFor(event).accent"
+          :tone="presentationFor(event).tone"
           :timestamp="formatDateTime(event.occurredAt)"
         >
-          <span class="text-sm font-semibold text-stone-800">{{ event.title }}</span>
+          <span class="text-sm font-bold text-ink">{{ event.title }}</span>
           <span
-            class="text-xs font-medium"
-            :style="{ color: presentationFor(event).accent }"
+            class="text-xs font-bold"
+            :class="toneText[presentationFor(event).tone]"
           >
             {{ presentationFor(event).label }}
           </span>
@@ -86,8 +121,12 @@ function detailsFor(event: TimelineEventDto): string {
       </BaseTimeline>
 
       <div v-if="hasNextPage" class="mt-6 flex justify-center">
-        <BaseButton variant="secondary" :loading="isFetchingNextPage" @click="fetchNextPage()">
-          Charger plus
+        <BaseButton
+          variant="ghost"
+          :loading="isFetchingNextPage"
+          @click="fetchNextPage()"
+        >
+          Voir plus loin dans la nuit
         </BaseButton>
       </div>
     </template>

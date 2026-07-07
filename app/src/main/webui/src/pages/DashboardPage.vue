@@ -1,24 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useUserStore } from '../stores/user'
 import StatsPanel from '../components/app/StatsPanel.vue'
 import HomelabTimeline from '../components/app/HomelabTimeline.vue'
+
+const userStore = useUserStore()
+
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+  return hour >= 18 || hour < 5 ? 'Bonsoir' : 'Bonjour'
+})
 </script>
 
 <template>
   <div class="flex flex-col gap-8">
     <header>
-      <h1
-        class="font-display text-4xl font-bold tracking-tight text-stone-900 underline decoration-brand-400/70 decoration-wavy underline-offset-8"
-      >
-        Dashboard
+      <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
+        {{ greeting
+        }}{{ userStore.username ? `, ${userStore.username}` : '' }} 🦉
       </h1>
-      <p class="mt-3 text-sm text-stone-500">L'état du homelab en un coup d'œil.</p>
+      <p class="mt-2 text-ink-soft">Voilà ce qui se passe à la maison.</p>
     </header>
 
     <StatsPanel />
 
-    <div>
-      <h2 class="font-display mb-4 text-2xl font-bold text-stone-800">Activité récente</h2>
+    <section>
+      <h2 class="mb-4 font-display text-[21px] font-bold">Activité récente</h2>
       <HomelabTimeline />
-    </div>
+    </section>
   </div>
 </template>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-withDefaults(defineProps<{ label: string; accept?: string }>(), { accept: undefined })
+withDefaults(defineProps<{ label: string; accept?: string }>(), {
+  accept: undefined,
+})
 
 const model = defineModel<File | null>({ default: null })
 const inputRef = ref<HTMLInputElement>()
@@ -20,19 +22,21 @@ defineExpose({ clear })
 
 <template>
   <label class="block">
-    <span class="mb-1.5 block text-sm font-medium text-stone-600">{{ label }}</span>
+    <span class="mb-1.5 block text-xs font-bold text-ink-soft">{{
+      label
+    }}</span>
     <div class="flex items-center gap-3">
       <input
         ref="inputRef"
         type="file"
         :accept="accept"
-        class="block w-full cursor-pointer text-sm text-stone-500 file:sketchy-sm file:mr-3 file:cursor-pointer file:border-2 file:border-stone-400 file:bg-card file:px-3.5 file:py-1.5 file:text-sm file:font-medium file:text-stone-700 hover:file:bg-stone-100"
+        class="block w-full cursor-pointer text-sm text-ink-soft file:mr-3 file:cursor-pointer file:rounded-xl file:border-[1.5px] file:border-line file:bg-paper file:px-4 file:py-2 file:font-display file:text-sm file:font-bold file:text-ink hover:file:bg-amber-soft"
         @change="onChange"
       />
       <button
         v-if="model"
         type="button"
-        class="cursor-pointer text-xs text-stone-400 hover:text-stone-600"
+        class="cursor-pointer text-xs text-mute hover:text-ink-soft"
         @click="clear"
       >
         ✕

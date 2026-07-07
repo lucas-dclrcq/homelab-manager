@@ -12,6 +12,7 @@ import BaseTextarea from '../ui/BaseTextarea.vue'
 import BaseToggle from '../ui/BaseToggle.vue'
 import BaseFileInput from '../ui/BaseFileInput.vue'
 import BaseButton from '../ui/BaseButton.vue'
+import UiIcon from '../ui/UiIcon.vue'
 
 const queryClient = useQueryClient()
 
@@ -34,8 +35,10 @@ const successMessage = ref('')
 const { mutate, isPending, isError } = usePostApiApplications({
   mutation: {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: getGetApiApplicationsQueryKey() })
-      successMessage.value = `« ${form.name} » a été ajoutée.`
+      queryClient.invalidateQueries({
+        queryKey: getGetApiApplicationsQueryKey(),
+      })
+      successMessage.value = `« ${form.name} » a rejoint la maison.`
       form.name = ''
       form.category = ''
       form.description = ''
@@ -62,12 +65,20 @@ function submit() {
 </script>
 
 <template>
-  <BaseCard accent="#c99a2e">
-    <h2 class="font-display mb-5 text-2xl font-bold text-stone-800">Ajouter une application</h2>
+  <BaseCard>
+    <h2 class="mb-1 font-display text-[22px] font-bold">Ajouter une appli</h2>
+    <p class="mb-5 text-sm text-ink-soft">
+      Un nouveau service dans la maison ? Présente-le ici.
+    </p>
 
     <form class="flex flex-col gap-4" @submit.prevent="submit">
       <div class="grid gap-4 sm:grid-cols-2">
-        <BaseInput v-model="form.name" label="Nom" placeholder="Jellyfin" required />
+        <BaseInput
+          v-model="form.name"
+          label="Nom"
+          placeholder="Jellyfin"
+          required
+        />
         <BaseInput
           v-model="form.category"
           label="Catégorie"
@@ -76,14 +87,18 @@ function submit() {
           required
         />
         <datalist id="existing-categories">
-          <option v-for="category in existingCategories" :key="category" :value="category" />
+          <option
+            v-for="category in existingCategories"
+            :key="category"
+            :value="category"
+          />
         </datalist>
       </div>
 
       <BaseTextarea
         v-model="form.description"
         label="Description"
-        placeholder="À quoi sert cette application ?"
+        placeholder="À quoi sert cette appli ?"
         required
       />
 
@@ -103,17 +118,23 @@ function submit() {
           accept="image/png,image/jpeg,image/svg+xml,image/webp"
         />
         <div class="flex items-end pb-1">
-          <BaseToggle v-model="form.requiresVpn" label="Accessible uniquement via VPN" />
+          <BaseToggle
+            v-model="form.requiresVpn"
+            label="Accessible uniquement via VPN"
+          />
         </div>
       </div>
 
       <div class="flex items-center gap-4">
-        <BaseButton type="submit" :loading="isPending">Ajouter</BaseButton>
-        <p v-if="successMessage" class="text-sm font-medium text-brand-700">
+        <BaseButton type="submit" :loading="isPending">
+          <UiIcon name="plus" class="size-4" />
+          Ajouter
+        </BaseButton>
+        <p v-if="successMessage" class="text-sm font-bold text-sage">
           {{ successMessage }}
         </p>
-        <p v-if="isError" class="text-sm font-medium text-rose-600">
-          L'ajout a échoué — vérifiez les champs et le logo.
+        <p v-if="isError" class="text-sm font-bold text-berry">
+          L'ajout a échoué — vérifie les champs et le logo.
         </p>
       </div>
     </form>

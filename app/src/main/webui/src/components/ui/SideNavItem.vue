@@ -1,26 +1,21 @@
 <script setup lang="ts">
+import UiIcon from './UiIcon.vue'
+
 defineProps<{
   to: string
   label: string
-  icon?: string
-  accent: string
+  icon: string
 }>()
 </script>
 
 <template>
   <RouterLink
     :to="to"
-    class="sketchy-sm group flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-200/60 hover:text-stone-900"
-    active-class="bg-brand-100 !text-brand-900"
-    exact-active-class="bg-brand-100 !text-brand-900"
+    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14.5px] font-semibold text-[#d8d2df] transition-colors duration-150 hover:bg-white/10 hover:text-white"
+    active-class="!bg-amber !text-ink"
+    exact-active-class="!bg-amber !text-ink"
   >
-    <span
-      class="sketchy-sm flex size-8 items-center justify-center text-base"
-      :style="{ backgroundColor: accent + '26', color: accent }"
-      aria-hidden="true"
-    >
-      {{ icon }}
-    </span>
+    <UiIcon :name="icon" class="size-[19px] shrink-0" />
     {{ label }}
   </RouterLink>
 </template>

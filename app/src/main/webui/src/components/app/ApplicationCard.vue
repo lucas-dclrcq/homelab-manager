@@ -1,52 +1,64 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ApplicationDto } from '../../api/model'
-import { colorFromName } from '../../lib/format'
-import BaseCard from '../ui/BaseCard.vue'
 import BaseBadge from '../ui/BaseBadge.vue'
-import PadlockIcon from '../ui/PadlockIcon.vue'
+import UiIcon from '../ui/UiIcon.vue'
 
 const props = defineProps<{ application: ApplicationDto }>()
 
-const accent = colorFromName(props.application.name)
+const hostname = computed(() => {
+  try {
+    return new URL(props.application.url).hostname
+  } catch {
+    return props.application.url
+  }
+})
 </script>
 
 <template>
-  <BaseCard :accent="accent">
-    <div class="flex items-start gap-4">
+  <a
+    :href="application.url"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="group flex flex-col gap-3 rounded-tile border-[1.5px] border-line bg-paper p-[18px] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-[3px] hover:border-amber-soft hover:shadow-lift"
+  >
+    <div class="flex size-13 items-center justify-center rounded-xl bg-cream">
       <img
         v-if="application.hasLogo"
         :src="`/api/applications/${application.id}/logo`"
         :alt="`Logo de ${application.name}`"
-        class="sketchy-sm size-12 object-contain"
+        class="size-8 object-contain"
       />
-      <div
+      <span
         v-else
-        class="sketchy-sm flex size-12 shrink-0 items-center justify-center text-xl font-bold text-white"
-        :style="{ backgroundColor: accent }"
+        class="font-display text-[22px] font-extrabold text-amber-deep"
         aria-hidden="true"
       >
         {{ application.name.charAt(0).toUpperCase() }}
-      </div>
-
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <h3 class="truncate font-semibold text-stone-800">{{ application.name }}</h3>
-          <BaseBadge v-if="application.requiresVpn" color="rose">
-            <PadlockIcon />
-            VPN
-          </BaseBadge>
-        </div>
-        <p class="mt-1 line-clamp-2 text-sm text-stone-500">{{ application.description }}</p>
-        <a
-          :href="application.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-3 inline-flex items-center gap-1 text-sm font-medium transition-colors hover:underline hover:decoration-wavy"
-          :style="{ color: accent }"
-        >
-          Ouvrir ↗
-        </a>
-      </div>
+      </span>
     </div>
-  </BaseCard>
+
+    <div class="flex items-center gap-2">
+      <h3 class="truncate font-display text-[17px] font-bold">
+        {{ application.name }}
+      </h3>
+      <BaseBadge v-if="application.requiresVpn" color="berry">
+        <UiIcon name="lock" class="size-3" />
+        VPN
+      </BaseBadge>
+    </div>
+    <p class="-mt-2 line-clamp-2 text-[13px] leading-snug text-ink-soft">
+      {{ application.description }}
+    </p>
+
+    <div class="mt-auto flex items-center justify-between">
+      <span class="truncate font-mono text-[11px] text-mute">{{
+        hostname
+      }}</span>
+      <UiIcon
+        name="arrow-up-right"
+        class="size-4 shrink-0 text-mute opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      />
+    </div>
+  </a>
 </template>

@@ -1,40 +1,69 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Patrick Hand', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Caveat', 'Patrick Hand', cursive;
+  /* Hoohoot 🦉 — deux couleurs portent la marque : l'ambre miel (lumière
+     de lampe, accueillant) et l'encre nuit-prune (le texte, la structure,
+     la nuit que la chouette surveille). */
+  --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* Papier & encre : fond crème, texte brun chaud */
-  --color-paper: #faf5ea;
-  --color-card: #fffcf4;
-  --color-ink: #3f3729;
+  --color-amber: #e8973a;
+  --color-amber-soft: #fbead1;
+  --color-amber-deep: #c87c1f;
 
-  /* Palette du design system : accent principal du portail (vert sauge) */
-  --color-brand-50: #f3f6ee;
-  --color-brand-100: #e3ecd9;
-  --color-brand-300: #b3c9a0;
-  --color-brand-400: #94b37d;
-  --color-brand-500: #78a05e;
-  --color-brand-600: #5f854a;
-  --color-brand-700: #4c6b3c;
-  --color-brand-900: #33482a;
+  --color-ink: #2e2933;
+  --color-ink-deep: #221e28;
+  --color-ink-soft: #5c5566;
 
-  /* Ombre décalée façon feutre */
-  --shadow-doodle: 3px 4px 0 0 rgb(63 55 41 / 0.12);
+  /* Indigo crépuscule : l'accent froid, utilisé avec parcimonie */
+  --color-dusk: #5d5aa6;
+  --color-dusk-soft: #e7e6f4;
+  --color-dusk-deep: #49468c;
+
+  /* Statuts — amicaux, légèrement adoucis */
+  --color-sage: #5e9e7a;
+  --color-sage-soft: #e2efe9;
+  --color-berry: #c4574f;
+  --color-berry-soft: #f6e6e5;
+  --color-sky: #4e93c4;
+  --color-sky-soft: #e2eef5;
+
+  /* Neutres crème chaude — jamais de blanc pur, jamais de gris froid */
+  --color-cream: #fbf7f0;
+  --color-paper: #fffdfa;
+  --color-line: #ece4d8;
+  --color-mute: #a79e92;
+
+  /* Rayons moelleux : tuiles 26px, cartes 18px */
+  --radius-tile: 26px;
+  --radius-card: 18px;
+
+  /* Ombres chaudes teintées d'encre — lumière de lampe, jamais dures */
+  --shadow-soft:
+    0 3px 10px rgb(46 41 51 / 0.07), 0 1px 3px rgb(46 41 51 / 0.05);
+  --shadow-lift:
+    0 16px 38px rgb(46 41 51 / 0.11), 0 5px 12px rgb(46 41 51 / 0.06);
 }
 
-/* Coins irréguliers, comme tracés à la main */
-@utility sketchy {
-  border-radius: 18px 25px 20px 28px / 26px 18px 28px 20px;
-}
+/* Le « perchoir » : la barre ambre arrondie glissée sous un titre */
+@utility roost {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
 
-@utility sketchy-sm {
-  border-radius: 10px 16px 12px 18px / 16px 10px 18px 12px;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 44px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--color-amber);
+  }
 }
 
 body {
-  @apply bg-paper text-stone-800 antialiased;
-  /* Grille de points façon carnet bullet journal */
-  background-image: radial-gradient(rgb(63 55 41 / 0.06) 1px, transparent 1px);
-  background-size: 24px 24px;
+  @apply bg-cream font-sans text-ink antialiased;
 }

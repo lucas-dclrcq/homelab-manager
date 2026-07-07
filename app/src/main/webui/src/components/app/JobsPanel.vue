@@ -17,7 +17,11 @@ import BaseSpinner from '../ui/BaseSpinner.vue'
 
 const queryClient = useQueryClient()
 
-const { data: jobs, isPending, isError } = useGetApiAdminJobs({
+const {
+  data: jobs,
+  isPending,
+  isError,
+} = useGetApiAdminJobs({
   query: { refetchInterval: 30_000 },
 })
 
@@ -71,63 +75,91 @@ function togglePause(job: JobStatusDto) {
 </script>
 
 <template>
-  <BaseCard accent="#5d84a6">
-    <h2 class="font-display mb-1 text-2xl font-bold text-stone-800">Tâches planifiées</h2>
-    <p class="mb-5 text-sm text-stone-500">
-      État des synchronisations et autres tâches récurrentes du portail.
+  <BaseCard>
+    <h2 class="mb-1 font-display text-[22px] font-bold">Tâches planifiées</h2>
+    <p class="mb-5 text-sm text-ink-soft">
+      Les synchronisations et autres routines qui tournent pendant que tout le
+      monde dort.
     </p>
 
     <BaseSpinner v-if="isPending" />
     <p
       v-else-if="isError"
-      class="sketchy-sm border-2 border-dashed border-rose-300 bg-rose-50 p-4 text-sm text-rose-700"
+      class="rounded-card border-[1.5px] border-berry/30 bg-berry-soft p-4 text-sm text-berry"
     >
-      Impossible de récupérer l'état des tâches.
+      Impossible de récupérer l'état des tâches — on réessaie ?
     </p>
 
     <div v-else-if="jobs" class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead>
-          <tr class="border-b-2 border-dashed border-stone-300 text-xs uppercase tracking-wide text-stone-500">
-            <th class="py-2 pr-4 font-semibold">Tâche</th>
-            <th class="py-2 pr-4 font-semibold">Planification</th>
-            <th class="py-2 pr-4 font-semibold">Prochaine exécution</th>
-            <th class="py-2 pr-4 font-semibold">Dernière exécution</th>
-            <th class="py-2 font-semibold">Actions</th>
+          <tr
+            class="border-b-[1.5px] border-line text-xs font-bold tracking-[0.06em] text-mute uppercase"
+          >
+            <th class="py-2 pr-4">Tâche</th>
+            <th class="py-2 pr-4">Planification</th>
+            <th class="py-2 pr-4">Prochaine exécution</th>
+            <th class="py-2 pr-4">Dernière exécution</th>
+            <th class="py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="job in jobs"
             :key="job.identity"
-            class="border-b border-dashed border-stone-200 align-top last:border-none"
+            class="border-b border-line align-top last:border-none"
           >
             <td class="py-3 pr-4">
-              <p class="font-medium text-stone-800">{{ job.displayName ?? job.identity }}</p>
-              <p class="font-mono text-xs text-stone-400">{{ job.identity }}</p>
+              <p class="font-semibold text-ink">
+                {{ job.displayName ?? job.identity }}
+              </p>
+              <p class="font-mono text-xs text-mute">{{ job.identity }}</p>
             </td>
-            <td class="py-3 pr-4 font-mono text-xs text-stone-600">{{ job.schedule ?? '—' }}</td>
-            <td class="py-3 pr-4 text-stone-600">
+            <td class="py-3 pr-4 font-mono text-xs text-ink-soft">
+              {{ job.schedule ?? '—' }}
+            </td>
+            <td class="py-3 pr-4 text-ink-soft">
               <BaseBadge v-if="job.paused" color="amber">⏸ En pause</BaseBadge>
-              <template v-else>{{ job.nextFireTime ? formatDateTime(job.nextFireTime) : '—' }}</template>
+              <template v-else>{{
+                job.nextFireTime ? formatDateTime(job.nextFireTime) : '—'
+              }}</template>
             </td>
             <td class="py-3 pr-4">
               <template v-if="job.lastExecution">
                 <div class="flex flex-wrap items-center gap-2">
-                  <BaseBadge :color="job.lastExecution.status === 'SUCCESS' ? 'emerald' : 'rose'">
-                    {{ job.lastExecution.status === 'SUCCESS' ? '✓ Succès' : '✗ Échec' }}
+                  <BaseBadge
+                    :color="
+                      job.lastExecution.status === 'SUCCESS' ? 'sage' : 'berry'
+                    "
+                  >
+                    {{
+                      job.lastExecution.status === 'SUCCESS'
+                        ? '✓ Succès'
+                        : '✗ Échec'
+                    }}
                   </BaseBadge>
-                  <BaseBadge v-if="job.lastExecution.manual" color="violet">manuelle</BaseBadge>
-                  <span class="text-stone-600">{{ formatDateTime(job.lastExecution.runAt) }}</span>
-                  <span v-if="job.lastExecution.durationMs != null" class="text-xs text-stone-400">
-                    ({{ job.lastExecution.durationMs.toLocaleString('fr-FR') }} ms)
+                  <BaseBadge v-if="job.lastExecution.manual" color="dusk"
+                    >manuelle</BaseBadge
+                  >
+                  <span class="text-ink-soft">{{
+                    formatDateTime(job.lastExecution.runAt)
+                  }}</span>
+                  <span
+                    v-if="job.lastExecution.durationMs != null"
+                    class="font-mono text-xs text-mute"
+                  >
+                    ({{ job.lastExecution.durationMs.toLocaleString('fr-FR') }}
+                    ms)
                   </span>
                 </div>
-                <p v-if="job.lastExecution.error" class="mt-1 max-w-md text-xs text-rose-600">
+                <p
+                  v-if="job.lastExecution.error"
+                  class="mt-1 max-w-md font-mono text-xs text-berry"
+                >
                   {{ job.lastExecution.error }}
                 </p>
               </template>
-              <span v-else class="text-stone-400">Jamais exécutée</span>
+              <span v-else class="text-mute">Jamais exécutée</span>
             </td>
             <td class="py-3">
               <div class="flex gap-2">
