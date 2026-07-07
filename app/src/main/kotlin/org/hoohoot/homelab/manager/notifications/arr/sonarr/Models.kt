@@ -1,5 +1,19 @@
 package org.hoohoot.homelab.manager.notifications.arr.sonarr
 
+import org.hoohoot.homelab.manager.notifications.arr.HistoryQuality
+
+data class SonarrHistoryRecord(
+    val id: Long? = null,
+    val seriesId: Int? = null,
+    val episodeId: Int? = null,
+    val sourceTitle: String? = null,
+    val date: String? = null,
+    val eventType: String? = null,
+    val quality: HistoryQuality? = null,
+    val series: Series? = null,
+    val episode: Episode? = null
+)
+
 data class Episode(
     val seriesId: Int? = null,
     val tvdbId: Int? = null,

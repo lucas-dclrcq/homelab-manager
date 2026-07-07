@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/episodes/history"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "data": [
+        {
+          "seriesTitle": "The Bear",
+          "episodeTitle": "Violet",
+          "episode_number": "3x04",
+          "language": { "name": "French", "code2": "fr" },
+          "provider": "opensubtitles",
+          "action": 1,
+          "raw_timestamp": "2026-07-06T21:10:00Z",
+          "sonarrEpisodeId": 100
+        }
+      ]
+    }
+  }
+}

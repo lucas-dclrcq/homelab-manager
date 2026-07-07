@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/movies/history"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "data": [
+        {
+          "title": "Dune: Part Two",
+          "language": { "name": "French", "code2": "fr" },
+          "provider": "subdl",
+          "action": 4,
+          "raw_timestamp": "2026-07-05T20:20:00Z",
+          "radarrId": 5
+        }
+      ]
+    }
+  }
+}

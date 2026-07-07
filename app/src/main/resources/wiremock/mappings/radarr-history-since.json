@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/history/since",
+    "queryParameters": {
+      "includeMovie": { "equalTo": "true" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "id": 1001,
+        "movieId": 5,
+        "eventType": "downloadFolderImported",
+        "date": "2026-07-05T20:14:00Z",
+        "quality": { "quality": { "name": "WEBDL-1080p" } },
+        "movie": { "id": 5, "title": "Dune: Part Two", "year": 2024 }
+      },
+      {
+        "id": 1002,
+        "movieId": 6,
+        "eventType": "downloadFolderImported",
+        "date": "2026-07-03T09:30:00Z",
+        "quality": { "quality": { "name": "Bluray-2160p" } },
+        "movie": { "id": 6, "title": "The Substance", "year": 2024 }
+      }
+    ]
+  }
+}

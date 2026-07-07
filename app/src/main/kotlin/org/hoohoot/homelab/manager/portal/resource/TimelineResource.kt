@@ -7,7 +7,8 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.portal.persistence.HomelabEventRepository
+import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
+import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadRepository
 import java.time.LocalDateTime
 
 data class TimelineEventDto(
@@ -29,7 +30,7 @@ data class TimelinePageDto(
 @Path("/api/timeline")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "Portal")
-class TimelineResource(private val eventRepository: HomelabEventRepository) {
+class TimelineResource(private val mediaDownloadRepository: MediaDownloadRepository) {
 
     @GET
     suspend fun getTimeline(
@@ -38,22 +39,35 @@ class TimelineResource(private val eventRepository: HomelabEventRepository) {
     ): TimelinePageDto {
         val sanitizedPage = page.coerceAtLeast(0)
         val sanitizedPageSize = pageSize.coerceIn(1, 100)
-        val eventPage = eventRepository.findPage(sanitizedPage, sanitizedPageSize)
-        val totalPages = ((eventPage.totalCount + sanitizedPageSize - 1) / sanitizedPageSize).toInt()
+        val downloadPage = mediaDownloadRepository.findPage(sanitizedPage, sanitizedPageSize)
+        val totalPages = ((downloadPage.totalCount + sanitizedPageSize - 1) / sanitizedPageSize).toInt()
         return TimelinePageDto(
-            items = eventPage.items.map {
-                TimelineEventDto(
-                    id = it.id!!,
-                    eventType = it.eventType,
-                    title = it.title,
-                    details = it.details.orEmpty(),
-                    occurredAt = it.occurredAt,
-                )
-            },
+            items = downloadPage.items.map { it.toTimelineEvent() },
             page = sanitizedPage,
             pageSize = sanitizedPageSize,
             totalPages = totalPages,
-            totalCount = eventPage.totalCount,
+            totalCount = downloadPage.totalCount,
         )
     }
+
+    private fun MediaDownloadEntity.toTimelineEvent() = TimelineEventDto(
+        id = id!!,
+        eventType = when (mediaType) {
+            MediaDownloadEntity.MEDIA_TYPE_MOVIE -> "movie_downloaded"
+            MediaDownloadEntity.MEDIA_TYPE_EPISODE -> "episode_downloaded"
+            MediaDownloadEntity.MEDIA_TYPE_ALBUM -> "album_downloaded"
+            else -> "subtitles_downloaded"
+        },
+        title = title,
+        details = buildMap {
+            quality?.let { put("quality", it) }
+            seasonNumber?.let { put("seasonNumber", it.toString()) }
+            episodeNumber?.let { put("episodeNumber", it.toString()) }
+            episodeTitle?.let { put("episodeTitle", it) }
+            language?.let { put("language", it) }
+            provider?.let { put("provider", it) }
+            artist?.let { put("artist", it) }
+        },
+        occurredAt = downloadedAt,
+    )
 }

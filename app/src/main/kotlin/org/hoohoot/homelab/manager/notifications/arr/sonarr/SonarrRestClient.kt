@@ -30,6 +30,14 @@ interface SonarrRestClient {
     suspend fun getSeries(): List<Series>?
 
     @GET
+    @Path("/history/since")
+    suspend fun getHistorySince(
+        @QueryParam("date") date: String,
+        @QueryParam("includeSeries") includeSeries: Boolean,
+        @QueryParam("includeEpisode") includeEpisode: Boolean,
+    ): List<SonarrHistoryRecord>?
+
+    @GET
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
 }

@@ -23,6 +23,14 @@ interface LidarrRestClient {
         @QueryParam("end") end: String?,
         @QueryParam("includeArtist") includeArtist: Boolean?
     ): List<LidarrAlbum>?
+
+    @GET
+    @Path("/history/since")
+    suspend fun getHistorySince(
+        @QueryParam("date") date: String,
+        @QueryParam("includeAlbum") includeAlbum: Boolean,
+        @QueryParam("includeArtist") includeArtist: Boolean,
+    ): List<LidarrHistoryRecord>?
 }
 
 suspend fun LidarrRestClient.getAlbumCalendar(start: Instant, end: Instant): List<LidarrAlbum> =

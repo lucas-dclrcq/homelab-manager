@@ -29,6 +29,13 @@ interface RadarrRestClient {
     suspend fun getMovies(): List<RadarrMovie>?
 
     @GET
+    @Path("/history/since")
+    suspend fun getHistorySince(
+        @QueryParam("date") date: String,
+        @QueryParam("includeMovie") includeMovie: Boolean,
+    ): List<RadarrHistoryRecord>?
+
+    @GET
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
 }

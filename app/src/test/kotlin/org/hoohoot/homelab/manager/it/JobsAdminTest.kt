@@ -56,7 +56,16 @@ internal class JobsAdminTest {
         val jobs = listJobs()
 
         val identities = jobs.getList<String>("identity")
-        assertThat(identities).contains("radarr-sync", "sonarr-sync", "notification-cleanup", "weekly-report")
+        assertThat(identities).contains(
+            "radarr-sync",
+            "sonarr-sync",
+            "notification-cleanup",
+            "weekly-report",
+            "radarr-downloads-sync",
+            "sonarr-downloads-sync",
+            "lidarr-downloads-sync",
+            "bazarr-downloads-sync",
+        )
 
         val radarrSync = job(jobs, "radarr-sync")!!
         assertThat(radarrSync["displayName"]).isEqualTo("Synchronisation des stats Radarr")

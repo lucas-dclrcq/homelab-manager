@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v1/history/since"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "id": 3001,
+        "albumId": 20,
+        "artistId": 30,
+        "eventType": "downloadImported",
+        "date": "2026-07-04T14:12:00Z",
+        "quality": { "quality": { "name": "FLAC" } },
+        "album": { "id": 20, "title": "Random Access Memories" },
+        "artist": { "id": 30, "artistName": "Daft Punk" }
+      }
+    ]
+  }
+}

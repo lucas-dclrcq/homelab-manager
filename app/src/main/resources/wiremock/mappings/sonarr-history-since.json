@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/history/since",
+    "queryParameters": {
+      "includeSeries": { "equalTo": "true" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "id": 2001,
+        "seriesId": 10,
+        "episodeId": 100,
+        "eventType": "downloadFolderImported",
+        "date": "2026-07-06T21:02:00Z",
+        "quality": { "quality": { "name": "WEBDL-720p" } },
+        "series": { "id": 10, "title": "The Bear" },
+        "episode": { "id": 100, "seasonNumber": 3, "episodeNumber": 4, "title": "Violet" }
+      },
+      {
+        "id": 2002,
+        "seriesId": 11,
+        "episodeId": 101,
+        "eventType": "downloadFolderImported",
+        "date": "2026-07-04T18:45:00Z",
+        "quality": { "quality": { "name": "WEBDL-1080p" } },
+        "series": { "id": 11, "title": "Severance" },
+        "episode": { "id": 101, "seasonNumber": 2, "episodeNumber": 7, "title": "Chikhai Bardo" }
+      }
+    ]
+  }
+}

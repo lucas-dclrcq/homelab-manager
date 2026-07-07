@@ -26,6 +26,7 @@ const eventPresentation: Record<string, { icon: string; accent: string; label: s
   movie_downloaded: { icon: '🎬', accent: '#c1663f', label: 'Film téléchargé' },
   episode_downloaded: { icon: '📺', accent: '#5d84a6', label: 'Épisode téléchargé' },
   subtitles_downloaded: { icon: '💬', accent: '#c99a2e', label: 'Sous-titres téléchargés' },
+  album_downloaded: { icon: '🎵', accent: '#7a9a65', label: 'Album téléchargé' },
 }
 
 function presentationFor(event: TimelineEventDto) {
@@ -40,6 +41,7 @@ function detailsFor(event: TimelineEventDto): string {
     const episode = String(details.episodeNumber).padStart(2, '0')
     parts.push(`S${season}E${episode}${details.episodeTitle ? ` – ${details.episodeTitle}` : ''}`)
   }
+  if (details.artist) parts.push(details.artist)
   if (details.language) parts.push(details.language)
   if (details.provider) parts.push(details.provider)
   if (details.episodeInfo) parts.push(details.episodeInfo)

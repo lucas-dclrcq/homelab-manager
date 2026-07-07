@@ -21,8 +21,6 @@ import org.hoohoot.homelab.manager.notifications.year
 import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
-import org.hoohoot.homelab.manager.portal.HomelabEventRecorder
-import org.hoohoot.homelab.manager.portal.HomelabEventTypes
 
 @Path("/api/notifications/radarr")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +30,6 @@ class RadarrResource(
     private val matrixClient: MatrixClientServerApiClient,
     private val roomProvider: MatrixRoomProvider,
     private val notificationRepo: NotificationSentRepository,
-    private val eventRecorder: HomelabEventRecorder,
 ) {
 
     @POST
@@ -59,12 +56,6 @@ class RadarrResource(
             val key = if (title != null && year != null) mediaKey(title, year.toString()) else null
             notificationRepo.saveOrUpdateThread(movieId, "movie", key, sentId)
         }
-
-        eventRecorder.record(
-            HomelabEventTypes.MOVIE_DOWNLOADED,
-            "${payload.title()} (${payload.year()})",
-            mapOf("quality" to payload.quality())
-        )
 
         return Response.noContent().build()
     }
