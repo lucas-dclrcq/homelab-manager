@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,6 +19,9 @@ internal class BotCommandsTest {
     @Inject
     lateinit var wireMock: WireMock
 
+    @ConfigProperty(name = "matrix.bot.prefix")
+    lateinit var botPrefix: String
+
     private lateinit var roomId: String
 
     @BeforeEach
@@ -29,7 +33,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `ping command should respond with Pong`() {
-        synapseTestClient.sendMessage(roomId, "!bot ping")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix ping")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         assertThat(response.get("body").asText()).isEqualTo("Pong!")
@@ -40,7 +44,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `help command should list available commands`() {
-        synapseTestClient.sendMessage(roomId, "!bot help")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix help")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -54,7 +58,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong believer should respond with patience message`() {
-        synapseTestClient.sendMessage(roomId, "!bot skong believer")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix skong believer")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -63,7 +67,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong doubter should respond with days count`() {
-        synapseTestClient.sendMessage(roomId, "!bot skong doubter")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix skong doubter")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -73,7 +77,7 @@ internal class BotCommandsTest {
 
     @Test
     fun `skong invalid parameter should respond with error`() {
-        synapseTestClient.sendMessage(roomId, "!bot skong invalid")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix skong invalid")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -85,7 +89,7 @@ internal class BotCommandsTest {
         stubJellyfinSearch()
         stubJellystatItemHistory()
 
-        synapseTestClient.sendMessage(roomId, "!bot who-watched Breaking Bad")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix who-watched Breaking Bad")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -100,7 +104,7 @@ internal class BotCommandsTest {
         stubJellystatMostViewed("Series", """[{"Plays": "10", "total_playback_duration": "36000", "Name": "The Bear"}]""")
         stubJellystatMostViewed("Movie", """[{"Plays": "8", "total_playback_duration": "18000", "Name": "Dune"}]""")
 
-        synapseTestClient.sendMessage(roomId, "!bot top-watched last-week")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix top-watched last-week")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
@@ -112,7 +116,7 @@ internal class BotCommandsTest {
     fun `top-watchers should return top watchers list`() {
         stubJellystatUserActivity()
 
-        synapseTestClient.sendMessage(roomId, "!bot top-watchers")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix top-watchers")
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
