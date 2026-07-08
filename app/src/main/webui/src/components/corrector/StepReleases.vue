@@ -114,10 +114,12 @@ function grabRelease(release: CorrectorReleaseDto) {
           v-for="release in visibleReleases"
           :key="release.guid"
           class="rounded-card border-[1.5px] border-line bg-white p-4"
-          :class="{ 'opacity-60': release.rejected }"
         >
           <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0 flex-1">
+            <div
+              class="min-w-0 flex-1"
+              :class="{ 'opacity-60': release.rejected }"
+            >
               <p class="font-mono text-[13px] break-all text-ink">
                 {{ release.title }}
               </p>
@@ -146,13 +148,13 @@ function grabRelease(release: CorrectorReleaseDto) {
               </p>
             </div>
             <BaseButton
-              v-if="!release.rejected"
+              :variant="release.rejected ? 'danger' : 'primary'"
               :loading="isGrabbing && grabbingGuid === release.guid"
               :disabled="isGrabbing"
               @click="grabRelease(release)"
             >
               <UiIcon name="download" class="size-4" />
-              Télécharger
+              {{ release.rejected ? 'Forcer' : 'Télécharger' }}
             </BaseButton>
           </div>
         </li>
