@@ -184,11 +184,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-scheduler</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-mutiny-vertx-web-client</artifactId>
-            <version>3.19.0</version>
-        </dependency>
 
         <!-- DevServices (dev mode only) -->
         <dependency>
