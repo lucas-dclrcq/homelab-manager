@@ -15,7 +15,7 @@ import io.restassured.path.json.JsonPath
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
+import org.hoohoot.homelab.manager.library.infra.MediaDownloadEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant

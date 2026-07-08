@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.resource
+package org.hoohoot.homelab.manager.jobsadmin.api
 
 import io.quarkus.scheduler.Scheduler
 import jakarta.annotation.security.RolesAllowed
@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.jobs.JobRunner
+import org.hoohoot.homelab.manager.shared.api.notFound
 import org.hoohoot.homelab.manager.jobs.JobExecutionEntity
 import org.hoohoot.homelab.manager.jobs.JobExecutionRepository
 import java.time.Instant
@@ -67,7 +68,7 @@ class JobsResource(
     @POST
     @Path("/{identity}/run")
     suspend fun runJob(@PathParam("identity") identity: String): Response {
-        val job = jobRunner.find(identity) ?: return notFound(identity)
+        val job = jobRunner.find(identity) ?: return notFound("unknown job '$identity'")
         val result = jobRunner.runNow(job)
         return Response.ok(
             JobExecutionDto(
@@ -83,7 +84,7 @@ class JobsResource(
     @POST
     @Path("/{identity}/pause")
     fun pauseJob(@PathParam("identity") identity: String): Response {
-        if (!isScheduled(identity)) return notFound(identity)
+        if (!isScheduled(identity)) return notFound("unknown job '$identity'")
         scheduler.pause(identity)
         return Response.noContent().build()
     }
@@ -91,15 +92,12 @@ class JobsResource(
     @POST
     @Path("/{identity}/resume")
     fun resumeJob(@PathParam("identity") identity: String): Response {
-        if (!isScheduled(identity)) return notFound(identity)
+        if (!isScheduled(identity)) return notFound("unknown job '$identity'")
         scheduler.resume(identity)
         return Response.noContent().build()
     }
 
     private fun isScheduled(identity: String) = scheduler.scheduledJobs.any { it.id == identity }
-
-    private fun notFound(identity: String) =
-        Response.status(Response.Status.NOT_FOUND).entity(mapOf("error" to "unknown job '$identity'")).build()
 
     private fun Instant.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this, ZoneId.systemDefault())
 

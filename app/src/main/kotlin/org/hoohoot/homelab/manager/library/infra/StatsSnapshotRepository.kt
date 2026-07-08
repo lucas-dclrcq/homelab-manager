@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.persistence
+package org.hoohoot.homelab.manager.library.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending

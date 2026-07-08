@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.stats
+package org.hoohoot.homelab.manager.library.infra
 
 import jakarta.enterprise.context.ApplicationScoped
 import kotlinx.coroutines.async
@@ -6,7 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.portal.persistence.DiskUsage
+import org.hoohoot.homelab.manager.library.infra.DiskUsage
 
 const val SOURCE_RADARR = "radarr"
 const val SOURCE_SONARR = "sonarr"

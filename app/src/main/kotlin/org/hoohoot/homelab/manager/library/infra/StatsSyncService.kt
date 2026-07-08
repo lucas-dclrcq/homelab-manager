@@ -1,11 +1,11 @@
-package org.hoohoot.homelab.manager.portal.stats
+package org.hoohoot.homelab.manager.library.infra
 
 import jakarta.enterprise.context.ApplicationScoped
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.hoohoot.homelab.manager.portal.persistence.DiskUsage
-import org.hoohoot.homelab.manager.portal.persistence.StatsSnapshotEntity
-import org.hoohoot.homelab.manager.portal.persistence.StatsSnapshotRepository
+import org.hoohoot.homelab.manager.library.infra.DiskUsage
+import org.hoohoot.homelab.manager.library.infra.StatsSnapshotEntity
+import org.hoohoot.homelab.manager.library.infra.StatsSnapshotRepository
 
 @ApplicationScoped
 class StatsSyncService(

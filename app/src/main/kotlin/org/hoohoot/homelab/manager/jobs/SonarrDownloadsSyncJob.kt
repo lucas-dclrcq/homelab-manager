@@ -5,7 +5,7 @@ import io.quarkus.scheduler.Scheduled
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.context.control.ActivateRequestContext
 import org.eclipse.microprofile.config.inject.ConfigProperty
-import org.hoohoot.homelab.manager.portal.downloads.DownloadsSyncService
+import org.hoohoot.homelab.manager.library.infra.DownloadsSyncService
 
 @ApplicationScoped
 class SonarrDownloadsSyncJob(

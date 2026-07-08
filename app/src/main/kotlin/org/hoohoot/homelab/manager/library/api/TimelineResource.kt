@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.resource
+package org.hoohoot.homelab.manager.library.api
 
 import jakarta.ws.rs.DefaultValue
 import jakarta.ws.rs.GET
@@ -7,8 +7,8 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
-import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadRepository
+import org.hoohoot.homelab.manager.library.infra.MediaDownloadEntity
+import org.hoohoot.homelab.manager.library.infra.MediaDownloadRepository
 import java.time.LocalDateTime
 
 data class TimelineEventDto(

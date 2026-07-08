@@ -13,8 +13,8 @@ import io.restassured.RestAssured
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.persistence.StatsSnapshotEntity
-import org.hoohoot.homelab.manager.portal.resource.StatsResource
+import org.hoohoot.homelab.manager.library.infra.StatsSnapshotEntity
+import org.hoohoot.homelab.manager.library.api.StatsResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
