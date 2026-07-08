@@ -3,3 +3,7 @@
 !app/target/*-runner.jar
 !app/target/lib/*
 !app/target/quarkus-app/*
+!operator/target/*-runner
+!operator/target/*-runner.jar
+!operator/target/lib/*
+!operator/target/quarkus-app/*
