@@ -1,32 +1,33 @@
-package org.hoohoot.homelab.manager.portal.persistence
+package org.hoohoot.homelab.manager.corrector.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
+import org.hoohoot.homelab.manager.corrector.domain.ports.CorrectorWorkflows
 import java.time.LocalDateTime
 import java.util.UUID
 
 @ApplicationScoped
-class CorrectorWorkflowRepository {
+class CorrectorWorkflowRepository : CorrectorWorkflows {
 
-    suspend fun listForUser(username: String): List<CorrectorWorkflowEntity> =
+    override suspend fun listForUser(username: String): List<CorrectorWorkflowEntity> =
         Panache.withSession {
             CorrectorWorkflowEntity
                 .list("username = ?1", Sort.descending("updatedAt"), username)
         }.awaitSuspending()
 
-    suspend fun findForUser(id: UUID, username: String): CorrectorWorkflowEntity? =
+    override suspend fun findForUser(id: UUID, username: String): CorrectorWorkflowEntity? =
         Panache.withSession {
             CorrectorWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
         }.awaitSuspending()
 
-    suspend fun save(entity: CorrectorWorkflowEntity): CorrectorWorkflowEntity =
+    override suspend fun save(entity: CorrectorWorkflowEntity): CorrectorWorkflowEntity =
         Panache.withTransaction {
             entity.persist<CorrectorWorkflowEntity>()
         }.awaitSuspending()
 
-    suspend fun update(id: UUID, username: String, mutate: (CorrectorWorkflowEntity) -> Unit): CorrectorWorkflowEntity? =
+    override suspend fun update(id: UUID, username: String, mutate: (CorrectorWorkflowEntity) -> Unit): CorrectorWorkflowEntity? =
         Panache.withTransaction {
             CorrectorWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
                 .invoke { entity ->
@@ -38,7 +39,7 @@ class CorrectorWorkflowRepository {
         }.awaitSuspending()
 
     // Complète les workflows en attente dont le film vient d'être importé après le grab. Idempotent.
-    suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int {
+    override suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int {
         if (movieIdToImportedAt.isEmpty()) return 0
         return Panache.withTransaction {
             CorrectorWorkflowEntity

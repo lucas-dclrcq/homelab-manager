@@ -18,7 +18,7 @@ import io.restassured.path.json.JsonPath
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.persistence.CorrectorWorkflowEntity
+import org.hoohoot.homelab.manager.corrector.infra.CorrectorWorkflowEntity
 import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -339,6 +339,28 @@ internal class CorrectorTest {
         RestAssured.given().contentType(ContentType.JSON).body("""{"guid": "release-multi", "indexerId": 1}""")
             .`when`().post("/api/corrector/workflows/$id/grab")
             .then().statusCode(Response.Status.CONFLICT.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `selecting a movie without radarrMovieId is rejected`() {
+        val id = createWorkflow().getString("id")
+
+        RestAssured.given().contentType(ContentType.JSON).body("""{}""")
+            .`when`().post("/api/corrector/workflows/$id/movie")
+            .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `grabbing without a guid is rejected`() {
+        val id = createWorkflow().getString("id")
+        selectMovie(id)
+        selectProblem(id)
+
+        RestAssured.given().contentType(ContentType.JSON).body("""{"indexerId": 1}""")
+            .`when`().post("/api/corrector/workflows/$id/grab")
+            .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
 
     @Test

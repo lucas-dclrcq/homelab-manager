@@ -10,7 +10,7 @@ import org.hoohoot.homelab.manager.shared.arr.bazarr.BazarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.portal.corrector.CorrectorCompletionService
+import org.hoohoot.homelab.manager.corrector.domain.usecases.CompleteAwaitingWorkflows
 import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
 import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadRepository
 import java.time.Instant
@@ -26,7 +26,7 @@ class DownloadsSyncService(
     @param:RestClient private val bazarrRestClient: BazarrRestClient,
     @param:RestClient private val lidarrRestClient: LidarrRestClient,
     private val mediaDownloadRepository: MediaDownloadRepository,
-    private val correctorCompletionService: CorrectorCompletionService,
+    private val completeAwaitingWorkflows: CompleteAwaitingWorkflows,
     @param:ConfigProperty(name = "downloads-sync.backfill-days") private val backfillDays: Long,
     @param:ConfigProperty(name = "downloads-sync.bazarr.page-length") private val bazarrPageLength: Int,
 ) {
@@ -74,7 +74,7 @@ class DownloadsSyncService(
             }
             .groupBy({ it.first }, { it.second })
             .mapValues { (_, dates) -> dates.max() }
-        correctorCompletionService.completeAwaitingMovieWorkflows(importsByMovie)
+        completeAwaitingWorkflows(importsByMovie)
     }
 
     suspend fun syncSonarr() {

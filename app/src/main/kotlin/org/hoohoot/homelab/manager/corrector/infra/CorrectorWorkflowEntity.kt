@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.persistence
+package org.hoohoot.homelab.manager.corrector.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanionBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
