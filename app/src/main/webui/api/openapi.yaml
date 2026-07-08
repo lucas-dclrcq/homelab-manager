@@ -22,6 +22,8 @@ components:
       - url
       - requiresVpn
       - hasLogo
+      - managedBy
+      - externalId
       - updatedAt
       properties:
         id:
@@ -38,6 +40,14 @@ components:
           type: boolean
         hasLogo:
           type: boolean
+        managedBy:
+          type:
+          - string
+          - "null"
+        externalId:
+          type:
+          - string
+          - "null"
         updatedAt:
           anyOf:
           - $ref: "#/components/schemas/LocalDateTime"
@@ -844,6 +854,8 @@ paths:
               - description
               - url
               - requiresVpn
+              - managedBy
+              - externalId
               - logo
               properties:
                 name:
@@ -864,6 +876,14 @@ paths:
                   - "null"
                 requiresVpn:
                   type: boolean
+                managedBy:
+                  type:
+                  - string
+                  - "null"
+                externalId:
+                  type:
+                  - string
+                  - "null"
                 logo:
                   type:
                   - string
@@ -884,6 +904,7 @@ paths:
       security:
       - SecurityScheme:
         - admin
+        - operator
   /api/applications/{id}:
     put:
       tags:
@@ -905,6 +926,8 @@ paths:
               - description
               - url
               - requiresVpn
+              - managedBy
+              - externalId
               - logo
               properties:
                 name:
@@ -925,6 +948,14 @@ paths:
                   - "null"
                 requiresVpn:
                   type: boolean
+                managedBy:
+                  type:
+                  - string
+                  - "null"
+                externalId:
+                  type:
+                  - string
+                  - "null"
                 logo:
                   type:
                   - string
@@ -945,6 +976,7 @@ paths:
       security:
       - SecurityScheme:
         - admin
+        - operator
     delete:
       tags:
       - Portal
@@ -968,6 +1000,7 @@ paths:
       security:
       - SecurityScheme:
         - admin
+        - operator
   /api/applications/{id}/logo:
     get:
       tags:
@@ -1331,7 +1364,7 @@ paths:
                 $ref: "#/components/schemas/TimelinePageDto"
       summary: Get Timeline
 servers:
-- url: http://localhost:8080
+- url: http://localhost:8088
   description: Auto generated value
-- url: http://0.0.0.0:8080
+- url: http://0.0.0.0:8088
   description: Auto generated value

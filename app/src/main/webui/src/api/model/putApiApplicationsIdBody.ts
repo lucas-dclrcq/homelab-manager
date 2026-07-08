@@ -8,6 +8,8 @@ import type { PutApiApplicationsIdBodyName } from "./putApiApplicationsIdBodyNam
 import type { PutApiApplicationsIdBodyCategory } from "./putApiApplicationsIdBodyCategory";
 import type { PutApiApplicationsIdBodyDescription } from "./putApiApplicationsIdBodyDescription";
 import type { PutApiApplicationsIdBodyUrl } from "./putApiApplicationsIdBodyUrl";
+import type { PutApiApplicationsIdBodyManagedBy } from "./putApiApplicationsIdBodyManagedBy";
+import type { PutApiApplicationsIdBodyExternalId } from "./putApiApplicationsIdBodyExternalId";
 import type { PutApiApplicationsIdBodyLogo } from "./putApiApplicationsIdBodyLogo";
 
 export type PutApiApplicationsIdBody = {
@@ -16,5 +18,7 @@ export type PutApiApplicationsIdBody = {
   description: PutApiApplicationsIdBodyDescription;
   url: PutApiApplicationsIdBodyUrl;
   requiresVpn: boolean;
+  managedBy: PutApiApplicationsIdBodyManagedBy;
+  externalId: PutApiApplicationsIdBodyExternalId;
   logo: PutApiApplicationsIdBodyLogo;
 };

@@ -5,6 +5,8 @@
  * OpenAPI spec version: 0.0.1
  */
 import type { Uuid } from "./uuid";
+import type { ApplicationDtoManagedBy } from "./applicationDtoManagedBy";
+import type { ApplicationDtoExternalId } from "./applicationDtoExternalId";
 import type { ApplicationDtoUpdatedAt } from "./applicationDtoUpdatedAt";
 
 export interface ApplicationDto {
@@ -15,5 +17,7 @@ export interface ApplicationDto {
   url: string;
   requiresVpn: boolean;
   hasLogo: boolean;
+  managedBy: ApplicationDtoManagedBy;
+  externalId: ApplicationDtoExternalId;
   updatedAt: ApplicationDtoUpdatedAt;
 }

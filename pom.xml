@@ -9,6 +9,7 @@
     <modules>
         <module>synapse-devservice</module>
         <module>app</module>
+        <module>operator</module>
     </modules>
 
     <properties>

@@ -36,6 +36,12 @@ class ApplicationEntity : PanacheEntityBase {
     @Column(name = "logo_content_type")
     var logoContentType: String? = null
 
+    @Column(name = "managed_by")
+    var managedBy: String? = null
+
+    @Column(name = "external_id")
+    var externalId: String? = null
+
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: LocalDateTime
 

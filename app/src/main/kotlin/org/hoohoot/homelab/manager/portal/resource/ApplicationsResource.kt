@@ -29,6 +29,8 @@ data class ApplicationDto(
     val url: String,
     val requiresVpn: Boolean,
     val hasLogo: Boolean,
+    val managedBy: String?,
+    val externalId: String?,
     val updatedAt: LocalDateTime?,
 )
 
@@ -46,11 +48,11 @@ class ApplicationsResource(
     @GET
     suspend fun listApplications(): List<ApplicationDto> =
         applicationRepository.listSummaries().map {
-            ApplicationDto(it.id, it.name, it.category, it.description, it.url, it.requiresVpn, it.hasLogo, it.updatedAt)
+            ApplicationDto(it.id, it.name, it.category, it.description, it.url, it.requiresVpn, it.hasLogo, it.managedBy, it.externalId, it.updatedAt)
         }
 
     @POST
-    @RolesAllowed("admin")
+    @RolesAllowed("admin", "operator")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     suspend fun createApplication(
         @RestForm name: String?,
@@ -58,6 +60,8 @@ class ApplicationsResource(
         @RestForm description: String?,
         @RestForm url: String?,
         @RestForm requiresVpn: Boolean,
+        @RestForm managedBy: String?,
+        @RestForm externalId: String?,
         @RestForm("logo") logo: FileUpload?,
     ): Response {
         if (name.isNullOrBlank() || category.isNullOrBlank() || description.isNullOrBlank() || url.isNullOrBlank()) {
@@ -74,6 +78,8 @@ class ApplicationsResource(
         entity.description = description.trim()
         entity.url = url.trim()
         entity.requiresVpn = requiresVpn
+        entity.managedBy = managedBy?.trim()?.takeIf { it.isNotEmpty() }
+        entity.externalId = externalId?.trim()?.takeIf { it.isNotEmpty() }
         entity.logo = logoBytes
         entity.logoContentType = if (logoBytes != null) logo?.contentType() else null
         entity.createdAt = LocalDateTime.now()
@@ -85,7 +91,7 @@ class ApplicationsResource(
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed("admin")
+    @RolesAllowed("admin", "operator")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     suspend fun updateApplication(
         @PathParam("id") id: UUID,
@@ -94,6 +100,8 @@ class ApplicationsResource(
         @RestForm description: String?,
         @RestForm url: String?,
         @RestForm requiresVpn: Boolean,
+        @RestForm managedBy: String?,
+        @RestForm externalId: String?,
         @RestForm("logo") logo: FileUpload?,
     ): Response {
         if (name.isNullOrBlank() || category.isNullOrBlank() || description.isNullOrBlank() || url.isNullOrBlank()) {
@@ -109,6 +117,9 @@ class ApplicationsResource(
             entity.description = description.trim()
             entity.url = url.trim()
             entity.requiresVpn = requiresVpn
+            // Champs absents du formulaire (admin UI) : on conserve les valeurs existantes
+            managedBy?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.managedBy = it }
+            externalId?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.externalId = it }
             if (logoBytes != null) {
                 entity.logo = logoBytes
                 entity.logoContentType = logo!!.contentType()
@@ -121,7 +132,7 @@ class ApplicationsResource(
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed("admin")
+    @RolesAllowed("admin", "operator")
     suspend fun deleteApplication(@PathParam("id") id: UUID): Response =
         if (applicationRepository.delete(id)) {
             Response.noContent().build()
@@ -158,7 +169,7 @@ class ApplicationsResource(
     }
 
     private fun ApplicationEntity.toDto() =
-        ApplicationDto(id!!, name, category, description, url, requiresVpn, logo != null, updatedAt)
+        ApplicationDto(id!!, name, category, description, url, requiresVpn, logo != null, managedBy, externalId, updatedAt)
 
     private fun badRequest(message: String) =
         Response.status(Response.Status.BAD_REQUEST).entity(mapOf("error" to message)).build()

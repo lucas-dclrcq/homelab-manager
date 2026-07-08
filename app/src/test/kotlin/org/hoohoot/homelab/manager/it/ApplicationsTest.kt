@@ -270,4 +270,99 @@ internal class ApplicationsTest {
             .`when`().get()
             .then().statusCode(Response.Status.UNAUTHORIZED.statusCode)
     }
+
+    @Test
+    @TestSecurity(user = "operator-sa", roles = ["operator"])
+    fun `operator can create a managed application and its managed fields round-trip`() {
+        val id = RestAssured.given()
+            .multiPart("name", "Jellyseerr")
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "Managed by homelab-manager-operator")
+            .multiPart("url", "https://jellyseerr.example.org")
+            .multiPart("requiresVpn", "false")
+            .multiPart("managedBy", "operator")
+            .multiPart("externalId", "default/jellyseerr")
+            .`when`().post()
+            .then().statusCode(Response.Status.CREATED.statusCode)
+            .extract().jsonPath().getString("id")
+
+        val applications = RestAssured.given()
+            .`when`().get()
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        val created = applications.getList<Map<String, Any>>("").first { it["id"] == id }
+        assertThat(created["managedBy"]).isEqualTo("operator")
+        assertThat(created["externalId"]).isEqualTo("default/jellyseerr")
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `application created without managed fields has null managed fields`() {
+        val id = createApplication("Homarr")
+
+        val applications = RestAssured.given()
+            .`when`().get()
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        val created = applications.getList<Map<String, Any>>("").first { it["id"] == id }
+        assertThat(created["managedBy"]).isNull()
+        assertThat(created["externalId"]).isNull()
+    }
+
+    @Test
+    @TestSecurity(user = "operator-sa", roles = ["operator"])
+    fun `updating without managed fields keeps the existing managed fields`() {
+        val id = RestAssured.given()
+            .multiPart("name", "Radarr")
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "Managed by homelab-manager-operator")
+            .multiPart("url", "https://radarr.example.org")
+            .multiPart("requiresVpn", "true")
+            .multiPart("managedBy", "operator")
+            .multiPart("externalId", "default/radarr")
+            .`when`().post()
+            .then().statusCode(Response.Status.CREATED.statusCode)
+            .extract().jsonPath().getString("id")
+
+        // Simule une édition depuis l'admin UI, qui n'envoie pas les champs managed
+        RestAssured.given()
+            .multiPart("name", "Radarr Films")
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "Gestion des films")
+            .multiPart("url", "https://radarr.example.org")
+            .multiPart("requiresVpn", "true")
+            .`when`().put("/{id}", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+
+        val applications = RestAssured.given()
+            .`when`().get()
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        val updated = applications.getList<Map<String, Any>>("").first { it["id"] == id }
+        assertThat(updated["name"]).isEqualTo("Radarr Films")
+        assertThat(updated["managedBy"]).isEqualTo("operator")
+        assertThat(updated["externalId"]).isEqualTo("default/radarr")
+    }
+
+    @Test
+    @TestSecurity(user = "operator-sa", roles = ["operator"])
+    fun `operator can update and delete an application`() {
+        val id = createApplication("Sonarr")
+
+        RestAssured.given()
+            .multiPart("name", "Sonarr")
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "Séries")
+            .multiPart("url", "https://sonarr.example.org")
+            .multiPart("requiresVpn", "true")
+            .`when`().put("/{id}", id)
+            .then().statusCode(Response.Status.OK.statusCode)
+
+        RestAssured.given()
+            .`when`().delete("/{id}", id)
+            .then().statusCode(Response.Status.NO_CONTENT.statusCode)
+    }
 }

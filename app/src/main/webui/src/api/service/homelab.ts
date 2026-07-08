@@ -514,6 +514,12 @@ export const postApiApplications = (
     "requiresVpn",
     postApiApplicationsBody.requiresVpn.toString(),
   );
+  if (postApiApplicationsBody.managedBy !== null) {
+    formData.append("managedBy", postApiApplicationsBody.managedBy);
+  }
+  if (postApiApplicationsBody.externalId !== null) {
+    formData.append("externalId", postApiApplicationsBody.externalId);
+  }
   if (postApiApplicationsBody.logo !== null) {
     formData.append("logo", postApiApplicationsBody.logo);
   }
@@ -626,6 +632,12 @@ export const putApiApplicationsId = (
     "requiresVpn",
     putApiApplicationsIdBody.requiresVpn.toString(),
   );
+  if (putApiApplicationsIdBody.managedBy !== null) {
+    formData.append("managedBy", putApiApplicationsIdBody.managedBy);
+  }
+  if (putApiApplicationsIdBody.externalId !== null) {
+    formData.append("externalId", putApiApplicationsIdBody.externalId);
+  }
   if (putApiApplicationsIdBody.logo !== null) {
     formData.append("logo", putApiApplicationsIdBody.logo);
   }

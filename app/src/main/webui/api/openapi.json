@@ -19,7 +19,7 @@
     "schemas" : {
       "ApplicationDto" : {
         "type" : "object",
-        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "updatedAt" ],
+        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "managedBy", "externalId", "updatedAt" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -41,6 +41,12 @@
           },
           "hasLogo" : {
             "type" : "boolean"
+          },
+          "managedBy" : {
+            "type" : [ "string", "null" ]
+          },
+          "externalId" : {
+            "type" : [ "string", "null" ]
           },
           "updatedAt" : {
             "anyOf" : [ {
@@ -904,7 +910,7 @@
             "multipart/form-data" : {
               "schema" : {
                 "type" : "object",
-                "required" : [ "name", "category", "description", "url", "requiresVpn", "logo" ],
+                "required" : [ "name", "category", "description", "url", "requiresVpn", "managedBy", "externalId", "logo" ],
                 "properties" : {
                   "name" : {
                     "type" : [ "string", "null" ]
@@ -920,6 +926,12 @@
                   },
                   "requiresVpn" : {
                     "type" : "boolean"
+                  },
+                  "managedBy" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "externalId" : {
+                    "type" : [ "string", "null" ]
                   },
                   "logo" : {
                     "type" : [ "string", "null" ],
@@ -949,7 +961,7 @@
         },
         "summary" : "Create Application",
         "security" : [ {
-          "SecurityScheme" : [ "admin" ]
+          "SecurityScheme" : [ "admin", "operator" ]
         } ]
       }
     },
@@ -969,7 +981,7 @@
             "multipart/form-data" : {
               "schema" : {
                 "type" : "object",
-                "required" : [ "name", "category", "description", "url", "requiresVpn", "logo" ],
+                "required" : [ "name", "category", "description", "url", "requiresVpn", "managedBy", "externalId", "logo" ],
                 "properties" : {
                   "name" : {
                     "type" : [ "string", "null" ]
@@ -985,6 +997,12 @@
                   },
                   "requiresVpn" : {
                     "type" : "boolean"
+                  },
+                  "managedBy" : {
+                    "type" : [ "string", "null" ]
+                  },
+                  "externalId" : {
+                    "type" : [ "string", "null" ]
                   },
                   "logo" : {
                     "type" : [ "string", "null" ],
@@ -1014,7 +1032,7 @@
         },
         "summary" : "Update Application",
         "security" : [ {
-          "SecurityScheme" : [ "admin" ]
+          "SecurityScheme" : [ "admin", "operator" ]
         } ]
       },
       "delete" : {
@@ -1045,7 +1063,7 @@
         },
         "summary" : "Delete Application",
         "security" : [ {
-          "SecurityScheme" : [ "admin" ]
+          "SecurityScheme" : [ "admin", "operator" ]
         } ]
       }
     },
@@ -1584,10 +1602,10 @@
     }
   },
   "servers" : [ {
-    "url" : "http://localhost:8080",
+    "url" : "http://localhost:8088",
     "description" : "Auto generated value"
   }, {
-    "url" : "http://0.0.0.0:8080",
+    "url" : "http://0.0.0.0:8088",
     "description" : "Auto generated value"
   } ]
 }

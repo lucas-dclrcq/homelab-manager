@@ -8,6 +8,8 @@ import type { PostApiApplicationsBodyName } from "./postApiApplicationsBodyName"
 import type { PostApiApplicationsBodyCategory } from "./postApiApplicationsBodyCategory";
 import type { PostApiApplicationsBodyDescription } from "./postApiApplicationsBodyDescription";
 import type { PostApiApplicationsBodyUrl } from "./postApiApplicationsBodyUrl";
+import type { PostApiApplicationsBodyManagedBy } from "./postApiApplicationsBodyManagedBy";
+import type { PostApiApplicationsBodyExternalId } from "./postApiApplicationsBodyExternalId";
 import type { PostApiApplicationsBodyLogo } from "./postApiApplicationsBodyLogo";
 
 export type PostApiApplicationsBody = {
@@ -16,5 +18,7 @@ export type PostApiApplicationsBody = {
   description: PostApiApplicationsBodyDescription;
   url: PostApiApplicationsBodyUrl;
   requiresVpn: boolean;
+  managedBy: PostApiApplicationsBodyManagedBy;
+  externalId: PostApiApplicationsBodyExternalId;
   logo: PostApiApplicationsBodyLogo;
 };

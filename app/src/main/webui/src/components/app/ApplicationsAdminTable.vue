@@ -75,7 +75,20 @@ function hostname(url: string) {
                   </span>
                 </span>
                 <div class="min-w-0">
-                  <p class="font-semibold text-ink">{{ application.name }}</p>
+                  <p
+                    class="flex items-center gap-2 font-semibold text-ink"
+                    :title="
+                      application.managedBy
+                        ? `Synchronisée depuis le cluster (${application.externalId}) — les modifications manuelles seront écrasées`
+                        : undefined
+                    "
+                  >
+                    {{ application.name }}
+                    <BaseBadge v-if="application.managedBy" color="sky">
+                      <UiIcon name="refresh-cw" class="size-3" />
+                      Synchronisée
+                    </BaseBadge>
+                  </p>
                   <p class="line-clamp-1 max-w-xs text-xs text-mute">
                     {{ application.description }}
                   </p>

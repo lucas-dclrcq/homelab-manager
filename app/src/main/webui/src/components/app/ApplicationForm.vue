@@ -56,6 +56,9 @@ function submit() {
     description: form.description,
     url: form.url,
     requiresVpn: form.requiresVpn,
+    // Jamais envoyés depuis l'admin : le backend conserve les valeurs posées par l'opérateur
+    managedBy: null,
+    externalId: null,
     logo: logo.value,
   }
   if (props.application) {

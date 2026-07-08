@@ -1,0 +1,24 @@
+{{- if and .Values.operator.enabled .Values.operator.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "homelab-manager.operator.fullname" . }}
+  labels:
+    {{- include "homelab-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: operator
+rules:
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - httproutes
+      - httproutes/status
+      - httproutes/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+      - create
+      - delete
+{{- end }}

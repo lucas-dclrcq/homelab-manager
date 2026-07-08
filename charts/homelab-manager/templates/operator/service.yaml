@@ -1,0 +1,23 @@
+{{- if and .Values.operator.enabled .Values.operator.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "homelab-manager.operator.fullname" . }}
+  labels:
+    {{- include "homelab-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: operator
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.operator.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "homelab-manager.operator.selectorLabels" . | nindent 4 }}
+{{- end }}

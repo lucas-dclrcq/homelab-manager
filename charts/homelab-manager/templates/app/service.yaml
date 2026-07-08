@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "homelab-manager.fullname" . }}
+  labels:
+    {{- include "homelab-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+spec:
+  type: {{ .Values.app.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.app.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "homelab-manager.app.selectorLabels" . | nindent 4 }}

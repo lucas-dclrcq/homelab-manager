@@ -14,6 +14,8 @@ data class ApplicationSummary(
     val url: String,
     val requiresVpn: Boolean,
     val hasLogo: Boolean,
+    val managedBy: String?,
+    val externalId: String?,
     val updatedAt: LocalDateTime?,
 )
 
@@ -28,7 +30,7 @@ class ApplicationRepository {
                 session.createQuery(
                     """select new org.hoohoot.homelab.manager.portal.persistence.ApplicationSummary(
                            a.id, a.name, a.category, a.description, a.url, a.requiresVpn,
-                           case when a.logo is null then false else true end, a.updatedAt)
+                           case when a.logo is null then false else true end, a.managedBy, a.externalId, a.updatedAt)
                        from ApplicationEntity a
                        order by a.category, a.name""",
                     ApplicationSummary::class.java
