@@ -2,9 +2,9 @@ package org.hoohoot.homelab.manager.notifications.weeklyreport
 
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import kotlinx.datetime.*
-import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrAlbum
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.Episode
+import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrAlbum
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
+import org.hoohoot.homelab.manager.shared.arr.sonarr.Episode
 import org.hoohoot.homelab.manager.notifications.jellystat.MostPopularMedia
 
 class WeeklyReportNotificationBuilder(

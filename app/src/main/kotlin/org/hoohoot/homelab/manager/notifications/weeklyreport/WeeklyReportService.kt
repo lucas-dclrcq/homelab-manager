@@ -4,18 +4,18 @@ import de.connect2x.trixnity.clientserverapi.client.MatrixClientServerApiClient
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrRestClient
-import org.hoohoot.homelab.manager.notifications.arr.lidarr.getAlbumCalendar
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRestClient
-import org.hoohoot.homelab.manager.notifications.arr.radarr.getMovieCalendar
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.getSeriesCalendar
+import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.lidarr.getAlbumCalendar
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.radarr.getMovieCalendar
+import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.sonarr.getSeriesCalendar
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatMediaType
 import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
 import org.hoohoot.homelab.manager.notifications.jellystat.MostPopularMedia
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
-import org.hoohoot.homelab.manager.time.TimeService
+import org.hoohoot.homelab.manager.shared.time.TimeService
 
 @ApplicationScoped
 class WeeklyReportService(

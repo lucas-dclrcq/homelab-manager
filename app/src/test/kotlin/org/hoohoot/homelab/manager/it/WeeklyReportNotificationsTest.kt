@@ -12,7 +12,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

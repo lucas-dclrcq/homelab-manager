@@ -4,8 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRestClient
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
 import org.hoohoot.homelab.manager.portal.persistence.DiskUsage
 
 const val SOURCE_RADARR = "radarr"

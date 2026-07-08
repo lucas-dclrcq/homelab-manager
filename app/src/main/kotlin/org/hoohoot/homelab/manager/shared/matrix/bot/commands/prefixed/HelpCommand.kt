@@ -1,0 +1,39 @@
+package org.hoohoot.homelab.manager.shared.matrix.bot.commands.prefixed
+
+import io.quarkus.logging.Log
+import de.connect2x.trixnity.core.model.EventId
+import de.connect2x.trixnity.core.model.RoomId
+import de.connect2x.trixnity.core.model.UserId
+import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
+import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
+import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotConfiguration
+import org.hoohoot.homelab.manager.shared.matrix.bot.commands.MatrixBotCommand
+import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
+import org.hoohoot.homelab.manager.shared.matrix.bot.markdown
+
+class HelpCommand(
+    private val config: MatrixBotConfiguration,
+    private val botName: String,
+    private val commandGetter: () -> List<MatrixBotCommand>
+) : PrefixedBotCommand() {
+    override val name: String = "help"
+    override val help: String = "shows this help message"
+
+    override suspend fun handle(
+        session: MatrixBotSession,
+        sender: UserId,
+        roomId: RoomId,
+        parameters: String,
+        textEventId: EventId,
+        textEvent: RoomMessageEventContent.TextBased.Text
+    ) {
+        Log.info("Help command requested by ${sender.localpart}")
+        var helpMessage = "This is $botName. You can use the following commands:\n"
+
+        for (command in commandGetter()) {
+            helpMessage += "\n* `!${config.prefix()} ${command.name} ${command.params} - ${command.help}`"
+        }
+
+        session.room.sendMessage(roomId) { markdown(helpMessage) }
+    }
+}

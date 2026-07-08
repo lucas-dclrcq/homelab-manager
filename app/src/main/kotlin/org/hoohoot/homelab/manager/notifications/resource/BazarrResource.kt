@@ -13,7 +13,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.BazarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.SubtitleDownload
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 

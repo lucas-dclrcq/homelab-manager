@@ -11,8 +11,8 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.jobs.JobRunner
-import org.hoohoot.homelab.manager.portal.persistence.JobExecutionEntity
-import org.hoohoot.homelab.manager.portal.persistence.JobExecutionRepository
+import org.hoohoot.homelab.manager.jobs.JobExecutionEntity
+import org.hoohoot.homelab.manager.jobs.JobExecutionRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

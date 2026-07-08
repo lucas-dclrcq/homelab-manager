@@ -2,10 +2,10 @@ package org.hoohoot.homelab.manager.portal.corrector
 
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrGrabRequest
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRelease
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRestClient
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrGrabRequest
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRelease
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 import java.text.Normalizer
 
 data class AnnotatedRelease(

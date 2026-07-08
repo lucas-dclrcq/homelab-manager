@@ -12,9 +12,9 @@ import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.notifications.arr.mediaKey
 import org.hoohoot.homelab.manager.notifications.arr.requester
-import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrWebhookPayload
+import org.hoohoot.homelab.manager.notifications.SonarrWebhookPayload
 import org.hoohoot.homelab.manager.notifications.arr.toImdbLink
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 

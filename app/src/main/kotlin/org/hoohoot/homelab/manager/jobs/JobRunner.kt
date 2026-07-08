@@ -3,8 +3,8 @@ package org.hoohoot.homelab.manager.jobs
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Instance
-import org.hoohoot.homelab.manager.portal.persistence.JobExecutionEntity
-import org.hoohoot.homelab.manager.portal.persistence.JobExecutionRepository
+import org.hoohoot.homelab.manager.jobs.JobExecutionEntity
+import org.hoohoot.homelab.manager.jobs.JobExecutionRepository
 
 data class JobRunResult(
     val status: String,

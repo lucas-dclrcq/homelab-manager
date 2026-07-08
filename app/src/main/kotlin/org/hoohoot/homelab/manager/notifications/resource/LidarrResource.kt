@@ -17,7 +17,7 @@ import org.hoohoot.homelab.manager.notifications.coverUrl
 import org.hoohoot.homelab.manager.notifications.source
 import org.hoohoot.homelab.manager.notifications.genres
 import org.hoohoot.homelab.manager.notifications.year
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 
 @Path("/api/notifications/lidarr")

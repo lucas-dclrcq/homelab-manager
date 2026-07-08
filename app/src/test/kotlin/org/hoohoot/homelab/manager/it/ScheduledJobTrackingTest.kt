@@ -11,7 +11,7 @@ import io.quarkus.test.junit.TestProfile
 import io.quarkus.vertx.VertxContextSupport
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.persistence.JobExecutionEntity
+import org.hoohoot.homelab.manager.jobs.JobExecutionEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

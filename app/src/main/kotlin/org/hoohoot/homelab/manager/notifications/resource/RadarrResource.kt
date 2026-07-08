@@ -18,7 +18,7 @@ import org.hoohoot.homelab.manager.notifications.quality
 import org.hoohoot.homelab.manager.notifications.requester
 import org.hoohoot.homelab.manager.notifications.title
 import org.hoohoot.homelab.manager.notifications.year
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.persistence.NotificationSentRepository
 

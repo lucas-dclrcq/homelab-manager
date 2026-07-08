@@ -6,7 +6,7 @@ import io.quarkus.test.security.TestSecurity
 import io.restassured.RestAssured
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.resource.MeResource
+import org.hoohoot.homelab.manager.shared.security.MeResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest

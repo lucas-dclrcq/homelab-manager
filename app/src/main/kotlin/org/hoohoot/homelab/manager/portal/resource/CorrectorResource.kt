@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrMovie
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.portal.corrector.AnnotatedRelease
 import org.hoohoot.homelab.manager.portal.corrector.CorrectorService
 import org.hoohoot.homelab.manager.portal.persistence.CorrectorWorkflowEntity

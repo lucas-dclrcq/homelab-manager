@@ -15,7 +15,7 @@ import org.hoohoot.homelab.manager.notifications.additionalInfo
 import org.hoohoot.homelab.manager.notifications.commentMessage
 import org.hoohoot.homelab.manager.notifications.commentedBy
 import org.hoohoot.homelab.manager.notifications.issueId
-import org.hoohoot.homelab.manager.notifications.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 import org.hoohoot.homelab.manager.notifications.matrix.sendNotification
 import org.hoohoot.homelab.manager.notifications.matrix.sendReaction
 import org.hoohoot.homelab.manager.notifications.message
