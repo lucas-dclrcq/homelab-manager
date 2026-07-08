@@ -7,9 +7,48 @@
     "status": 200,
     "headers": { "Content-Type": "application/json" },
     "jsonBody": [
-      { "id": 1, "title": "Dune: Part Two", "year": 2024 },
-      { "id": 2, "title": "Oppenheimer", "year": 2023 },
-      { "id": 3, "title": "The Substance", "year": 2024 }
+      {
+        "id": 1,
+        "title": "Dune: Part Two",
+        "year": 2024,
+        "overview": "Paul Atreides s'unit à Chani et aux Fremen pour mener la révolte contre ceux qui ont détruit sa famille.",
+        "hasFile": true,
+        "images": [
+          { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/dune2.jpg" }
+        ],
+        "movieFile": {
+          "quality": { "quality": { "name": "WEBDL-1080p" } },
+          "languages": [{ "id": 1, "name": "English" }]
+        }
+      },
+      {
+        "id": 2,
+        "title": "Oppenheimer",
+        "year": 2023,
+        "overview": "L'histoire de J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.",
+        "hasFile": true,
+        "images": [
+          { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/oppenheimer.jpg" }
+        ],
+        "movieFile": {
+          "quality": { "quality": { "name": "Bluray-1080p" } },
+          "languages": [{ "id": 1, "name": "English" }]
+        }
+      },
+      {
+        "id": 3,
+        "title": "The Substance",
+        "year": 2024,
+        "overview": "Une célébrité vieillissante essaie une substance qui crée une version plus jeune d'elle-même.",
+        "hasFile": true,
+        "images": [
+          { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/substance.jpg" }
+        ],
+        "movieFile": {
+          "quality": { "quality": { "name": "WEBDL-720p" } },
+          "languages": [{ "id": 1, "name": "English" }]
+        }
+      }
     ]
   }
 }

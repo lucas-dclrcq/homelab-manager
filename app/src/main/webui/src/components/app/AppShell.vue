@@ -32,6 +32,7 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
         </div>
         <SideNavItem to="/" label="Accueil" icon="house" />
         <SideNavItem to="/applications" label="Tes applis" icon="layout-grid" />
+        <SideNavItem to="/corrector" label="El Corrector" icon="wrench" />
 
         <template v-if="userStore.isAdmin">
           <div

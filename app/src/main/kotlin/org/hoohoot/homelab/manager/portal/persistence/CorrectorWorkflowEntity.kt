@@ -1,0 +1,88 @@
+package org.hoohoot.homelab.manager.portal.persistence
+
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanionBase
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
+import java.time.LocalDateTime
+import java.util.UUID
+
+data class MovieSnapshot(
+    val title: String? = null,
+    val year: Int? = null,
+    val posterUrl: String? = null,
+    val overview: String? = null,
+    val currentQuality: String? = null,
+    val currentLanguages: List<String> = emptyList(),
+)
+
+data class GrabbedRelease(
+    val guid: String? = null,
+    val indexerId: Int? = null,
+    val indexer: String? = null,
+    val title: String? = null,
+    val quality: String? = null,
+    val size: Long? = null,
+)
+
+// Objet racine obligatoire pour le client PG réactif (jamais une List à la racine du JSONB)
+data class CorrectorWorkflowState(
+    val movie: MovieSnapshot? = null,
+    val grabbedRelease: GrabbedRelease? = null,
+)
+
+@Entity
+@Table(name = "corrector_workflow")
+class CorrectorWorkflowEntity : PanacheEntityBase {
+    @Id
+    var id: UUID? = null
+
+    @Column(name = "username", nullable = false)
+    lateinit var username: String
+
+    @Column(name = "media_type", nullable = false)
+    lateinit var mediaType: String
+
+    @Column(name = "problem_type")
+    var problemType: String? = null
+
+    @Column(name = "status", nullable = false)
+    lateinit var status: String
+
+    @Column(name = "radarr_movie_id")
+    var radarrMovieId: Int? = null
+
+    @Column(name = "movie_title")
+    var movieTitle: String? = null
+
+    @Column(name = "grabbed_at")
+    var grabbedAt: LocalDateTime? = null
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "state", nullable = false)
+    var state: CorrectorWorkflowState = CorrectorWorkflowState()
+
+    @Column(name = "created_at", nullable = false)
+    lateinit var createdAt: LocalDateTime
+
+    @Column(name = "updated_at", nullable = false)
+    lateinit var updatedAt: LocalDateTime
+
+    @Column(name = "completed_at")
+    var completedAt: LocalDateTime? = null
+
+    companion object : PanacheCompanionBase<CorrectorWorkflowEntity, UUID> {
+        const val MEDIA_TYPE_MOVIE = "movie"
+
+        const val PROBLEM_VO_SHOULD_BE_FRENCH = "vo_should_be_french"
+
+        const val STATUS_IN_PROGRESS = "IN_PROGRESS"
+        const val STATUS_AWAITING_IMPORT = "AWAITING_IMPORT"
+        const val STATUS_COMPLETED = "COMPLETED"
+        const val STATUS_ABANDONED = "ABANDONED"
+    }
+}

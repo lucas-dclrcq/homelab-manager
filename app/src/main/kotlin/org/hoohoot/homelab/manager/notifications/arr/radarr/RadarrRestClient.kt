@@ -2,7 +2,9 @@ package org.hoohoot.homelab.manager.notifications.arr.radarr
 
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
+import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import kotlinx.datetime.Instant
@@ -38,6 +40,15 @@ interface RadarrRestClient {
     @GET
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
+
+    @GET
+    @Path("/release")
+    suspend fun searchReleases(@QueryParam("movieId") movieId: Int): List<RadarrRelease>?
+
+    @POST
+    @Path("/release")
+    @Produces(MediaType.APPLICATION_JSON)
+    suspend fun grabRelease(request: RadarrGrabRequest): RadarrRelease?
 }
 
 suspend fun RadarrRestClient.getMovieCalendar(start: Instant, end: Instant): List<RadarrMovie> =

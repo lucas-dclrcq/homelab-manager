@@ -1,0 +1,88 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/release"
+  },
+  "response": {
+    "status": 200,
+    "fixedDelayMilliseconds": 2000,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      {
+        "guid": "release-multi-1",
+        "indexerId": 1,
+        "indexer": "YGG",
+        "title": "Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R",
+        "quality": { "quality": { "name": "WEBDL-1080p" } },
+        "languages": [{ "id": 1, "name": "English" }],
+        "size": 8589934592,
+        "age": 120,
+        "seeders": 145,
+        "leechers": 12,
+        "protocol": "torrent",
+        "rejected": false,
+        "rejections": []
+      },
+      {
+        "guid": "release-truefrench-2",
+        "indexerId": 1,
+        "indexer": "YGG",
+        "title": "Dune.Part.Two.2024.TRUEFRENCH.720p.BluRay.x264-Fr3nchy",
+        "quality": { "quality": { "name": "Bluray-720p" } },
+        "languages": [],
+        "size": 4294967296,
+        "age": 90,
+        "seeders": 52,
+        "leechers": 4,
+        "protocol": "torrent",
+        "rejected": false,
+        "rejections": []
+      },
+      {
+        "guid": "release-vostfr-3",
+        "indexerId": 2,
+        "indexer": "Sharewood",
+        "title": "Dune.Part.Two.2024.VOSTFR.1080p.WEB.x264-SubTeam",
+        "quality": { "quality": { "name": "WEBDL-1080p" } },
+        "languages": [{ "id": 1, "name": "English" }],
+        "size": 7516192768,
+        "age": 100,
+        "seeders": 88,
+        "leechers": 9,
+        "protocol": "torrent",
+        "rejected": false,
+        "rejections": []
+      },
+      {
+        "guid": "release-vo-4",
+        "indexerId": 2,
+        "indexer": "Sharewood",
+        "title": "Dune.Part.Two.2024.1080p.WEB.H264-FLUX",
+        "quality": { "quality": { "name": "WEBDL-1080p" } },
+        "languages": [{ "id": 1, "name": "English" }],
+        "size": 9663676416,
+        "age": 130,
+        "seeders": 412,
+        "leechers": 30,
+        "protocol": "torrent",
+        "rejected": false,
+        "rejections": []
+      },
+      {
+        "guid": "release-multi-rejected-5",
+        "indexerId": 1,
+        "indexer": "YGG",
+        "title": "Dune.Part.Two.2024.MULTI.2160p.WEB.H265-Slay3R",
+        "quality": { "quality": { "name": "WEBDL-2160p" } },
+        "languages": [{ "id": 2, "name": "French" }, { "id": 1, "name": "English" }],
+        "size": 34359738368,
+        "age": 110,
+        "seeders": 23,
+        "leechers": 2,
+        "protocol": "torrent",
+        "rejected": true,
+        "rejections": ["2160p is not allowed by the quality profile"]
+      }
+    ]
+  }
+}

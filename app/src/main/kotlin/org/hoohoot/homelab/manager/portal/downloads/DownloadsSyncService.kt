@@ -10,6 +10,7 @@ import org.hoohoot.homelab.manager.notifications.arr.bazarr.BazarrRestClient
 import org.hoohoot.homelab.manager.notifications.arr.lidarr.LidarrRestClient
 import org.hoohoot.homelab.manager.notifications.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.notifications.arr.sonarr.SonarrRestClient
+import org.hoohoot.homelab.manager.portal.corrector.CorrectorCompletionService
 import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadEntity
 import org.hoohoot.homelab.manager.portal.persistence.MediaDownloadRepository
 import java.time.Instant
@@ -25,6 +26,7 @@ class DownloadsSyncService(
     @param:RestClient private val bazarrRestClient: BazarrRestClient,
     @param:RestClient private val lidarrRestClient: LidarrRestClient,
     private val mediaDownloadRepository: MediaDownloadRepository,
+    private val correctorCompletionService: CorrectorCompletionService,
     @param:ConfigProperty(name = "downloads-sync.backfill-days") private val backfillDays: Long,
     @param:ConfigProperty(name = "downloads-sync.bazarr.page-length") private val bazarrPageLength: Int,
 ) {
@@ -62,6 +64,17 @@ class DownloadsSyncService(
             }
         val inserted = mediaDownloadRepository.saveNewDownloads(MediaDownloadEntity.SOURCE_RADARR, candidates)
         Log.info("Radarr downloads sync: $inserted new download(s) since $since")
+
+        val importsByMovie = records
+            .filter { it.eventType == DOWNLOAD_IMPORTED_EVENT_TYPE }
+            .mapNotNull { record ->
+                val movieId = record.movieId ?: return@mapNotNull null
+                val importedAt = record.date?.parseInstantOrNull() ?: return@mapNotNull null
+                movieId to importedAt
+            }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, dates) -> dates.max() }
+        correctorCompletionService.completeAwaitingMovieWorkflows(importsByMovie)
     }
 
     suspend fun syncSonarr() {

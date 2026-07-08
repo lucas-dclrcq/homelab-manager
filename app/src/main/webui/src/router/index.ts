@@ -15,6 +15,16 @@ const router = createRouter({
       component: () => import('../pages/ApplicationsPage.vue'),
     },
     {
+      path: '/corrector',
+      name: 'corrector',
+      component: () => import('../pages/CorrectorPage.vue'),
+    },
+    {
+      path: '/corrector/:id',
+      name: 'corrector-workflow',
+      component: () => import('../pages/CorrectorWorkflowPage.vue'),
+    },
+    {
       path: '/admin',
       redirect: { name: 'admin-applications' },
     },
