@@ -891,11 +891,12 @@ paths:
                   format: binary
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/ApplicationDto"
+          description: Created
         "401":
           description: Not Authorized
         "403":
@@ -967,7 +968,8 @@ paths:
           description: OK
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/ApplicationDto"
         "401":
           description: Not Authorized
         "403":

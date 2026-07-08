@@ -524,7 +524,7 @@ export const postApiApplications = (
     formData.append("logo", postApiApplicationsBody.logo);
   }
 
-  return customInstance<unknown>(
+  return customInstance<ApplicationDto>(
     {
       url: `/api/applications`,
       method: "POST",
@@ -642,7 +642,7 @@ export const putApiApplicationsId = (
     formData.append("logo", putApiApplicationsIdBody.logo);
   }
 
-  return customInstance<unknown>(
+  return customInstance<ApplicationDto>(
     {
       url: `/api/applications/${id}`,
       method: "PUT",

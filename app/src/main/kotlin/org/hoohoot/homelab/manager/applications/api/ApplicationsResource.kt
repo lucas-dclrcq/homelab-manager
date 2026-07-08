@@ -14,6 +14,7 @@ import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.applications.infra.ApplicationEntity
 import org.hoohoot.homelab.manager.applications.infra.ApplicationRepository
@@ -56,6 +57,7 @@ class ApplicationsResource(
     @POST
     @RolesAllowed("admin", "operator")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @APIResponseSchema(value = ApplicationDto::class, responseCode = "201")
     suspend fun createApplication(
         @RestForm @NotBlank name: String?,
         @RestForm @NotBlank category: String?,
@@ -92,6 +94,7 @@ class ApplicationsResource(
     @Path("/{id}")
     @RolesAllowed("admin", "operator")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @APIResponseSchema(value = ApplicationDto::class, responseCode = "200")
     suspend fun updateApplication(
         @PathParam("id") id: UUID,
         @RestForm @NotBlank name: String?,

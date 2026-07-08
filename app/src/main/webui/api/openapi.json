@@ -944,13 +944,15 @@
           "required" : true
         },
         "responses" : {
-          "200" : {
-            "description" : "OK",
+          "201" : {
             "content" : {
               "application/json" : {
-                "schema" : { }
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApplicationDto"
+                }
               }
-            }
+            },
+            "description" : "Created"
           },
           "401" : {
             "description" : "Not Authorized"
@@ -1019,7 +1021,9 @@
             "description" : "OK",
             "content" : {
               "application/json" : {
-                "schema" : { }
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApplicationDto"
+                }
               }
             }
           },
