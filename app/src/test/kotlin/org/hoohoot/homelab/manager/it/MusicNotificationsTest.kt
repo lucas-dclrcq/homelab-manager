@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
-import org.hoohoot.homelab.manager.notifications.resource.LidarrResource
+import org.hoohoot.homelab.manager.notifications.api.LidarrResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

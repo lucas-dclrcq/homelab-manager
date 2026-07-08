@@ -9,7 +9,7 @@ import de.connect2x.trixnity.core.model.RoomId
 import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.utils.toByteArrayFlow
-import org.hoohoot.homelab.manager.notifications.giphy.GiphyService
+import org.hoohoot.homelab.manager.notifications.infra.giphy.GiphyService
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 

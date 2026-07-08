@@ -7,8 +7,8 @@ import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
-import org.hoohoot.homelab.manager.notifications.jellystat.TopWatchedPeriod
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.TopWatchedPeriod
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 

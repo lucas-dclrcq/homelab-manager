@@ -7,7 +7,7 @@ import de.connect2x.trixnity.core.model.EventId
 import de.connect2x.trixnity.core.model.RoomId
 import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 

@@ -8,11 +8,11 @@ import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.notifications.jellyfin.JellyfinRestClient
-import org.hoohoot.homelab.manager.notifications.jellyfin.searchSeries
-import org.hoohoot.homelab.manager.notifications.jellystat.JellystatService
-import org.hoohoot.homelab.manager.notifications.jellystat.MultipleSeriesFoundException
-import org.hoohoot.homelab.manager.notifications.jellystat.NoSeriesFoundException
+import org.hoohoot.homelab.manager.notifications.infra.jellyfin.JellyfinRestClient
+import org.hoohoot.homelab.manager.notifications.infra.jellyfin.searchSeries
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.MultipleSeriesFoundException
+import org.hoohoot.homelab.manager.notifications.infra.jellystat.NoSeriesFoundException
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 
