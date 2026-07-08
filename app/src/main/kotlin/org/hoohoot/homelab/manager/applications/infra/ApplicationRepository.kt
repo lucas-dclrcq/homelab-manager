@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.portal.persistence
+package org.hoohoot.homelab.manager.applications.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending
@@ -28,7 +28,7 @@ class ApplicationRepository {
         Panache.withSession {
             Panache.getSession().flatMap { session ->
                 session.createQuery(
-                    """select new org.hoohoot.homelab.manager.portal.persistence.ApplicationSummary(
+                    """select new org.hoohoot.homelab.manager.applications.infra.ApplicationSummary(
                            a.id, a.name, a.category, a.description, a.url, a.requiresVpn,
                            case when a.logo is null then false else true end, a.managedBy, a.externalId, a.updatedAt)
                        from ApplicationEntity a

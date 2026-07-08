@@ -1,8 +1,9 @@
-package org.hoohoot.homelab.manager.portal.resource
+package org.hoohoot.homelab.manager.applications.api
 
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import io.vertx.mutiny.core.Vertx
 import jakarta.annotation.security.RolesAllowed
+import jakarta.validation.constraints.NotBlank
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -14,8 +15,9 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.portal.persistence.ApplicationEntity
-import org.hoohoot.homelab.manager.portal.persistence.ApplicationRepository
+import org.hoohoot.homelab.manager.applications.infra.ApplicationEntity
+import org.hoohoot.homelab.manager.applications.infra.ApplicationRepository
+import org.hoohoot.homelab.manager.shared.api.badRequest
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
 import java.time.LocalDateTime
@@ -55,33 +57,30 @@ class ApplicationsResource(
     @RolesAllowed("admin", "operator")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     suspend fun createApplication(
-        @RestForm name: String?,
-        @RestForm category: String?,
-        @RestForm description: String?,
-        @RestForm url: String?,
+        @RestForm @NotBlank name: String?,
+        @RestForm @NotBlank category: String?,
+        @RestForm @NotBlank description: String?,
+        @RestForm @NotBlank url: String?,
         @RestForm requiresVpn: Boolean,
         @RestForm managedBy: String?,
         @RestForm externalId: String?,
         @RestForm("logo") logo: FileUpload?,
     ): Response {
-        if (name.isNullOrBlank() || category.isNullOrBlank() || description.isNullOrBlank() || url.isNullOrBlank()) {
-            return badRequest("name, category, description and url are required")
-        }
         logoValidationError(logo)?.let { return it }
 
-        val logoBytes = readLogoBytes(logo)
+        val upload = readLogo(logo)
 
         val entity = ApplicationEntity()
         entity.id = UUID.randomUUID()
-        entity.name = name.trim()
-        entity.category = category.trim()
-        entity.description = description.trim()
-        entity.url = url.trim()
+        entity.name = requireNotNull(name).trim()
+        entity.category = requireNotNull(category).trim()
+        entity.description = requireNotNull(description).trim()
+        entity.url = requireNotNull(url).trim()
         entity.requiresVpn = requiresVpn
         entity.managedBy = managedBy?.trim()?.takeIf { it.isNotEmpty() }
         entity.externalId = externalId?.trim()?.takeIf { it.isNotEmpty() }
-        entity.logo = logoBytes
-        entity.logoContentType = if (logoBytes != null) logo?.contentType() else null
+        entity.logo = upload?.bytes
+        entity.logoContentType = upload?.contentType
         entity.createdAt = LocalDateTime.now()
 
         val saved = applicationRepository.save(entity)
@@ -95,34 +94,31 @@ class ApplicationsResource(
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     suspend fun updateApplication(
         @PathParam("id") id: UUID,
-        @RestForm name: String?,
-        @RestForm category: String?,
-        @RestForm description: String?,
-        @RestForm url: String?,
+        @RestForm @NotBlank name: String?,
+        @RestForm @NotBlank category: String?,
+        @RestForm @NotBlank description: String?,
+        @RestForm @NotBlank url: String?,
         @RestForm requiresVpn: Boolean,
         @RestForm managedBy: String?,
         @RestForm externalId: String?,
         @RestForm("logo") logo: FileUpload?,
     ): Response {
-        if (name.isNullOrBlank() || category.isNullOrBlank() || description.isNullOrBlank() || url.isNullOrBlank()) {
-            return badRequest("name, category, description and url are required")
-        }
         logoValidationError(logo)?.let { return it }
 
-        val logoBytes = readLogoBytes(logo)
+        val upload = readLogo(logo)
 
         val updated = applicationRepository.update(id) { entity ->
-            entity.name = name.trim()
-            entity.category = category.trim()
-            entity.description = description.trim()
-            entity.url = url.trim()
+            entity.name = requireNotNull(name).trim()
+            entity.category = requireNotNull(category).trim()
+            entity.description = requireNotNull(description).trim()
+            entity.url = requireNotNull(url).trim()
             entity.requiresVpn = requiresVpn
             // Champs absents du formulaire (admin UI) : on conserve les valeurs existantes
             managedBy?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.managedBy = it }
             externalId?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.externalId = it }
-            if (logoBytes != null) {
-                entity.logo = logoBytes
-                entity.logoContentType = logo!!.contentType()
+            if (upload != null) {
+                entity.logo = upload.bytes
+                entity.logoContentType = upload.contentType
             }
             entity.updatedAt = LocalDateTime.now()
         } ?: return Response.status(Response.Status.NOT_FOUND).build()
@@ -163,14 +159,14 @@ class ApplicationsResource(
         return null
     }
 
+    private data class LogoUpload(val bytes: ByteArray, val contentType: String?)
+
     // The upload lives in a temp file: read it with Vert.x before opening the reactive session
-    private suspend fun readLogoBytes(logo: FileUpload?): ByteArray? = logo?.let {
-        vertx.fileSystem().readFile(it.uploadedFile().toString()).awaitSuspending().bytes
+    private suspend fun readLogo(logo: FileUpload?): LogoUpload? = logo?.let {
+        val bytes = vertx.fileSystem().readFile(it.uploadedFile().toString()).awaitSuspending().bytes
+        LogoUpload(bytes, it.contentType())
     }
 
     private fun ApplicationEntity.toDto() =
-        ApplicationDto(id!!, name, category, description, url, requiresVpn, logo != null, managedBy, externalId, updatedAt)
-
-    private fun badRequest(message: String) =
-        Response.status(Response.Status.BAD_REQUEST).entity(mapOf("error" to message)).build()
+        ApplicationDto(requireNotNull(id), name, category, description, url, requiresVpn, logo != null, managedBy, externalId, updatedAt)
 }

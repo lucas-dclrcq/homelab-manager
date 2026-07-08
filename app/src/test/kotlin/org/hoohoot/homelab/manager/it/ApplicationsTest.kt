@@ -8,7 +8,7 @@ import io.restassured.builder.MultiPartSpecBuilder
 import io.restassured.specification.MultiPartSpecification
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.portal.resource.ApplicationsResource
+import org.hoohoot.homelab.manager.applications.api.ApplicationsResource
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -79,6 +79,19 @@ internal class ApplicationsTest {
     fun `admin cannot create an application with missing fields`() {
         RestAssured.given()
             .multiPart("name", "Incomplete")
+            .`when`().post()
+            .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `admin cannot create an application with a blank name`() {
+        RestAssured.given()
+            .multiPart("name", "   ")
+            .multiPart(utf8Part("category", "Médias"))
+            .multiPart("description", "desc")
+            .multiPart("url", "https://blank.example.org")
+            .multiPart("requiresVpn", "false")
             .`when`().post()
             .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
