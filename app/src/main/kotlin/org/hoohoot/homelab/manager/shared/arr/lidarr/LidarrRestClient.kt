@@ -1,5 +1,10 @@
 package org.hoohoot.homelab.manager.shared.arr.lidarr
 
+import jakarta.ws.rs.ProcessingException
+import java.time.temporal.ChronoUnit
+import org.eclipse.microprofile.faulttolerance.Retry
+import org.eclipse.microprofile.faulttolerance.Timeout
+import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
@@ -15,6 +20,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 @RegisterRestClient(configKey = "lidarr-api")
 @Consumes(MediaType.APPLICATION_JSON)
 @ClientHeaderParam(name = "X-Api-Key", value = ["\${lidarr.api_key}"])
+@Retry(maxRetries = 2, delay = 500, jitter = 250, retryOn = [ProcessingException::class, TimeoutException::class])
+@Timeout(value = 30, unit = ChronoUnit.SECONDS)
 interface LidarrRestClient {
     @GET
     @Path("/calendar")

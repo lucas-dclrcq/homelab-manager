@@ -1,5 +1,10 @@
 package org.hoohoot.homelab.manager.shared.arr.radarr
 
+import jakarta.ws.rs.ProcessingException
+import java.time.temporal.ChronoUnit
+import org.eclipse.microprofile.faulttolerance.Retry
+import org.eclipse.microprofile.faulttolerance.Timeout
+import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
@@ -18,6 +23,8 @@ import org.hoohoot.homelab.manager.shared.arr.DiskSpace
 @RegisterRestClient(configKey = "radarr-api")
 @Consumes(MediaType.APPLICATION_JSON)
 @ClientHeaderParam(name = "X-Api-Key", value = ["\${radarr.api_key}"])
+@Retry(maxRetries = 2, delay = 500, jitter = 250, retryOn = [ProcessingException::class, TimeoutException::class])
+@Timeout(value = 30, unit = ChronoUnit.SECONDS)
 interface RadarrRestClient {
     @GET
     @Path("/calendar")
@@ -41,13 +48,17 @@ interface RadarrRestClient {
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
 
+    // La recherche interactive interroge tous les indexers : doit dépasser le read-timeout de 120s
     @GET
     @Path("/release")
+    @Timeout(value = 125, unit = ChronoUnit.SECONDS)
     suspend fun searchReleases(@QueryParam("movieId") movieId: Int): List<RadarrRelease>?
 
+    // Seul appel non-idempotent : un grab rejoué déclencherait un double téléchargement
     @POST
     @Path("/release")
     @Produces(MediaType.APPLICATION_JSON)
+    @Retry(maxRetries = 0)
     suspend fun grabRelease(request: RadarrGrabRequest): RadarrRelease?
 }
 

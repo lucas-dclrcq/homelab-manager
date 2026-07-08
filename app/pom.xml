@@ -184,6 +184,15 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-scheduler</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Support @Retry/@Timeout sur les fonctions suspend -->
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-fault-tolerance-kotlin</artifactId>
+        </dependency>
 
         <!-- DevServices (dev mode only) -->
         <dependency>
