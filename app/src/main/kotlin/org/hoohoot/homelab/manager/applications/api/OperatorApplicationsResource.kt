@@ -11,6 +11,7 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.hoohoot.homelab.manager.applications.domain.ApplicationInput
+import org.hoohoot.homelab.manager.applications.domain.LogoChange
 import org.hoohoot.homelab.manager.applications.domain.usecases.CreateApplication
 import org.hoohoot.homelab.manager.applications.domain.usecases.DeleteApplication
 import org.hoohoot.homelab.manager.applications.domain.usecases.ListApplications
@@ -27,11 +28,13 @@ data class OperatorApplicationRequest(
     val requiresVpn: Boolean,
     val managedBy: String? = null,
     val externalId: String? = null,
+    val logoUrl: String? = null,
 )
 
 /**
  * Duplication des endpoints applications pour l'opérateur k8s : auth par clé partagée
- * (voir OperatorApiKeyFilter) au lieu d'OIDC, JSON au lieu de multipart (pas de logo).
+ * (voir OperatorApiKeyFilter) au lieu d'OIDC, JSON au lieu de multipart (le logo est déclaré
+ * par URL et téléchargé côté serveur, pas uploadé).
  * Exclu du contrat OpenAPI consommé par Orval (mp.openapi.scan.exclude.classes).
  */
 @Path("/api/operator/applications")
@@ -77,8 +80,13 @@ class OperatorApplicationsResource(
             Response.status(Response.Status.NOT_FOUND).build()
         }
 
+    // Contrat déclaratif : logoUrl absent = pas de logo désiré, le use case supprime alors
+    // un logo précédemment téléchargé (mais préserve un upload manuel)
     private fun OperatorApplicationRequest.toInput() =
-        ApplicationInput(name, category, description, url, requiresVpn, managedBy, externalId)
+        ApplicationInput(
+            name, category, description, url, requiresVpn, managedBy, externalId,
+            logo = logoUrl?.trim()?.takeIf { it.isNotEmpty() }?.let { LogoChange.FromUrl(it) } ?: LogoChange.Remove,
+        )
 
     private fun validationError(request: OperatorApplicationRequest): Response? =
         listOf(

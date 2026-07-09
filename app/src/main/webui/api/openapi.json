@@ -14,12 +14,16 @@
     "name" : "Portal"
   }, {
     "name" : "Corrector"
+  }, {
+    "name" : "Finances"
+  }, {
+    "name" : "Membres"
   } ],
   "components" : {
     "schemas" : {
       "ApplicationDto" : {
         "type" : "object",
-        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "managedBy", "externalId", "updatedAt" ],
+        "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "logoSourceUrl", "managedBy", "externalId", "updatedAt" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -41,6 +45,9 @@
           },
           "hasLogo" : {
             "type" : "boolean"
+          },
+          "logoSourceUrl" : {
+            "type" : [ "string", "null" ]
           },
           "managedBy" : {
             "type" : [ "string", "null" ]
@@ -198,6 +205,183 @@
         "properties" : {
           "mediaType" : {
             "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "EnergyStatusDto" : {
+        "type" : "object",
+        "required" : [ "currentPowerWatts", "estimatedMonthlyKwh", "estimatedMonthlyCostCents", "kwhPriceConfigured" ],
+        "properties" : {
+          "currentPowerWatts" : {
+            "type" : [ "number", "null" ],
+            "format" : "double"
+          },
+          "estimatedMonthlyKwh" : {
+            "type" : [ "number", "null" ],
+            "format" : "double"
+          },
+          "estimatedMonthlyCostCents" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "kwhPriceConfigured" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "EntrySource" : {
+        "type" : "string",
+        "enum" : [ "MANUAL", "RECURRING", "ENERGY" ]
+      },
+      "EntryType" : {
+        "type" : "string",
+        "enum" : [ "CONTRIBUTION", "EXPENSE" ]
+      },
+      "FinanceEntriesPageDto" : {
+        "type" : "object",
+        "required" : [ "items", "total", "page", "pageSize" ],
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/FinanceEntryDto"
+            }
+          },
+          "total" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "FinanceEntryDto" : {
+        "type" : "object",
+        "required" : [ "id", "type", "source", "label", "vendor", "amountCents", "entryDate", "memberId", "memberDisplayName", "period", "notes" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/EntryType"
+          },
+          "source" : {
+            "$ref" : "#/components/schemas/EntrySource"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "vendor" : {
+            "type" : [ "string", "null" ]
+          },
+          "amountCents" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "entryDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "memberId" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "memberDisplayName" : {
+            "type" : [ "string", "null" ]
+          },
+          "period" : {
+            "type" : [ "string", "null" ]
+          },
+          "notes" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "FinanceEntryRequest" : {
+        "type" : "object",
+        "required" : [ "type", "label", "vendor", "amountCents", "entryDate", "memberId", "notes" ],
+        "properties" : {
+          "type" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/EntryType"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "label" : {
+            "type" : [ "string", "null" ]
+          },
+          "vendor" : {
+            "type" : [ "string", "null" ]
+          },
+          "amountCents" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "entryDate" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "memberId" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "notes" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "FinanceSettingsDto" : {
+        "type" : "object",
+        "required" : [ "kwhPrice" ],
+        "properties" : {
+          "kwhPrice" : {
+            "type" : [ "number", "null" ]
+          }
+        }
+      },
+      "FinanceSettingsRequest" : {
+        "type" : "object",
+        "required" : [ "kwhPrice" ],
+        "properties" : {
+          "kwhPrice" : {
+            "type" : [ "number", "null" ]
+          }
+        }
+      },
+      "FinanceSummaryDto" : {
+        "type" : "object",
+        "required" : [ "year", "totalContributionsCents", "totalExpensesCents", "balanceCents" ],
+        "properties" : {
+          "year" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalContributionsCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalExpensesCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "balanceCents" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
@@ -406,6 +590,11 @@
           }
         }
       },
+      "LocalDate" : {
+        "type" : "string",
+        "format" : "date",
+        "examples" : [ "2022-03-10" ]
+      },
       "LocalDateTime" : {
         "type" : "string",
         "format" : "date-time",
@@ -424,6 +613,48 @@
             "items" : {
               "type" : "string"
             }
+          }
+        }
+      },
+      "MemberDto" : {
+        "type" : "object",
+        "required" : [ "id", "username", "displayName", "email", "active", "fromAuthentik" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "username" : {
+            "type" : "string"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : [ "string", "null" ]
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "fromAuthentik" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "MonthlyTotalsDto" : {
+        "type" : "object",
+        "required" : [ "month", "contributionsCents", "expensesCents" ],
+        "properties" : {
+          "month" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "contributionsCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "expensesCents" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
@@ -503,6 +734,103 @@
           "movieFile" : {
             "anyOf" : [ {
               "$ref" : "#/components/schemas/RadarrWebhookMovieFile"
+            }, {
+              "type" : "null"
+            } ]
+          }
+        }
+      },
+      "RecurringRuleDto" : {
+        "type" : "object",
+        "required" : [ "id", "type", "label", "amountCents", "dayOfMonth", "memberId", "vendor", "active", "startDate", "endDate" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/EntryType"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "amountCents" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "dayOfMonth" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "memberId" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "vendor" : {
+            "type" : [ "string", "null" ]
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "startDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "endDate" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
+            }, {
+              "type" : "null"
+            } ]
+          }
+        }
+      },
+      "RecurringRuleRequest" : {
+        "type" : "object",
+        "required" : [ "type", "label", "amountCents", "dayOfMonth", "memberId", "vendor", "active", "startDate", "endDate" ],
+        "properties" : {
+          "type" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/EntryType"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "label" : {
+            "type" : [ "string", "null" ]
+          },
+          "amountCents" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "dayOfMonth" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "memberId" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "vendor" : {
+            "type" : [ "string", "null" ]
+          },
+          "active" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "startDate" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "endDate" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
             }, {
               "type" : "null"
             } ]
@@ -754,6 +1082,337 @@
     }
   },
   "paths" : {
+    "/api/admin/finances/entries" : {
+      "post" : {
+        "tags" : [ "Finances" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FinanceEntryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceEntryDto"
+                }
+              }
+            },
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Create Entry",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/finances/entries/{id}" : {
+      "put" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FinanceEntryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceEntryDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Update Entry",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Delete Entry",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/finances/rules" : {
+      "get" : {
+        "tags" : [ "Finances" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/RecurringRuleDto"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "List Rules",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Finances" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RecurringRuleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RecurringRuleDto"
+                }
+              }
+            },
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Create Rule",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/finances/rules/{id}" : {
+      "put" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RecurringRuleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RecurringRuleDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Update Rule",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Delete Rule",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/finances/settings" : {
+      "put" : {
+        "tags" : [ "Finances" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FinanceSettingsRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceSettingsDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Update Settings",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "get" : {
+        "tags" : [ "Finances" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceSettingsDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Get Settings",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
     "/api/admin/jobs" : {
       "get" : {
         "tags" : [ "Portal" ],
@@ -1370,6 +2029,135 @@
         "summary" : "List Releases"
       }
     },
+    "/api/finances/energy" : {
+      "get" : {
+        "tags" : [ "Finances" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EnergyStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Energy Status"
+      }
+    },
+    "/api/finances/entries" : {
+      "get" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "schema" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/EntryType"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "required" : true
+        }, {
+          "name" : "year",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceEntriesPageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Search Entries"
+      }
+    },
+    "/api/finances/monthly" : {
+      "get" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "year",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/MonthlyTotalsDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Monthly Breakdown"
+      }
+    },
+    "/api/finances/summary" : {
+      "get" : {
+        "tags" : [ "Finances" ],
+        "parameters" : [ {
+          "name" : "year",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinanceSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Summary"
+      }
+    },
     "/api/me" : {
       "get" : {
         "tags" : [ "Portal" ],
@@ -1386,6 +2174,27 @@
           }
         },
         "summary" : "Get Current User"
+      }
+    },
+    "/api/members" : {
+      "get" : {
+        "tags" : [ "Membres" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/MemberDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "List Members"
       }
     },
     "/api/notifications/bazarr" : {
@@ -1606,10 +2415,10 @@
     }
   },
   "servers" : [ {
-    "url" : "http://localhost:8088",
+    "url" : "http://localhost:8080",
     "description" : "Auto generated value"
   }, {
-    "url" : "http://0.0.0.0:8088",
+    "url" : "http://0.0.0.0:8080",
     "description" : "Auto generated value"
   } ]
 }

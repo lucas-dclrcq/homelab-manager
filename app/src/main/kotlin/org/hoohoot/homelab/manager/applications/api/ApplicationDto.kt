@@ -13,13 +13,14 @@ data class ApplicationDto(
     val url: String,
     val requiresVpn: Boolean,
     val hasLogo: Boolean,
+    val logoSourceUrl: String?,
     val managedBy: String?,
     val externalId: String?,
     val updatedAt: LocalDateTime?,
 )
 
 fun ApplicationSummary.toDto() =
-    ApplicationDto(id, name, category, description, url, requiresVpn, hasLogo, managedBy, externalId, updatedAt)
+    ApplicationDto(id, name, category, description, url, requiresVpn, hasLogo, logoSourceUrl, managedBy, externalId, updatedAt)
 
 fun ApplicationEntity.toDto() =
-    ApplicationDto(requireNotNull(id), name, category, description, url, requiresVpn, logo != null, managedBy, externalId, updatedAt)
+    ApplicationDto(requireNotNull(id), name, category, description, url, requiresVpn, logo != null, logoSourceUrl, managedBy, externalId, updatedAt)

@@ -22,6 +22,7 @@ data class ApplicationDto(
     val description: String,
     val url: String,
     val requiresVpn: Boolean,
+    val logoSourceUrl: String? = null,
     val managedBy: String? = null,
     val externalId: String? = null,
 )
@@ -34,9 +35,9 @@ data class ApplicationRequest(
     val requiresVpn: Boolean,
     val managedBy: String,
     val externalId: String,
+    val logoUrl: String?,
 )
 
-// Auth par clé partagée : header X-Api-Key statique via quarkus.rest-client.manager-api.headers
 @Path("/api/operator/applications")
 @RegisterRestClient(configKey = "manager-api")
 @Consumes(MediaType.APPLICATION_JSON)

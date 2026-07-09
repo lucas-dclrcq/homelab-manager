@@ -15,6 +15,7 @@ data class ApplicationSummary(
     val url: String,
     val requiresVpn: Boolean,
     val hasLogo: Boolean,
+    val logoSourceUrl: String?,
     val managedBy: String?,
     val externalId: String?,
     val updatedAt: LocalDateTime?,
@@ -31,12 +32,17 @@ class ApplicationRepository : Applications {
                 session.createQuery(
                     """select new org.hoohoot.homelab.manager.applications.infra.ApplicationSummary(
                            a.id, a.name, a.category, a.description, a.url, a.requiresVpn,
-                           case when a.logo is null then false else true end, a.managedBy, a.externalId, a.updatedAt)
+                           case when a.logo is null then false else true end, a.logoSourceUrl, a.managedBy, a.externalId, a.updatedAt)
                        from ApplicationEntity a
                        order by a.category, a.name""",
                     ApplicationSummary::class.java
                 ).resultList
             }
+        }.awaitSuspending()
+
+    override suspend fun findById(id: UUID): ApplicationEntity? =
+        Panache.withSession {
+            ApplicationEntity.findById(id)
         }.awaitSuspending()
 
     override suspend fun save(entity: ApplicationEntity): ApplicationEntity =
@@ -55,9 +61,7 @@ class ApplicationRepository : Applications {
         }.awaitSuspending()
 
     suspend fun findLogo(id: UUID): ApplicationLogo? {
-        val entity = Panache.withSession {
-            ApplicationEntity.findById(id)
-        }.awaitSuspending()
+        val entity = findById(id)
         val content = entity?.logo ?: return null
         return ApplicationLogo(content, entity.logoContentType ?: "application/octet-stream")
     }

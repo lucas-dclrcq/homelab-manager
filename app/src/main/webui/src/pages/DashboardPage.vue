@@ -19,7 +19,7 @@ const greeting = computed(() => {
         {{ greeting
         }}{{ userStore.username ? `, ${userStore.username}` : '' }} 🦉
       </h1>
-      <p class="mt-2 text-ink-soft">Voilà ce qui se passe à la maison.</p>
+      <p class="mt-2 text-ink-soft">Voilà ce qui se passe sur Hoohoot.</p>
     </header>
 
     <StatsPanel />

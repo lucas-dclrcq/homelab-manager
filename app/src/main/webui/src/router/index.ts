@@ -20,6 +20,11 @@ const router = createRouter({
       component: () => import('../pages/CorrectorPage.vue'),
     },
     {
+      path: '/finances',
+      name: 'finances',
+      component: () => import('../pages/FinancesPage.vue'),
+    },
+    {
       path: '/corrector/:id',
       name: 'corrector-workflow',
       component: () => import('../pages/CorrectorWorkflowPage.vue'),
@@ -38,6 +43,18 @@ const router = createRouter({
       path: '/admin/jobs',
       name: 'admin-jobs',
       component: () => import('../pages/AdminJobsPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/finances',
+      name: 'admin-finances',
+      component: () => import('../pages/AdminFinancesPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/members',
+      name: 'admin-members',
+      component: () => import('../pages/AdminMembersPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

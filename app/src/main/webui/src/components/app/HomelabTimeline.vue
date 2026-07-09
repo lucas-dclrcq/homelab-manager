@@ -99,7 +99,7 @@ function detailsFor(event: TimelineEventDto): string {
         v-if="events.length === 0"
         class="rounded-tile border-[1.5px] border-line bg-paper p-6 text-sm text-ink-soft"
       >
-        Tout est calme à la maison 🦉 — les téléchargements apparaîtront ici.
+        Tout est calme pour l'instant 🦉 — les téléchargements apparaîtront ici.
       </p>
       <BaseTimeline v-else>
         <BaseTimelineItem

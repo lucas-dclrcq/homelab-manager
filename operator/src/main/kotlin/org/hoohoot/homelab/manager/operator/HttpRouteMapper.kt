@@ -11,6 +11,7 @@ data class DesiredApplication(
     val description: String,
     val url: String,
     val requiresVpn: Boolean,
+    val logoUrl: String? = null,
 )
 
 const val MANAGED_BY = "operator"
@@ -43,6 +44,7 @@ class HttpRouteMapper(private val config: OperatorConfig) {
             description = annotations["$prefix/description"]?.takeIf { it.isNotBlank() } ?: DEFAULT_DESCRIPTION,
             url = url,
             requiresVpn = requiresVpn,
+            logoUrl = annotations["$prefix/logo-url"]?.takeIf { it.isNotBlank() },
         )
     }
 }

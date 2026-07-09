@@ -9,7 +9,7 @@ import ApplicationsByCategory from '../components/app/ApplicationsByCategory.vue
         Tes applis
       </h1>
       <p class="mt-2 text-ink-soft">
-        Tout ce que la maison héberge — le cadenas veut dire qu'il faut le VPN.
+        Tout ce que hoohoot héberge — le cadenas veut dire qu'il faut le VPN.
       </p>
     </header>
 

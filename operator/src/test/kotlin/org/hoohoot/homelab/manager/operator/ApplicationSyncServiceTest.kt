@@ -104,7 +104,8 @@ internal class ApplicationSyncServiceTest {
                             "url": "https://jellyfin.example.org",
                             "requiresVpn": false,
                             "managedBy": "operator",
-                            "externalId": "media/jellyfin"
+                            "externalId": "media/jellyfin",
+                            "logoUrl": null
                         }
                         """.trimIndent()
                     )
@@ -131,12 +132,51 @@ internal class ApplicationSyncServiceTest {
                             "url": "https://jellyfin.example.org",
                             "requiresVpn": true,
                             "managedBy": "operator",
-                            "externalId": "media/jellyfin"
+                            "externalId": "media/jellyfin",
+                            "logoUrl": null
                         }
                         """.trimIndent()
                     )
                 )
         )
+    }
+
+    @Test
+    fun `updates a managed application when the declared logo url drifts`() {
+        stubList(managedJellyfin)
+
+        val logoUrl = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg"
+        syncService.syncAll(listOf(desiredJellyfin.copy(logoUrl = logoUrl)))
+
+        server.verify(
+            putRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111"))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                        {
+                            "name": "jellyfin",
+                            "category": "Uncategorized",
+                            "description": "$DEFAULT_DESCRIPTION",
+                            "url": "https://jellyfin.example.org",
+                            "requiresVpn": false,
+                            "managedBy": "operator",
+                            "externalId": "media/jellyfin",
+                            "logoUrl": "$logoUrl"
+                        }
+                        """.trimIndent()
+                    )
+                )
+        )
+    }
+
+    @Test
+    fun `does not consider a manually uploaded logo as drift`() {
+        // hasLogo true mais logoSourceUrl null : logo posé à la main, la route ne déclare pas de logo-url
+        stubList(managedJellyfin.replace("\"hasLogo\": false", "\"hasLogo\": true"))
+
+        syncService.syncAll(listOf(desiredJellyfin))
+
+        server.verify(0, putRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111")))
     }
 
     @Test

@@ -49,7 +49,7 @@ const { mutate: deleteApplication, isPending: isDeleting } =
           Applications
         </h1>
         <p class="mt-2 text-ink-soft">
-          Le catalogue de la maison : ajoute, corrige ou retire des applis.
+          Le catalogue de hoohoot : ajoute, corrige ou retire des applis.
         </p>
       </div>
       <BaseButton @click="openCreate">
@@ -74,7 +74,7 @@ const { mutate: deleteApplication, isPending: isDeleting } =
       @close="deleting = null"
     >
       <p class="mb-5 text-sm text-ink-soft">
-        Elle disparaîtra du catalogue de toute la maison. Pas de retour en
+        Elle disparaîtra du catalogue. Pas de retour en
         arrière possible.
       </p>
       <div class="flex gap-3">

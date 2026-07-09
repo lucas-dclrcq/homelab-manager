@@ -30,7 +30,7 @@ const byCategory = computed<Map<string, ApplicationDto[]>>(() => {
     v-else-if="byCategory.size === 0"
     class="rounded-tile border-[1.5px] border-line bg-paper p-6 text-sm text-ink-soft"
   >
-    Aucune appli pour l'instant — la maison est toute neuve 🦉
+    Aucune appli pour l'instant 🦉
   </p>
   <div v-else class="flex flex-col gap-8">
     <section

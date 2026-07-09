@@ -9,7 +9,7 @@ import JobsPanel from '../components/app/JobsPanel.vue'
         Tâches
       </h1>
       <p class="mt-2 text-ink-soft">
-        Les synchronisations et routines planifiées de la maison.
+        Les synchronisations et routines planifiées de hoohoot.
       </p>
     </header>
 

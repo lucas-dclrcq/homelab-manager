@@ -36,6 +36,9 @@ class ApplicationEntity : PanacheEntityBase {
     @Column(name = "logo_content_type")
     var logoContentType: String? = null
 
+    @Column(name = "logo_source_url")
+    var logoSourceUrl: String? = null
+
     @Column(name = "managed_by")
     var managedBy: String? = null
 

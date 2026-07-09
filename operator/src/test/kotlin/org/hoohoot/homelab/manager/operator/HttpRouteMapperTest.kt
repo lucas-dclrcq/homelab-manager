@@ -81,6 +81,34 @@ internal class HttpRouteMapperTest {
     }
 
     @Test
+    fun `maps the logo-url annotation when present`() {
+        val desired = mapper.map(
+            route(
+                annotations = mapOf(
+                    "homelab-manager.hoohoot.org/enabled" to "true",
+                    "homelab-manager.hoohoot.org/logo-url" to "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg",
+                )
+            )
+        )
+
+        assertThat(desired?.logoUrl).isEqualTo("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg")
+    }
+
+    @Test
+    fun `ignores a blank logo-url annotation`() {
+        val desired = mapper.map(
+            route(
+                annotations = mapOf(
+                    "homelab-manager.hoohoot.org/enabled" to "true",
+                    "homelab-manager.hoohoot.org/logo-url" to "  ",
+                )
+            )
+        )
+
+        assertThat(desired?.logoUrl).isNull()
+    }
+
+    @Test
     fun `url annotation overrides the hostname`() {
         val desired = mapper.map(
             route(

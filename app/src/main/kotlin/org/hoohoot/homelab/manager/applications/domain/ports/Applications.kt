@@ -6,6 +6,7 @@ import java.util.UUID
 
 interface Applications {
     suspend fun listSummaries(): List<ApplicationSummary>
+    suspend fun findById(id: UUID): ApplicationEntity?
     suspend fun save(entity: ApplicationEntity): ApplicationEntity
     suspend fun update(id: UUID, mutate: (ApplicationEntity) -> Unit): ApplicationEntity?
     suspend fun delete(id: UUID): Boolean

@@ -27,16 +27,30 @@ import type {
   CorrectorReleaseDto,
   CorrectorWorkflowDto,
   CreateWorkflowRequest,
+  EnergyStatusDto,
+  FinanceEntriesPageDto,
+  FinanceEntryDto,
+  FinanceEntryRequest,
+  FinanceSettingsDto,
+  FinanceSettingsRequest,
+  FinanceSummaryDto,
   GetApiCorrectorMoviesParams,
+  GetApiFinancesEntriesParams,
+  GetApiFinancesMonthlyParams,
+  GetApiFinancesSummaryParams,
   GetApiTimelineParams,
   GrabReleaseRequest,
   JobStatusDto,
   LibraryStats,
   LidarrWebhookPayload,
   MeDto,
+  MemberDto,
+  MonthlyTotalsDto,
   PostApiApplicationsBody,
   PutApiApplicationsIdBody,
   RadarrWebhookPayload,
+  RecurringRuleDto,
+  RecurringRuleRequest,
   SeerrWebhookPayload,
   SelectMovieRequest,
   SelectProblemRequest,
@@ -48,6 +62,826 @@ import type {
 import { customInstance } from "../axios-instance";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary Create Entry
+ */
+export const postApiAdminFinancesEntries = (
+  financeEntryRequest: MaybeRef<FinanceEntryRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  financeEntryRequest = unref(financeEntryRequest);
+
+  return customInstance<FinanceEntryDto>(
+    {
+      url: `/api/admin/finances/entries`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: financeEntryRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminFinancesEntriesMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminFinancesEntries>>,
+    TError,
+    { data: FinanceEntryRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminFinancesEntries>>,
+  TError,
+  { data: FinanceEntryRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminFinancesEntries"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminFinancesEntries>>,
+    { data: FinanceEntryRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAdminFinancesEntries(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminFinancesEntriesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminFinancesEntries>>
+>;
+export type PostApiAdminFinancesEntriesMutationBody = FinanceEntryRequest;
+export type PostApiAdminFinancesEntriesMutationError = void;
+
+/**
+ * @summary Create Entry
+ */
+export const usePostApiAdminFinancesEntries = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminFinancesEntries>>,
+      TError,
+      { data: FinanceEntryRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminFinancesEntries>>,
+  TError,
+  { data: FinanceEntryRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminFinancesEntriesMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Entry
+ */
+export const putApiAdminFinancesEntriesId = (
+  id: MaybeRef<Uuid>,
+  financeEntryRequest: MaybeRef<FinanceEntryRequest>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+  financeEntryRequest = unref(financeEntryRequest);
+
+  return customInstance<FinanceEntryDto>(
+    {
+      url: `/api/admin/finances/entries/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: financeEntryRequest,
+    },
+    options,
+  );
+};
+
+export const getPutApiAdminFinancesEntriesIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>,
+    TError,
+    { id: Uuid; data: FinanceEntryRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>,
+  TError,
+  { id: Uuid; data: FinanceEntryRequest },
+  TContext
+> => {
+  const mutationKey = ["putApiAdminFinancesEntriesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>,
+    { id: Uuid; data: FinanceEntryRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putApiAdminFinancesEntriesId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutApiAdminFinancesEntriesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>
+>;
+export type PutApiAdminFinancesEntriesIdMutationBody = FinanceEntryRequest;
+export type PutApiAdminFinancesEntriesIdMutationError = void;
+
+/**
+ * @summary Update Entry
+ */
+export const usePutApiAdminFinancesEntriesId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>,
+      TError,
+      { id: Uuid; data: FinanceEntryRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof putApiAdminFinancesEntriesId>>,
+  TError,
+  { id: Uuid; data: FinanceEntryRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPutApiAdminFinancesEntriesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Entry
+ */
+export const deleteApiAdminFinancesEntriesId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/finances/entries/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiAdminFinancesEntriesIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiAdminFinancesEntriesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiAdminFinancesEntriesId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiAdminFinancesEntriesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>
+>;
+
+export type DeleteApiAdminFinancesEntriesIdMutationError = void;
+
+/**
+ * @summary Delete Entry
+ */
+export const useDeleteApiAdminFinancesEntriesId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesEntriesId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getDeleteApiAdminFinancesEntriesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List Rules
+ */
+export const getApiAdminFinancesRules = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RecurringRuleDto[]>(
+    { url: `/api/admin/finances/rules`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminFinancesRulesQueryKey = () => {
+  return ["api", "admin", "finances", "rules"] as const;
+};
+
+export const getGetApiAdminFinancesRulesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminFinancesRules>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAdminFinancesRules>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminFinancesRulesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminFinancesRules>>
+  > = ({ signal }) => getApiAdminFinancesRules(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminFinancesRules>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminFinancesRulesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminFinancesRules>>
+>;
+export type GetApiAdminFinancesRulesQueryError = void;
+
+/**
+ * @summary List Rules
+ */
+
+export function useGetApiAdminFinancesRules<
+  TData = Awaited<ReturnType<typeof getApiAdminFinancesRules>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminFinancesRules>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminFinancesRulesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Create Rule
+ */
+export const postApiAdminFinancesRules = (
+  recurringRuleRequest: MaybeRef<RecurringRuleRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  recurringRuleRequest = unref(recurringRuleRequest);
+
+  return customInstance<RecurringRuleDto>(
+    {
+      url: `/api/admin/finances/rules`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: recurringRuleRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminFinancesRulesMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminFinancesRules>>,
+    TError,
+    { data: RecurringRuleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminFinancesRules>>,
+  TError,
+  { data: RecurringRuleRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminFinancesRules"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminFinancesRules>>,
+    { data: RecurringRuleRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAdminFinancesRules(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminFinancesRulesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminFinancesRules>>
+>;
+export type PostApiAdminFinancesRulesMutationBody = RecurringRuleRequest;
+export type PostApiAdminFinancesRulesMutationError = void;
+
+/**
+ * @summary Create Rule
+ */
+export const usePostApiAdminFinancesRules = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminFinancesRules>>,
+      TError,
+      { data: RecurringRuleRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminFinancesRules>>,
+  TError,
+  { data: RecurringRuleRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiAdminFinancesRulesMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Rule
+ */
+export const putApiAdminFinancesRulesId = (
+  id: MaybeRef<Uuid>,
+  recurringRuleRequest: MaybeRef<RecurringRuleRequest>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+  recurringRuleRequest = unref(recurringRuleRequest);
+
+  return customInstance<RecurringRuleDto>(
+    {
+      url: `/api/admin/finances/rules/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: recurringRuleRequest,
+    },
+    options,
+  );
+};
+
+export const getPutApiAdminFinancesRulesIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>,
+    TError,
+    { id: Uuid; data: RecurringRuleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>,
+  TError,
+  { id: Uuid; data: RecurringRuleRequest },
+  TContext
+> => {
+  const mutationKey = ["putApiAdminFinancesRulesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>,
+    { id: Uuid; data: RecurringRuleRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putApiAdminFinancesRulesId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutApiAdminFinancesRulesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>
+>;
+export type PutApiAdminFinancesRulesIdMutationBody = RecurringRuleRequest;
+export type PutApiAdminFinancesRulesIdMutationError = void;
+
+/**
+ * @summary Update Rule
+ */
+export const usePutApiAdminFinancesRulesId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>,
+      TError,
+      { id: Uuid; data: RecurringRuleRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof putApiAdminFinancesRulesId>>,
+  TError,
+  { id: Uuid; data: RecurringRuleRequest },
+  TContext
+> => {
+  const mutationOptions = getPutApiAdminFinancesRulesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Rule
+ */
+export const deleteApiAdminFinancesRulesId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/finances/rules/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiAdminFinancesRulesIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiAdminFinancesRulesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiAdminFinancesRulesId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiAdminFinancesRulesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>
+>;
+
+export type DeleteApiAdminFinancesRulesIdMutationError = void;
+
+/**
+ * @summary Delete Rule
+ */
+export const useDeleteApiAdminFinancesRulesId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiAdminFinancesRulesId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getDeleteApiAdminFinancesRulesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Settings
+ */
+export const putApiAdminFinancesSettings = (
+  financeSettingsRequest: MaybeRef<FinanceSettingsRequest>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  financeSettingsRequest = unref(financeSettingsRequest);
+
+  return customInstance<FinanceSettingsDto>(
+    {
+      url: `/api/admin/finances/settings`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: financeSettingsRequest,
+    },
+    options,
+  );
+};
+
+export const getPutApiAdminFinancesSettingsMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putApiAdminFinancesSettings>>,
+    TError,
+    { data: FinanceSettingsRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putApiAdminFinancesSettings>>,
+  TError,
+  { data: FinanceSettingsRequest },
+  TContext
+> => {
+  const mutationKey = ["putApiAdminFinancesSettings"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putApiAdminFinancesSettings>>,
+    { data: FinanceSettingsRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return putApiAdminFinancesSettings(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutApiAdminFinancesSettingsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putApiAdminFinancesSettings>>
+>;
+export type PutApiAdminFinancesSettingsMutationBody = FinanceSettingsRequest;
+export type PutApiAdminFinancesSettingsMutationError = void;
+
+/**
+ * @summary Update Settings
+ */
+export const usePutApiAdminFinancesSettings = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putApiAdminFinancesSettings>>,
+      TError,
+      { data: FinanceSettingsRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof putApiAdminFinancesSettings>>,
+  TError,
+  { data: FinanceSettingsRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPutApiAdminFinancesSettingsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get Settings
+ */
+export const getApiAdminFinancesSettings = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<FinanceSettingsDto>(
+    { url: `/api/admin/finances/settings`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminFinancesSettingsQueryKey = () => {
+  return ["api", "admin", "finances", "settings"] as const;
+};
+
+export const getGetApiAdminFinancesSettingsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminFinancesSettings>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAdminFinancesSettings>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminFinancesSettingsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminFinancesSettings>>
+  > = ({ signal }) => getApiAdminFinancesSettings(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminFinancesSettings>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminFinancesSettingsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminFinancesSettings>>
+>;
+export type GetApiAdminFinancesSettingsQueryError = void;
+
+/**
+ * @summary Get Settings
+ */
+
+export function useGetApiAdminFinancesSettings<
+  TData = Awaited<ReturnType<typeof getApiAdminFinancesSettings>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminFinancesSettings>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminFinancesSettingsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
 
 /**
  * @summary List Jobs
@@ -1775,6 +2609,400 @@ export function useGetApiCorrectorWorkflowsIdReleases<
 }
 
 /**
+ * @summary Get Energy Status
+ */
+export const getApiFinancesEnergy = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<EnergyStatusDto>(
+    { url: `/api/finances/energy`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiFinancesEnergyQueryKey = () => {
+  return ["api", "finances", "energy"] as const;
+};
+
+export const getGetApiFinancesEnergyQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiFinancesEnergy>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiFinancesEnergy>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiFinancesEnergyQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiFinancesEnergy>>
+  > = ({ signal }) => getApiFinancesEnergy(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiFinancesEnergy>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiFinancesEnergyQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiFinancesEnergy>>
+>;
+export type GetApiFinancesEnergyQueryError = unknown;
+
+/**
+ * @summary Get Energy Status
+ */
+
+export function useGetApiFinancesEnergy<
+  TData = Awaited<ReturnType<typeof getApiFinancesEnergy>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesEnergy>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiFinancesEnergyQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Search Entries
+ */
+export const getApiFinancesEntries = (
+  params: MaybeRef<GetApiFinancesEntriesParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<FinanceEntriesPageDto>(
+    {
+      url: `/api/finances/entries`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiFinancesEntriesQueryKey = (
+  params: MaybeRef<GetApiFinancesEntriesParams>,
+) => {
+  return ["api", "finances", "entries", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiFinancesEntriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiFinancesEntries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesEntriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesEntries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiFinancesEntriesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiFinancesEntries>>
+  > = ({ signal }) => getApiFinancesEntries(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiFinancesEntries>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiFinancesEntriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiFinancesEntries>>
+>;
+export type GetApiFinancesEntriesQueryError = unknown;
+
+/**
+ * @summary Search Entries
+ */
+
+export function useGetApiFinancesEntries<
+  TData = Awaited<ReturnType<typeof getApiFinancesEntries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesEntriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesEntries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiFinancesEntriesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Monthly Breakdown
+ */
+export const getApiFinancesMonthly = (
+  params: MaybeRef<GetApiFinancesMonthlyParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<MonthlyTotalsDto[]>(
+    {
+      url: `/api/finances/monthly`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiFinancesMonthlyQueryKey = (
+  params: MaybeRef<GetApiFinancesMonthlyParams>,
+) => {
+  return ["api", "finances", "monthly", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiFinancesMonthlyQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiFinancesMonthly>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesMonthlyParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesMonthly>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiFinancesMonthlyQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiFinancesMonthly>>
+  > = ({ signal }) => getApiFinancesMonthly(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiFinancesMonthly>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiFinancesMonthlyQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiFinancesMonthly>>
+>;
+export type GetApiFinancesMonthlyQueryError = unknown;
+
+/**
+ * @summary Get Monthly Breakdown
+ */
+
+export function useGetApiFinancesMonthly<
+  TData = Awaited<ReturnType<typeof getApiFinancesMonthly>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesMonthlyParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesMonthly>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiFinancesMonthlyQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Summary
+ */
+export const getApiFinancesSummary = (
+  params: MaybeRef<GetApiFinancesSummaryParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<FinanceSummaryDto>(
+    {
+      url: `/api/finances/summary`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiFinancesSummaryQueryKey = (
+  params: MaybeRef<GetApiFinancesSummaryParams>,
+) => {
+  return ["api", "finances", "summary", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiFinancesSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiFinancesSummary>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesSummaryParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiFinancesSummaryQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiFinancesSummary>>
+  > = ({ signal }) => getApiFinancesSummary(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiFinancesSummary>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiFinancesSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiFinancesSummary>>
+>;
+export type GetApiFinancesSummaryQueryError = unknown;
+
+/**
+ * @summary Get Summary
+ */
+
+export function useGetApiFinancesSummary<
+  TData = Awaited<ReturnType<typeof getApiFinancesSummary>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiFinancesSummaryParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiFinancesSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiFinancesSummaryQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
  * @summary Get Current User
  */
 export const getApiMe = (
@@ -1839,6 +3067,86 @@ export function useGetApiMe<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiMeQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary List Members
+ */
+export const getApiMembers = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<MemberDto[]>(
+    { url: `/api/members`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiMembersQueryKey = () => {
+  return ["api", "members"] as const;
+};
+
+export const getGetApiMembersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiMembers>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiMembers>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiMembersQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiMembers>>> = ({
+    signal,
+  }) => getApiMembers(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiMembers>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiMembersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiMembers>>
+>;
+export type GetApiMembersQueryError = unknown;
+
+/**
+ * @summary List Members
+ */
+
+export function useGetApiMembers<
+  TData = Awaited<ReturnType<typeof getApiMembers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiMembers>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiMembersQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
     TData,

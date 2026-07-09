@@ -16,8 +16,11 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
+import org.hoohoot.homelab.manager.applications.domain.ALLOWED_LOGO_CONTENT_TYPES
 import org.hoohoot.homelab.manager.applications.domain.ApplicationInput
+import org.hoohoot.homelab.manager.applications.domain.LogoChange
 import org.hoohoot.homelab.manager.applications.domain.LogoUpload
+import org.hoohoot.homelab.manager.applications.domain.MAX_LOGO_SIZE_BYTES
 import org.hoohoot.homelab.manager.applications.domain.usecases.CreateApplication
 import org.hoohoot.homelab.manager.applications.domain.usecases.DeleteApplication
 import org.hoohoot.homelab.manager.applications.domain.usecases.ListApplications
@@ -27,9 +30,6 @@ import org.hoohoot.homelab.manager.shared.api.badRequest
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
 import java.util.UUID
-
-private val ALLOWED_LOGO_CONTENT_TYPES = setOf("image/png", "image/jpeg", "image/svg+xml", "image/webp")
-private const val MAX_LOGO_SIZE_BYTES = 1024L * 1024L
 
 @Path("/api/applications")
 @Produces(MediaType.APPLICATION_JSON)
@@ -147,8 +147,8 @@ class ApplicationsResource(
     }
 
     // The upload lives in a temp file: read it with Vert.x before opening the reactive session
-    private suspend fun readLogo(logo: FileUpload?): LogoUpload? = logo?.let {
+    private suspend fun readLogo(logo: FileUpload?): LogoChange = logo?.let {
         val bytes = vertx.fileSystem().readFile(it.uploadedFile().toString()).awaitSuspending().bytes
-        LogoUpload(bytes, it.contentType())
-    }
+        LogoChange.Upload(LogoUpload(bytes, it.contentType()))
+    } ?: LogoChange.Keep
 }

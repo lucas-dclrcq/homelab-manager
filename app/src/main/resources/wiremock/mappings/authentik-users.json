@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/core/users/"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "pagination": { "next": 0, "total_pages": 1, "count": 3 },
+      "results": [
+        {
+          "pk": 1,
+          "username": "alice",
+          "name": "Alice la Chouette",
+          "email": "alice@hoohoot.org",
+          "is_active": true
+        },
+        {
+          "pk": 2,
+          "username": "bob",
+          "name": "Bob le Hibou",
+          "email": "bob@hoohoot.org",
+          "is_active": true
+        },
+        {
+          "pk": 3,
+          "username": "paul",
+          "name": "Paul",
+          "email": "paul@hoohoot.org",
+          "is_active": true
+        }
+      ]
+    }
+  }
+}

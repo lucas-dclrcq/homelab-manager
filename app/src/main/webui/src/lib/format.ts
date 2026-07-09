@@ -17,3 +17,18 @@ export function formatDateTime(isoDate: string): string {
     minute: '2-digit',
   })
 }
+
+export function formatDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+export function formatEuros(cents: number): string {
+  return (cents / 100).toLocaleString('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+  })
+}

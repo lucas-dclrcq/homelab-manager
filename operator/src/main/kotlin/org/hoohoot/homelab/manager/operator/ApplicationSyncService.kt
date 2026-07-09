@@ -55,14 +55,18 @@ class ApplicationSyncService(@param:RestClient private val api: ManagerApiClient
     }
 
     private fun DesiredApplication.toRequest() =
-        ApplicationRequest(name, category, description, url, requiresVpn, MANAGED_BY, externalId)
+        ApplicationRequest(name, category, description, url, requiresVpn, MANAGED_BY, externalId, logoUrl)
 
+    // logoSourceUrl : un logo uploadé à la main a une source nulle, donc pas de drift tant que
+    // le CRD ne déclare pas de logo-url ; un téléchargement échoué garde l'ancienne source et
+    // sera retenté au prochain sweep
     private fun ApplicationDto.hasDriftedFrom(desired: DesiredApplication): Boolean =
         name != desired.name ||
             category != desired.category ||
             description != desired.description ||
             url != desired.url ||
-            requiresVpn != desired.requiresVpn
+            requiresVpn != desired.requiresVpn ||
+            logoSourceUrl != desired.logoUrl
 
     private fun Response.logIfFailed(operation: String) {
         if (status !in 200..299) {

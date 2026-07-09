@@ -47,7 +47,7 @@ const { mutate: selectMovie, isPending: isSelecting } =
 <template>
   <div class="flex flex-col gap-4">
     <p class="text-sm text-ink-soft">
-      Quel film te pose souci ? Cherche-le dans la bibliothèque de la maison.
+      Quel film te pose souci ? Cherche-le dans la bibliothèque.
     </p>
 
     <BaseInput

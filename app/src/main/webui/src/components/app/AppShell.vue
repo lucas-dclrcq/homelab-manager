@@ -28,10 +28,11 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
         <div
           class="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.1em] text-[#8f8798] uppercase"
         >
-          La maison
+          Hoohoot
         </div>
         <SideNavItem to="/" label="Accueil" icon="house" />
         <SideNavItem to="/applications" label="Tes applis" icon="layout-grid" />
+        <SideNavItem to="/finances" label="Finances" icon="piggy-bank" />
         <SideNavItem to="/corrector" label="El Corrector" icon="wrench" />
 
         <template v-if="userStore.isAdmin">
@@ -45,6 +46,8 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
             label="Applications"
             icon="package"
           />
+          <SideNavItem to="/admin/finances" label="Finances" icon="wallet" />
+          <SideNavItem to="/admin/members" label="Membres" icon="users" />
           <SideNavItem to="/admin/jobs" label="Tâches" icon="clock" />
         </template>
 

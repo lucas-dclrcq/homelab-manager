@@ -24,6 +24,7 @@ Préfixe configurable (`ANNOTATION_PREFIX`, défaut `homelab-manager.hoohoot.org
 | `homelab-manager.hoohoot.org/category` | non | `DEFAULT_CATEGORY` (défaut `Uncategorized`) |
 | `homelab-manager.hoohoot.org/description` | non | `Managed by homelab-manager-operator` |
 | `homelab-manager.hoohoot.org/url` | non | `https://<premier hostname du spec>` ; sans hostname ni annotation, la route est ignorée |
+| `homelab-manager.hoohoot.org/logo-url` | non | absente → pas de logo ; le portail télécharge l'image (png/jpeg/svg/webp, 1 Mo max) |
 
 Exemple :
 
@@ -38,6 +39,7 @@ metadata:
     homelab-manager.hoohoot.org/name: "Jellyfin"
     homelab-manager.hoohoot.org/category: "Médias"
     homelab-manager.hoohoot.org/description: "Serveur de streaming du homelab"
+    homelab-manager.hoohoot.org/logo-url: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg"
 spec:
   parentRefs:
     - name: internal   # gateway VPN → requiresVpn=true
@@ -45,8 +47,10 @@ spec:
     - jellyfin.example.org
 ```
 
-Les logos ne sont pas gérés par l'opérateur : un logo ajouté à la main dans l'admin sur une
-application managée survit aux reconciles (le PUT ne touche pas au logo quand il est absent).
+Logos : l'annotation `logo-url` déclare la source, le portail télécharge l'image et la stocke.
+Le logo est re-téléchargé quand l'URL change et supprimé quand l'annotation disparaît. Un logo
+uploadé à la main dans l'admin survit aux reconciles tant que la route ne déclare pas de
+`logo-url` (dès qu'une annotation est posée, le déclaratif reprend la main).
 
 ## Configuration
 
