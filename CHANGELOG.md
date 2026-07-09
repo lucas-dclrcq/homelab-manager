@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.0...v0.1.1) (2026-07-09)
+
+
+### Features
+
+* add fault tolerance to all external REST clients ([299cea8](https://github.com/lucas-dclrcq/homelab-manager/commit/299cea854e96c44d986112f313a8c7ee9b70cfe8))
+* **applications:** type the create/update responses in the OpenAPI contract ([8359d45](https://github.com/lucas-dclrcq/homelab-manager/commit/8359d455ea53c14ceb5d4ae4104fcd47d25ad853))
+
 ## 0.1.0 (2026-07-08)
 
 
