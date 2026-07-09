@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.2](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.1...v0.1.2) (2026-07-09)
+
+
+### Features
+
+* add finances tab ([55f5766](https://github.com/lucas-dclrcq/homelab-manager/commit/55f576695808f80177c5086157cd0eeb37224115))
+
+
+### Documentation
+
+* **README:** rewrite ([a62f03a](https://github.com/lucas-dclrcq/homelab-manager/commit/a62f03a845b16332314640b17056dc11547c669c))
+
 ## [0.1.1](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.0...v0.1.1) (2026-07-09)
 
 
