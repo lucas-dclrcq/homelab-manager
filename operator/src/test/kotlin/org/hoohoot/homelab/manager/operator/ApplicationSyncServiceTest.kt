@@ -1,10 +1,11 @@
 package org.hoohoot.homelab.manager.operator
 
-import com.github.tomakehurst.wiremock.client.WireMock.aMultipart
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
+import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
@@ -68,15 +69,14 @@ internal class ApplicationSyncServiceTest {
     @BeforeEach
     fun resetStubs() {
         server.resetAll()
-        WireMockTestResource.stubTokenEndpoint()
-        server.stubFor(post(urlEqualTo("/api/applications")).willReturn(aResponse().withStatus(201)))
+        server.stubFor(post(urlEqualTo("/api/operator/applications")).willReturn(aResponse().withStatus(201)))
         server.stubFor(put(anyUrl()).willReturn(aResponse().withStatus(200)))
         server.stubFor(com.github.tomakehurst.wiremock.client.WireMock.delete(anyUrl()).willReturn(aResponse().withStatus(204)))
     }
 
     private fun stubList(vararg applications: String) {
         server.stubFor(
-            get(urlEqualTo("/api/applications")).willReturn(
+            get(urlEqualTo("/api/operator/applications")).willReturn(
                 aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withBody(applications.joinToString(",", prefix = "[", postfix = "]"))
@@ -85,20 +85,30 @@ internal class ApplicationSyncServiceTest {
     }
 
     @Test
-    fun `creates a missing application with managed fields and bearer token`() {
+    fun `creates a missing application with managed fields and api key`() {
         stubList()
 
         syncService.syncAll(listOf(desiredJellyfin))
 
         server.verify(
-            postRequestedFor(urlEqualTo("/api/applications"))
-                .withHeader("Authorization", equalTo("Bearer test-token"))
-                .withRequestBodyPart(aMultipart().withName("name").withBody(equalTo("jellyfin")).build())
-                .withRequestBodyPart(aMultipart().withName("category").withBody(equalTo("Uncategorized")).build())
-                .withRequestBodyPart(aMultipart().withName("url").withBody(equalTo("https://jellyfin.example.org")).build())
-                .withRequestBodyPart(aMultipart().withName("requiresVpn").withBody(equalTo("false")).build())
-                .withRequestBodyPart(aMultipart().withName("managedBy").withBody(equalTo("operator")).build())
-                .withRequestBodyPart(aMultipart().withName("externalId").withBody(equalTo("media/jellyfin")).build())
+            postRequestedFor(urlEqualTo("/api/operator/applications"))
+                .withHeader("X-Api-Key", equalTo(TEST_API_KEY))
+                .withHeader("Content-Type", containing("application/json"))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                        {
+                            "name": "jellyfin",
+                            "category": "Uncategorized",
+                            "description": "$DEFAULT_DESCRIPTION",
+                            "url": "https://jellyfin.example.org",
+                            "requiresVpn": false,
+                            "managedBy": "operator",
+                            "externalId": "media/jellyfin"
+                        }
+                        """.trimIndent()
+                    )
+                )
         )
     }
 
@@ -109,9 +119,23 @@ internal class ApplicationSyncServiceTest {
         syncService.syncAll(listOf(desiredJellyfin.copy(requiresVpn = true, category = "Médias")))
 
         server.verify(
-            putRequestedFor(urlEqualTo("/api/applications/11111111-1111-1111-1111-111111111111"))
-                .withRequestBodyPart(aMultipart().withName("category").withBody(equalTo("Médias")).build())
-                .withRequestBodyPart(aMultipart().withName("requiresVpn").withBody(equalTo("true")).build())
+            putRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111"))
+                .withHeader("X-Api-Key", equalTo(TEST_API_KEY))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                        {
+                            "name": "jellyfin",
+                            "category": "Médias",
+                            "description": "$DEFAULT_DESCRIPTION",
+                            "url": "https://jellyfin.example.org",
+                            "requiresVpn": true,
+                            "managedBy": "operator",
+                            "externalId": "media/jellyfin"
+                        }
+                        """.trimIndent()
+                    )
+                )
         )
     }
 
@@ -121,9 +145,9 @@ internal class ApplicationSyncServiceTest {
 
         syncService.syncAll(listOf(desiredJellyfin))
 
-        server.verify(0, postRequestedFor(urlEqualTo("/api/applications")))
-        server.verify(0, putRequestedFor(urlEqualTo("/api/applications/11111111-1111-1111-1111-111111111111")))
-        server.verify(0, deleteRequestedFor(urlEqualTo("/api/applications/11111111-1111-1111-1111-111111111111")))
+        server.verify(0, postRequestedFor(urlEqualTo("/api/operator/applications")))
+        server.verify(0, putRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111")))
+        server.verify(0, deleteRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111")))
     }
 
     @Test
@@ -132,8 +156,8 @@ internal class ApplicationSyncServiceTest {
 
         syncService.syncAll(emptyList())
 
-        server.verify(deleteRequestedFor(urlEqualTo("/api/applications/11111111-1111-1111-1111-111111111111")))
-        server.verify(0, deleteRequestedFor(urlEqualTo("/api/applications/22222222-2222-2222-2222-222222222222")))
+        server.verify(deleteRequestedFor(urlEqualTo("/api/operator/applications/11111111-1111-1111-1111-111111111111")))
+        server.verify(0, deleteRequestedFor(urlEqualTo("/api/operator/applications/22222222-2222-2222-2222-222222222222")))
     }
 
     @Test
@@ -142,7 +166,7 @@ internal class ApplicationSyncServiceTest {
 
         syncService.deleteIfManaged("monitoring/grafana")
 
-        server.verify(0, deleteRequestedFor(urlEqualTo("/api/applications/22222222-2222-2222-2222-222222222222")))
+        server.verify(0, deleteRequestedFor(urlEqualTo("/api/operator/applications/22222222-2222-2222-2222-222222222222")))
     }
 
     @Test
@@ -151,6 +175,6 @@ internal class ApplicationSyncServiceTest {
 
         syncService.upsert(desiredJellyfin)
 
-        server.verify(postRequestedFor(urlEqualTo("/api/applications")))
+        server.verify(postRequestedFor(urlEqualTo("/api/operator/applications")))
     }
 }

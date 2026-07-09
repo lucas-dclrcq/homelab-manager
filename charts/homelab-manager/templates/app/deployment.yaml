@@ -34,9 +34,18 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- with .Values.app.env }}
+          {{- if or .Values.app.env .Values.operatorApiKey.existingSecret }}
           env:
+            {{- if .Values.operatorApiKey.existingSecret }}
+            - name: OPERATOR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.operatorApiKey.existingSecret }}
+                  key: {{ .Values.operatorApiKey.key }}
+            {{- end }}
+            {{- with .Values.app.env }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.app.envFrom }}
           envFrom:

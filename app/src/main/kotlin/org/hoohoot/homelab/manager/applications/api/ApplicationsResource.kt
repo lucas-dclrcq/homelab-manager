@@ -16,26 +16,17 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import org.hoohoot.homelab.manager.applications.infra.ApplicationEntity
+import org.hoohoot.homelab.manager.applications.domain.ApplicationInput
+import org.hoohoot.homelab.manager.applications.domain.LogoUpload
+import org.hoohoot.homelab.manager.applications.domain.usecases.CreateApplication
+import org.hoohoot.homelab.manager.applications.domain.usecases.DeleteApplication
+import org.hoohoot.homelab.manager.applications.domain.usecases.ListApplications
+import org.hoohoot.homelab.manager.applications.domain.usecases.UpdateApplication
 import org.hoohoot.homelab.manager.applications.infra.ApplicationRepository
 import org.hoohoot.homelab.manager.shared.api.badRequest
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
-import java.time.LocalDateTime
 import java.util.UUID
-
-data class ApplicationDto(
-    val id: UUID,
-    val name: String,
-    val category: String,
-    val description: String,
-    val url: String,
-    val requiresVpn: Boolean,
-    val hasLogo: Boolean,
-    val managedBy: String?,
-    val externalId: String?,
-    val updatedAt: LocalDateTime?,
-)
 
 private val ALLOWED_LOGO_CONTENT_TYPES = setOf("image/png", "image/jpeg", "image/svg+xml", "image/webp")
 private const val MAX_LOGO_SIZE_BYTES = 1024L * 1024L
@@ -44,18 +35,19 @@ private const val MAX_LOGO_SIZE_BYTES = 1024L * 1024L
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "Portal")
 class ApplicationsResource(
+    private val listApplicationsUseCase: ListApplications,
+    private val createApplicationUseCase: CreateApplication,
+    private val updateApplicationUseCase: UpdateApplication,
+    private val deleteApplicationUseCase: DeleteApplication,
     private val applicationRepository: ApplicationRepository,
     private val vertx: Vertx,
 ) {
 
     @GET
-    suspend fun listApplications(): List<ApplicationDto> =
-        applicationRepository.listSummaries().map {
-            ApplicationDto(it.id, it.name, it.category, it.description, it.url, it.requiresVpn, it.hasLogo, it.managedBy, it.externalId, it.updatedAt)
-        }
+    suspend fun listApplications(): List<ApplicationDto> = listApplicationsUseCase().map { it.toDto() }
 
     @POST
-    @RolesAllowed("admin", "operator")
+    @RolesAllowed("admin")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @APIResponseSchema(value = ApplicationDto::class, responseCode = "201")
     suspend fun createApplication(
@@ -70,29 +62,25 @@ class ApplicationsResource(
     ): Response {
         logoValidationError(logo)?.let { return it }
 
-        val upload = readLogo(logo)
+        val input = ApplicationInput(
+            name = requireNotNull(name),
+            category = requireNotNull(category),
+            description = requireNotNull(description),
+            url = requireNotNull(url),
+            requiresVpn = requiresVpn,
+            managedBy = managedBy,
+            externalId = externalId,
+            logo = readLogo(logo),
+        )
 
-        val entity = ApplicationEntity()
-        entity.id = UUID.randomUUID()
-        entity.name = requireNotNull(name).trim()
-        entity.category = requireNotNull(category).trim()
-        entity.description = requireNotNull(description).trim()
-        entity.url = requireNotNull(url).trim()
-        entity.requiresVpn = requiresVpn
-        entity.managedBy = managedBy?.trim()?.takeIf { it.isNotEmpty() }
-        entity.externalId = externalId?.trim()?.takeIf { it.isNotEmpty() }
-        entity.logo = upload?.bytes
-        entity.logoContentType = upload?.contentType
-        entity.createdAt = LocalDateTime.now()
-
-        val saved = applicationRepository.save(entity)
+        val saved = createApplicationUseCase(input)
 
         return Response.status(Response.Status.CREATED).entity(saved.toDto()).build()
     }
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed("admin", "operator")
+    @RolesAllowed("admin")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @APIResponseSchema(value = ApplicationDto::class, responseCode = "200")
     suspend fun updateApplication(
@@ -108,32 +96,28 @@ class ApplicationsResource(
     ): Response {
         logoValidationError(logo)?.let { return it }
 
-        val upload = readLogo(logo)
+        val input = ApplicationInput(
+            name = requireNotNull(name),
+            category = requireNotNull(category),
+            description = requireNotNull(description),
+            url = requireNotNull(url),
+            requiresVpn = requiresVpn,
+            managedBy = managedBy,
+            externalId = externalId,
+            logo = readLogo(logo),
+        )
 
-        val updated = applicationRepository.update(id) { entity ->
-            entity.name = requireNotNull(name).trim()
-            entity.category = requireNotNull(category).trim()
-            entity.description = requireNotNull(description).trim()
-            entity.url = requireNotNull(url).trim()
-            entity.requiresVpn = requiresVpn
-            // Champs absents du formulaire (admin UI) : on conserve les valeurs existantes
-            managedBy?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.managedBy = it }
-            externalId?.trim()?.takeIf { it.isNotEmpty() }?.let { entity.externalId = it }
-            if (upload != null) {
-                entity.logo = upload.bytes
-                entity.logoContentType = upload.contentType
-            }
-            entity.updatedAt = LocalDateTime.now()
-        } ?: return Response.status(Response.Status.NOT_FOUND).build()
+        val updated = updateApplicationUseCase(id, input)
+            ?: return Response.status(Response.Status.NOT_FOUND).build()
 
         return Response.ok(updated.toDto()).build()
     }
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed("admin", "operator")
+    @RolesAllowed("admin")
     suspend fun deleteApplication(@PathParam("id") id: UUID): Response =
-        if (applicationRepository.delete(id)) {
+        if (deleteApplicationUseCase(id)) {
             Response.noContent().build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()
@@ -162,14 +146,9 @@ class ApplicationsResource(
         return null
     }
 
-    private data class LogoUpload(val bytes: ByteArray, val contentType: String?)
-
     // The upload lives in a temp file: read it with Vert.x before opening the reactive session
     private suspend fun readLogo(logo: FileUpload?): LogoUpload? = logo?.let {
         val bytes = vertx.fileSystem().readFile(it.uploadedFile().toString()).awaitSuspending().bytes
         LogoUpload(bytes, it.contentType())
     }
-
-    private fun ApplicationEntity.toDto() =
-        ApplicationDto(requireNotNull(id), name, category, description, url, requiresVpn, logo != null, managedBy, externalId, updatedAt)
 }

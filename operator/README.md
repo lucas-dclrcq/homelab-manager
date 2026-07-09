@@ -53,26 +53,19 @@ application managée survit aux reconciles (le PUT ne touche pas au logo quand i
 | Variable | Défaut | Description |
 |---|---|---|
 | `MANAGER_API_URL` | `http://localhost:8080` | URL de l'API homelab-manager |
-| `OIDC_AUTH_SERVER_URL` | — | URL du realm OIDC (ex. `https://sso.example.org/realms/homelab`) |
-| `OIDC_CLIENT_ID` | `homelab-manager-operator` | Client OIDC (client credentials) |
-| `OIDC_CLIENT_SECRET` | — | Secret du client |
+| `OPERATOR_API_KEY` | `dev-operator-key` | Clé API partagée avec le portail (header `X-Api-Key`) |
 | `VPN_GATEWAYS` | `internal` | Noms de gateways (séparés par des virgules) impliquant `requiresVpn=true` |
 | `ANNOTATION_PREFIX` | `homelab-manager.hoohoot.org` | Préfixe des annotations |
 | `DEFAULT_CATEGORY` | `Uncategorized` | Catégorie par défaut |
 | `SYNC_INTERVAL` | `5m` | Intervalle du sweep complet |
 | `WATCH_NAMESPACES` | `JOSDK_ALL_NAMESPACES` | Namespaces watchés par le reconciler |
 
-## Setup Keycloak
+## Authentification
 
-L'opérateur s'authentifie en client credentials et appelle les endpoints `/api/applications`
-du portail, qui exigent le rôle `admin` ou `operator` :
-
-1. Créer un client confidentiel `homelab-manager-operator` dans le realm.
-2. Activer *Service accounts roles* sur le client.
-3. Assigner le rôle realm `operator` au service account du client.
-
-Côté portail, `quarkus.oidc.application-type=hybrid` accepte les bearer tokens en plus du flow
-web-app du SPA.
+L'opérateur appelle les endpoints dédiés `/api/operator/applications` du portail, protégés par
+une clé partagée passée dans le header `X-Api-Key`. La même valeur doit être fournie des deux
+côtés via `OPERATOR_API_KEY` (côté portail, clé absente ⇒ tous les appels opérateur sont
+rejetés en 401). Aucun setup Keycloak n'est nécessaire pour l'opérateur.
 
 ## RBAC
 
@@ -112,4 +105,5 @@ mvn -pl operator quarkus:dev
 ```
 
 Le mode dev utilise le kubeconfig local (list/watch cluster-wide requis) et pointe par défaut
-sur `http://localhost:8080` (portail en dev) et un Keycloak local sur le port 8180.
+sur `http://localhost:8080` (portail en dev), avec la clé API de dev `dev-operator-key` des
+deux côtés.

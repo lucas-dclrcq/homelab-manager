@@ -44,22 +44,18 @@ class ApplicationSyncService(@param:RestClient private val api: ManagerApiClient
         when {
             current == null -> {
                 Log.info("Creating application '${desired.name}' (${desired.externalId})")
-                api.create(
-                    desired.name, desired.category, desired.description, desired.url,
-                    desired.requiresVpn.toString(), MANAGED_BY, desired.externalId,
-                ).logIfFailed("create ${desired.externalId}")
+                api.create(desired.toRequest()).logIfFailed("create ${desired.externalId}")
             }
 
             current.hasDriftedFrom(desired) -> {
                 Log.info("Updating application '${desired.name}' (${desired.externalId})")
-                api.update(
-                    current.id,
-                    desired.name, desired.category, desired.description, desired.url,
-                    desired.requiresVpn.toString(), MANAGED_BY, desired.externalId,
-                ).logIfFailed("update ${desired.externalId}")
+                api.update(current.id, desired.toRequest()).logIfFailed("update ${desired.externalId}")
             }
         }
     }
+
+    private fun DesiredApplication.toRequest() =
+        ApplicationRequest(name, category, description, url, requiresVpn, MANAGED_BY, externalId)
 
     private fun ApplicationDto.hasDriftedFrom(desired: DesiredApplication): Boolean =
         name != desired.name ||

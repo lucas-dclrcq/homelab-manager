@@ -1,7 +1,6 @@
 package org.hoohoot.homelab.manager.operator
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.quarkus.oidc.client.filter.OidcClientFilter
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -13,7 +12,6 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
-import org.jboss.resteasy.reactive.RestForm
 import java.util.UUID
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,40 +26,32 @@ data class ApplicationDto(
     val externalId: String? = null,
 )
 
-@Path("/api/applications")
+data class ApplicationRequest(
+    val name: String,
+    val category: String,
+    val description: String,
+    val url: String,
+    val requiresVpn: Boolean,
+    val managedBy: String,
+    val externalId: String,
+)
+
+// Auth par clé partagée : header X-Api-Key statique via quarkus.rest-client.manager-api.headers
+@Path("/api/operator/applications")
 @RegisterRestClient(configKey = "manager-api")
-@OidcClientFilter
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 interface ManagerApiClient {
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     fun list(): List<ApplicationDto>
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    fun create(
-        @RestForm name: String,
-        @RestForm category: String,
-        @RestForm description: String,
-        @RestForm url: String,
-        @RestForm requiresVpn: String,
-        @RestForm managedBy: String,
-        @RestForm externalId: String,
-    ): Response
+    fun create(request: ApplicationRequest): Response
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    fun update(
-        @PathParam("id") id: UUID,
-        @RestForm name: String,
-        @RestForm category: String,
-        @RestForm description: String,
-        @RestForm url: String,
-        @RestForm requiresVpn: String,
-        @RestForm managedBy: String,
-        @RestForm externalId: String,
-    ): Response
+    fun update(@PathParam("id") id: UUID, request: ApplicationRequest): Response
 
     @DELETE
     @Path("/{id}")

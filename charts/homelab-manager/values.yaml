@@ -9,6 +9,13 @@ image:
 
 imagePullSecrets: []
 
+# Clé API partagée entre l'app et l'opérateur (endpoints /api/operator/*).
+# Injectée en OPERATOR_API_KEY dans les deux conteneurs depuis un secret existant.
+# Si absente côté app, tous les appels opérateur sont rejetés en 401 (fail-closed).
+operatorApiKey:
+  existingSecret: ""
+  key: operator-api-key
+
 app:
   replicaCount: 1
 

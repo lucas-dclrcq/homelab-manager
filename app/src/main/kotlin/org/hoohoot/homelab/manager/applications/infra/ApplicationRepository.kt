@@ -3,6 +3,7 @@ package org.hoohoot.homelab.manager.applications.infra
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
+import org.hoohoot.homelab.manager.applications.domain.ports.Applications
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -22,9 +23,9 @@ data class ApplicationSummary(
 data class ApplicationLogo(val content: ByteArray, val contentType: String)
 
 @ApplicationScoped
-class ApplicationRepository {
+class ApplicationRepository : Applications {
 
-    suspend fun listSummaries(): List<ApplicationSummary> =
+    override suspend fun listSummaries(): List<ApplicationSummary> =
         Panache.withSession {
             Panache.getSession().flatMap { session ->
                 session.createQuery(
@@ -38,17 +39,17 @@ class ApplicationRepository {
             }
         }.awaitSuspending()
 
-    suspend fun save(entity: ApplicationEntity): ApplicationEntity =
+    override suspend fun save(entity: ApplicationEntity): ApplicationEntity =
         Panache.withTransaction {
             entity.persist<ApplicationEntity>()
         }.awaitSuspending()
 
-    suspend fun update(id: UUID, mutate: (ApplicationEntity) -> Unit): ApplicationEntity? =
+    override suspend fun update(id: UUID, mutate: (ApplicationEntity) -> Unit): ApplicationEntity? =
         Panache.withTransaction {
             ApplicationEntity.findById(id).invoke { entity -> entity?.let(mutate) }
         }.awaitSuspending()
 
-    suspend fun delete(id: UUID): Boolean =
+    override suspend fun delete(id: UUID): Boolean =
         Panache.withTransaction {
             ApplicationEntity.deleteById(id)
         }.awaitSuspending()
