@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.4](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.3...v0.1.4) (2026-07-10)
+
+
+### Features
+
+* **problems:** other problem reports, tv support, admin module, release recommendations ([42dc89a](https://github.com/lucas-dclrcq/homelab-manager/commit/42dc89a835a96da3d91eddece05c90c0e8fa7d85))
+* **problems:** Problèmes UI — tv/series, other-problem reports, admin module, recommended releases ([6a5868b](https://github.com/lucas-dclrcq/homelab-manager/commit/6a5868b822eaa12b36efb3f03c4698886c93cb5a))
+
+
+### Bug Fixes
+
+* **problems:** base release recommendation on desired quality, not current file ([f720513](https://github.com/lucas-dclrcq/homelab-manager/commit/f72051307732974ee519572c0e99c7954f73432b))
+* **problems:** pin isFrench/isRecommended JSON keys so the default filter works ([38e0861](https://github.com/lucas-dclrcq/homelab-manager/commit/38e0861f245da79d5a777e467b732762e64e4601))
+* **problems:** recommend 1080p+ VF/MULTI torrents regardless of exact profile target ([e6b6438](https://github.com/lucas-dclrcq/homelab-manager/commit/e6b6438952cfb48596fe2e95dfd2f8461e07c857))
+* **problems:** recommend only the exact desired resolution, not higher ([7772470](https://github.com/lucas-dclrcq/homelab-manager/commit/777247089f82915ed495a678064163e99112e1a5))
+* try to avoid infinite loop ([f266f36](https://github.com/lucas-dclrcq/homelab-manager/commit/f266f369fce2223fdce0fb2fde262b9fdcf40204))
+
 ## [0.1.3](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.2...v0.1.3) (2026-07-10)
 
 
