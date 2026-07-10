@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CorrectorWorkflowDto } from '../../api/model'
+import type { ProblemWorkflowDto } from '../../api/model'
 import BaseBadge from '../ui/BaseBadge.vue'
 import UiIcon from '../ui/UiIcon.vue'
 import { formatBytes, formatDateTime } from '../../lib/format'
 
-const props = defineProps<{ workflow: CorrectorWorkflowDto }>()
+const props = defineProps<{ workflow: ProblemWorkflowDto }>()
 
 const isCompleted = computed(() => props.workflow.status === 'COMPLETED')
 </script>

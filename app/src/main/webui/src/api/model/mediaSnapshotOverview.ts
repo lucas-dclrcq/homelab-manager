@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoQuality = string | null;
+export type MediaSnapshotOverview = string | null;

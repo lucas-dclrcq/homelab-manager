@@ -5,7 +5,9 @@
  * OpenAPI spec version: 0.0.1
  */
 import type { SelectProblemRequestProblemType } from "./selectProblemRequestProblemType";
+import type { SelectProblemRequestDescription } from "./selectProblemRequestDescription";
 
 export interface SelectProblemRequest {
   problemType: SelectProblemRequestProblemType;
+  description: SelectProblemRequestDescription;
 }

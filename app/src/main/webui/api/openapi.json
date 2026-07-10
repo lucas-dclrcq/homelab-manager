@@ -23,6 +23,18 @@
   } ],
   "components" : {
     "schemas" : {
+      "AdminProblemWorkflowDto" : {
+        "type" : "object",
+        "required" : [ "username", "workflow" ],
+        "properties" : {
+          "username" : {
+            "type" : "string"
+          },
+          "workflow" : {
+            "$ref" : "#/components/schemas/ProblemWorkflowDto"
+          }
+        }
+      },
       "ApplicationDto" : {
         "type" : "object",
         "required" : [ "id", "name", "category", "description", "url", "requiresVpn", "hasLogo", "logoSourceUrl", "managedBy", "externalId", "updatedAt" ],
@@ -693,7 +705,7 @@
       },
       "ProblemReleaseDto" : {
         "type" : "object",
-        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections", "isFrench" ],
+        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections", "isFrench", "isRecommended" ],
         "properties" : {
           "guid" : {
             "type" : "string"
@@ -741,12 +753,35 @@
           },
           "isFrench" : {
             "type" : "boolean"
+          },
+          "isRecommended" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ProblemSeriesDto" : {
+        "type" : "object",
+        "required" : [ "sonarrSeriesId", "title", "year", "posterUrl" ],
+        "properties" : {
+          "sonarrSeriesId" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
           }
         }
       },
       "ProblemWorkflowDto" : {
         "type" : "object",
-        "required" : [ "id", "mediaType", "status", "currentStep", "problemType", "media", "grabbedRelease", "createdAt", "updatedAt", "completedAt" ],
+        "required" : [ "id", "mediaType", "status", "currentStep", "problemType", "description", "media", "grabbedRelease", "createdAt", "updatedAt", "completedAt" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -761,6 +796,9 @@
             "type" : "string"
           },
           "problemType" : {
+            "type" : [ "string", "null" ]
+          },
+          "description" : {
             "type" : [ "string", "null" ]
           },
           "media" : {
@@ -1026,10 +1064,23 @@
       },
       "SelectProblemRequest" : {
         "type" : "object",
-        "required" : [ "problemType" ],
+        "required" : [ "problemType", "description" ],
         "properties" : {
           "problemType" : {
             "type" : [ "string", "null" ]
+          },
+          "description" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "SelectSeriesRequest" : {
+        "type" : "object",
+        "required" : [ "sonarrSeriesId" ],
+        "properties" : {
+          "sonarrSeriesId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
           }
         }
       },
@@ -1772,6 +1823,397 @@
         } ]
       }
     },
+    "/api/admin/problems/workflows" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminProblemWorkflowDto"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "List Workflows",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Get Workflow",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Workflow supprimé"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Delete Workflow",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/abandon" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Abandon Workflow",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/grab" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/GrabReleaseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Grab Release",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/movie" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectMovieRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Movie",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/problem" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectProblemRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Problem",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/releases" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProblemReleaseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "List Releases",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/resolve" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Resolve Workflow",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/problems/workflows/{id}/series" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectSeriesRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Series",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
     "/api/admin/statistics/import" : {
       "post" : {
         "tags" : [ "Statistics" ],
@@ -2384,6 +2826,35 @@
         "summary" : "Search Movies"
       }
     },
+    "/api/problems/series" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "query",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "string", "null" ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProblemSeriesDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Search Series"
+      }
+    },
     "/api/problems/workflows" : {
       "get" : {
         "tags" : [ "Problems" ],
@@ -2630,6 +3101,71 @@
           }
         },
         "summary" : "List Releases"
+      }
+    },
+    "/api/problems/workflows/{id}/resolve" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Resolve Workflow"
+      }
+    },
+    "/api/problems/workflows/{id}/series" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectSeriesRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Series"
       }
     },
     "/api/statistics/activity-by-hour" : {

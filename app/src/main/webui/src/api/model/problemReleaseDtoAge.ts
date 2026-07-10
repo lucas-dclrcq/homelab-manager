@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoProtocol = string | null;
+export type ProblemReleaseDtoAge = number | null;

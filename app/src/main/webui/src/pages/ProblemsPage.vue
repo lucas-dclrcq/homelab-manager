@@ -3,24 +3,23 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQueryClient } from '@tanstack/vue-query'
 import {
-  getGetApiCorrectorWorkflowsQueryKey,
-  useGetApiCorrectorWorkflows,
-  usePostApiCorrectorWorkflows,
+  getGetApiProblemsWorkflowsQueryKey,
+  useGetApiProblemsWorkflows,
+  usePostApiProblemsWorkflows,
 } from '../api/service/homelab'
-import BaseBadge from '../components/ui/BaseBadge.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseSpinner from '../components/ui/BaseSpinner.vue'
 import UiIcon from '../components/ui/UiIcon.vue'
-import WorkflowCard from '../components/corrector/WorkflowCard.vue'
-import { isActive } from '../lib/corrector'
+import WorkflowCard from '../components/problems/WorkflowCard.vue'
+import { isActive } from '../lib/problems'
 
 const router = useRouter()
 const queryClient = useQueryClient()
 
 const chooseMediaOpen = ref(false)
 
-const { data: workflows, isPending } = useGetApiCorrectorWorkflows()
+const { data: workflows, isPending } = useGetApiProblemsWorkflows()
 
 const activeWorkflows = computed(
   () => workflows.value?.filter((w) => isActive(w)) ?? [],
@@ -30,14 +29,14 @@ const pastWorkflows = computed(
 )
 
 const { mutate: createWorkflow, isPending: isCreating } =
-  usePostApiCorrectorWorkflows({
+  usePostApiProblemsWorkflows({
     mutation: {
       onSuccess: (workflow) => {
         queryClient.invalidateQueries({
-          queryKey: getGetApiCorrectorWorkflowsQueryKey(),
+          queryKey: getGetApiProblemsWorkflowsQueryKey(),
         })
         chooseMediaOpen.value = false
-        router.push(`/corrector/${workflow.id}`)
+        router.push(`/problems/${workflow.id}`)
       },
     },
   })
@@ -48,16 +47,16 @@ const { mutate: createWorkflow, isPending: isCreating } =
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-          El Corrector
+          Problèmes
         </h1>
         <p class="mt-2 text-ink-soft">
-          Un film en VO qui devrait parler français ? On règle ça ensemble, pas
-          besoin d'appeler un adulte.
+          Un film en VO, une série qui coince, un truc qui cloche ? Signale-le
+          ici, on règle ça ensemble.
         </p>
       </div>
       <BaseButton @click="chooseMediaOpen = true">
         <UiIcon name="wrench" class="size-4" />
-        Régler un problème
+        Signaler un problème
       </BaseButton>
     </header>
 
@@ -88,8 +87,8 @@ const { mutate: createWorkflow, isPending: isCreating } =
       >
         <p class="font-display text-lg font-bold">Rien à signaler !</p>
         <p class="mt-1 text-sm text-ink-soft">
-          Quand quelque chose cloche avec un film, clique sur « Régler un
-          problème » et laisse-toi guider.
+          Quand quelque chose cloche avec un film ou une série, clique sur «
+          Signaler un problème » et laisse-toi guider.
         </p>
       </div>
     </template>
@@ -112,13 +111,15 @@ const { mutate: createWorkflow, isPending: isCreating } =
           <UiIcon name="film" class="size-8 text-amber-deep" />
           <span class="font-display font-bold">Un film</span>
         </button>
-        <div
-          class="flex flex-col items-center gap-2 rounded-tile border-[1.5px] border-line bg-cream p-6 opacity-60"
+        <button
+          type="button"
+          class="flex cursor-pointer flex-col items-center gap-2 rounded-tile border-[1.5px] border-line bg-white p-6 transition-colors hover:border-amber disabled:cursor-not-allowed"
+          :disabled="isCreating"
+          @click="createWorkflow({ data: { mediaType: 'tv' } })"
         >
-          <UiIcon name="tv" class="size-8 text-mute" />
-          <span class="font-display font-bold text-mute">Une série</span>
-          <BaseBadge color="dusk">Bientôt</BaseBadge>
-        </div>
+          <UiIcon name="tv" class="size-8 text-amber-deep" />
+          <span class="font-display font-bold">Une série</span>
+        </button>
       </div>
     </BaseModal>
   </div>

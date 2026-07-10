@@ -5,4 +5,6 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorMovieDtoYear = number | null;
+export type GetApiProblemsMoviesParams = {
+  query: string | null;
+};

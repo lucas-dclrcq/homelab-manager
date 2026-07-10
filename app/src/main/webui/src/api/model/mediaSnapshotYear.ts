@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoSeeders = number | null;
+export type MediaSnapshotYear = number | null;

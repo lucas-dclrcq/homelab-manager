@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoSize = number | null;
+export type ProblemReleaseDtoQuality = string | null;

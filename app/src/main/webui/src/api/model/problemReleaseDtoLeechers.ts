@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoAge = number | null;
+export type ProblemReleaseDtoLeechers = number | null;

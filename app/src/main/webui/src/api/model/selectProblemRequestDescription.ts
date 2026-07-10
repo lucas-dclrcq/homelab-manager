@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorMovieDtoPosterUrl = string | null;
+export type SelectProblemRequestDescription = string | null;

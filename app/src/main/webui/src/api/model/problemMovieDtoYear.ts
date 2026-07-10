@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type CorrectorReleaseDtoLeechers = number | null;
+export type ProblemMovieDtoYear = number | null;

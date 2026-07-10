@@ -2,26 +2,31 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQueryClient } from '@tanstack/vue-query'
-import {
-  getGetApiCorrectorWorkflowsIdQueryKey,
-  getGetApiCorrectorWorkflowsQueryKey,
-  useGetApiCorrectorWorkflowsId,
-  usePostApiCorrectorWorkflowsIdAbandon,
-} from '../api/service/homelab'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import BaseSpinner from '../components/ui/BaseSpinner.vue'
+import BaseBadge from '../components/ui/BaseBadge.vue'
 import UiIcon from '../components/ui/UiIcon.vue'
-import CorrectorStepper from '../components/corrector/CorrectorStepper.vue'
-import StepMovieSearch from '../components/corrector/StepMovieSearch.vue'
-import StepProblem from '../components/corrector/StepProblem.vue'
-import StepReleases from '../components/corrector/StepReleases.vue'
-import StepAwaiting from '../components/corrector/StepAwaiting.vue'
-import { isActive, stepIndex } from '../lib/corrector'
+import ProblemStepper from '../components/problems/ProblemStepper.vue'
+import StepMediaSearch from '../components/problems/StepMediaSearch.vue'
+import StepProblem from '../components/problems/StepProblem.vue'
+import StepReleases from '../components/problems/StepReleases.vue'
+import StepAwaiting from '../components/problems/StepAwaiting.vue'
+import StepReported from '../components/problems/StepReported.vue'
+import { isActive, stepIndex, wizardStepsFor } from '../lib/problems'
+import {
+  invalidateWorkflows,
+  useAbandonMutation,
+  useWorkflowQuery,
+} from '../lib/problemsApi'
 
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
+
+// Reprise d'un problème par un admin : même wizard, endpoints admin
+const admin = computed(() => route.meta.requiresAdmin === true)
+const backTo = computed(() => (admin.value ? '/admin/problems' : '/problems'))
 
 const workflowId = computed(() => String(route.params.id))
 
@@ -31,41 +36,37 @@ const {
   data: workflow,
   isPending,
   isError,
-} = useGetApiCorrectorWorkflowsId(workflowId, {
-  query: {
-    // Tant qu'on attend l'import Radarr, on vérifie régulièrement si c'est réglé
-    refetchInterval: (query) =>
-      query.state.data?.status === 'AWAITING_IMPORT' ? 30_000 : false,
-  },
-})
+} = useWorkflowQuery(admin.value, workflowId)
 
-const { mutate: abandon, isPending: isAbandoning } =
-  usePostApiCorrectorWorkflowsIdAbandon({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: getGetApiCorrectorWorkflowsIdQueryKey(workflowId.value),
-        })
-        queryClient.invalidateQueries({
-          queryKey: getGetApiCorrectorWorkflowsQueryKey(),
-        })
-        abandonOpen.value = false
-        router.push('/corrector')
-      },
+const steps = computed(() =>
+  workflow.value ? wizardStepsFor(workflow.value) : [],
+)
+
+const { mutate: abandon, isPending: isAbandoning } = useAbandonMutation(
+  admin.value,
+  {
+    onSuccess: () => {
+      invalidateWorkflows(queryClient, workflowId.value)
+      abandonOpen.value = false
+      router.push(backTo.value)
     },
-  })
+  },
+)
 </script>
 
 <template>
   <div class="flex max-w-3xl flex-col gap-6">
     <header class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <BaseButton variant="ghost" @click="router.push('/corrector')">
+        <BaseButton variant="ghost" @click="router.push(backTo)">
           Retour
         </BaseButton>
         <h1 class="roost font-display text-[28px] font-extrabold leading-tight">
-          {{ workflow?.movie?.title ?? 'Réglons ça' }}
+          {{ workflow?.media?.title ?? 'Réglons ça' }}
         </h1>
+        <BaseBadge v-if="admin && workflow?.reportedBy" color="dusk">
+          Signalé par {{ workflow.reportedBy }}
+        </BaseBadge>
       </div>
       <BaseButton
         v-if="workflow && isActive(workflow)"
@@ -83,7 +84,7 @@ const { mutate: abandon, isPending: isAbandoning } =
       v-else-if="isError || !workflow"
       class="rounded-tile border-[1.5px] border-line bg-paper p-8 text-center"
     >
-      <p class="font-display text-lg font-bold">Workflow introuvable</p>
+      <p class="font-display text-lg font-bold">Problème introuvable</p>
       <p class="mt-1 text-sm text-ink-soft">
         Il a peut-être été supprimé, ou ce n'est pas le tien.
       </p>
@@ -91,25 +92,30 @@ const { mutate: abandon, isPending: isAbandoning } =
 
     <template v-else>
       <div
+        v-if="steps.length"
         class="rounded-tile border-[1.5px] border-line bg-paper p-5 shadow-soft"
       >
-        <CorrectorStepper :current-index="stepIndex(workflow)" />
+        <ProblemStepper :steps="steps" :current-index="stepIndex(workflow)" />
       </div>
 
       <div
         class="rounded-tile border-[1.5px] border-line bg-paper p-6 shadow-soft"
       >
-        <StepMovieSearch
-          v-if="workflow.currentStep === 'SELECT_MOVIE'"
+        <StepMediaSearch
+          v-if="workflow.currentStep === 'SELECT_MEDIA'"
           :workflow-id="workflow.id"
+          :media-type="workflow.mediaType"
+          :admin="admin"
         />
         <StepProblem
           v-else-if="workflow.currentStep === 'SELECT_PROBLEM'"
           :workflow="workflow"
+          :admin="admin"
         />
         <StepReleases
           v-else-if="workflow.currentStep === 'SELECT_RELEASE'"
           :workflow-id="workflow.id"
+          :admin="admin"
         />
         <StepAwaiting
           v-else-if="
@@ -118,20 +124,28 @@ const { mutate: abandon, isPending: isAbandoning } =
           "
           :workflow="workflow"
         />
+        <StepReported
+          v-else-if="
+            workflow.currentStep === 'REPORTED' ||
+            workflow.currentStep === 'RESOLVED'
+          "
+          :workflow="workflow"
+          :admin="admin"
+        />
         <p v-else class="text-sm text-ink-soft">
-          Ce workflow a été abandonné. Tu peux en relancer un depuis la page El
-          Corrector.
+          Ce problème a été abandonné. Tu peux en signaler un autre depuis la
+          page Problèmes.
         </p>
       </div>
     </template>
 
     <BaseModal
       v-if="abandonOpen"
-      title="Abandonner ce workflow ?"
+      title="Abandonner ce problème ?"
       @close="abandonOpen = false"
     >
       <p class="mb-5 text-sm text-ink-soft">
-        Le problème restera tel quel, mais tu pourras toujours relancer une
+        Le problème restera tel quel, mais tu pourras toujours en relancer une
         résolution plus tard.
       </p>
       <div class="flex gap-3">

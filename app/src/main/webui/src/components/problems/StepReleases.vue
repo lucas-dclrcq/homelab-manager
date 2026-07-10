@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useQueryClient } from '@tanstack/vue-query'
-import type { CorrectorReleaseDto } from '../../api/model'
-import {
-  getGetApiCorrectorWorkflowsIdQueryKey,
-  useGetApiCorrectorWorkflowsIdReleases,
-  usePostApiCorrectorWorkflowsIdGrab,
-} from '../../api/service/homelab'
+import type { ProblemReleaseDto } from '../../api/model'
+import { useGrabMutation, useReleasesQuery } from '../../lib/problemsApi'
 import BaseBadge from '../ui/BaseBadge.vue'
 import BaseButton from '../ui/BaseButton.vue'
 import BaseToggle from '../ui/BaseToggle.vue'
 import UiIcon from '../ui/UiIcon.vue'
 import { formatBytes } from '../../lib/format'
 
-const props = defineProps<{ workflowId: string }>()
-
-const queryClient = useQueryClient()
+const props = withDefaults(
+  defineProps<{ workflowId: string; admin?: boolean }>(),
+  { admin: false },
+)
 
 const showAll = ref(false)
 const grabbingGuid = ref<string | null>(null)
@@ -26,31 +22,21 @@ const {
   isPending,
   isError,
   refetch,
-} = useGetApiCorrectorWorkflowsIdReleases(props.workflowId, {
-  query: { staleTime: 60_000, retry: false },
-})
+} = useReleasesQuery(props.admin, props.workflowId)
 
 const visibleReleases = computed(() => {
   const all = releases.value ?? []
-  return showAll.value ? all : all.filter((r) => r.isFrench)
+  return showAll.value ? all : all.filter((r) => r.isRecommended)
 })
 
-const { mutate: grab, isPending: isGrabbing } =
-  usePostApiCorrectorWorkflowsIdGrab({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: getGetApiCorrectorWorkflowsIdQueryKey(props.workflowId),
-        })
-      },
-      onError: () => {
-        grabError.value = true
-        grabbingGuid.value = null
-      },
-    },
-  })
+const { mutate: grab, isPending: isGrabbing } = useGrabMutation(props.admin, {
+  onError: () => {
+    grabError.value = true
+    grabbingGuid.value = null
+  },
+})
 
-function grabRelease(release: CorrectorReleaseDto) {
+function grabRelease(release: ProblemReleaseDto) {
   grabError.value = false
   grabbingGuid.value = release.guid
   grab({
@@ -94,9 +80,9 @@ function grabRelease(release: CorrectorReleaseDto) {
     <template v-else>
       <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm text-ink-soft">
-          {{ visibleReleases.length }} version(s)
-          {{ showAll ? 'trouvée(s)' : 'en français' }} — choisis celle à
-          télécharger.
+          {{ visibleReleases.length }}
+          {{ showAll ? 'release(s)' : 'version(s) recommandée(s)' }} — choisis
+          celle à télécharger.
         </p>
         <BaseToggle v-model="showAll" label="Voir toutes les releases" />
       </div>
@@ -113,7 +99,8 @@ function grabRelease(release: CorrectorReleaseDto) {
         <li
           v-for="release in visibleReleases"
           :key="release.guid"
-          class="rounded-card border-[1.5px] border-line bg-white p-4"
+          class="rounded-card border-[1.5px] bg-white p-4"
+          :class="release.isRecommended ? 'border-sage/50' : 'border-line'"
         >
           <div class="flex items-start justify-between gap-3">
             <div
@@ -124,6 +111,9 @@ function grabRelease(release: CorrectorReleaseDto) {
                 {{ release.title }}
               </p>
               <p class="mt-2 flex flex-wrap items-center gap-2">
+                <BaseBadge v-if="release.isRecommended" color="sage">
+                  Recommandée
+                </BaseBadge>
                 <BaseBadge v-if="release.isFrench" color="amber">
                   VF/MULTI
                 </BaseBadge>
@@ -164,8 +154,8 @@ function grabRelease(release: CorrectorReleaseDto) {
         v-else
         class="rounded-card border-[1.5px] border-dashed border-line bg-cream p-4 text-sm text-ink-soft"
       >
-        Aucune version française trouvée pour l'instant. Active « Voir toutes
-        les releases » pour vérifier, ou retente plus tard.
+        Aucune version recommandée pour l'instant. Active « Voir toutes les
+        releases » pour parcourir tout ce que les indexers proposent.
       </p>
     </template>
   </div>

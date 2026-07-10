@@ -6,4 +6,4 @@
  */
 import type { GrabbedRelease } from "./grabbedRelease";
 
-export type CorrectorWorkflowDtoGrabbedRelease = GrabbedRelease | null;
+export type ProblemWorkflowDtoGrabbedRelease = GrabbedRelease | null;

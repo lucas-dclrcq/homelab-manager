@@ -4,6 +4,5 @@
  * Homelab Manager API
  * OpenAPI spec version: 0.0.1
  */
-import type { MovieSnapshot } from "./movieSnapshot";
 
-export type CorrectorWorkflowDtoMovie = MovieSnapshot | null;
+export type ProblemWorkflowDtoDescription = string | null;

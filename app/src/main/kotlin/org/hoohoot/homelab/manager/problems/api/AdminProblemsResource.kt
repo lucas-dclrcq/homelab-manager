@@ -118,7 +118,7 @@ class AdminProblemsResource(
 
     @DELETE
     @Path("/workflows/{id}")
-    @APIResponse(responseCode = "204")
+    @APIResponse(responseCode = "204", description = "Workflow supprimé")
     suspend fun deleteWorkflow(@PathParam("id") id: UUID): Response =
         if (deleteWorkflowUseCase(id)) Response.noContent().build()
         else throw NotFoundException()

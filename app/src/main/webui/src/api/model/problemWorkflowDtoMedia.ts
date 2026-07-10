@@ -4,5 +4,6 @@
  * Homelab Manager API
  * OpenAPI spec version: 0.0.1
  */
+import type { MediaSnapshot } from "./mediaSnapshot";
 
-export type CorrectorWorkflowDtoProblemType = string | null;
+export type ProblemWorkflowDtoMedia = MediaSnapshot | null;

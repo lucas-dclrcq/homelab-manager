@@ -21,11 +21,9 @@ import { computed, unref } from "vue";
 import type { MaybeRef } from "vue";
 
 import type {
+  AdminProblemWorkflowDto,
   ApplicationDto,
   BazarrWebhookPayload,
-  CorrectorMovieDto,
-  CorrectorReleaseDto,
-  CorrectorWorkflowDto,
   CreateWorkflowRequest,
   EnergyStatusDto,
   FinanceEntriesPageDto,
@@ -34,10 +32,11 @@ import type {
   FinanceSettingsDto,
   FinanceSettingsRequest,
   FinanceSummaryDto,
-  GetApiCorrectorMoviesParams,
   GetApiFinancesEntriesParams,
   GetApiFinancesMonthlyParams,
   GetApiFinancesSummaryParams,
+  GetApiProblemsMoviesParams,
+  GetApiProblemsSeriesParams,
   GetApiStatisticsActivityByHourParams,
   GetApiStatisticsActivityByWeekdayParams,
   GetApiStatisticsPlatformsParams,
@@ -60,6 +59,10 @@ import type {
   PlaysOverTimeDto,
   PostApiAdminStatisticsImportBody,
   PostApiApplicationsBody,
+  ProblemMovieDto,
+  ProblemReleaseDto,
+  ProblemSeriesDto,
+  ProblemWorkflowDto,
   PutApiApplicationsIdBody,
   RadarrWebhookPayload,
   RecurringRuleDto,
@@ -67,6 +70,7 @@ import type {
   SeerrWebhookPayload,
   SelectMovieRequest,
   SelectProblemRequest,
+  SelectSeriesRequest,
   SonarrWebhookPayload,
   StatisticsSummaryDto,
   TimelinePageDto,
@@ -1252,6 +1256,976 @@ export const usePostApiAdminJobsIdentityRun = <
 };
 
 /**
+ * @summary List Workflows
+ */
+export const getApiAdminProblemsWorkflows = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<AdminProblemWorkflowDto[]>(
+    { url: `/api/admin/problems/workflows`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminProblemsWorkflowsQueryKey = () => {
+  return ["api", "admin", "problems", "workflows"] as const;
+};
+
+export const getGetApiAdminProblemsWorkflowsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminProblemsWorkflowsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>
+  > = ({ signal }) => getApiAdminProblemsWorkflows(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminProblemsWorkflowsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>
+>;
+export type GetApiAdminProblemsWorkflowsQueryError = void;
+
+/**
+ * @summary List Workflows
+ */
+
+export function useGetApiAdminProblemsWorkflows<
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminProblemsWorkflows>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminProblemsWorkflowsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Workflow
+ */
+export const getApiAdminProblemsWorkflowsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<AdminProblemWorkflowDto>(
+    { url: `/api/admin/problems/workflows/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminProblemsWorkflowsIdQueryKey = (
+  id: MaybeRef<Uuid>,
+) => {
+  return ["api", "admin", "problems", "workflows", id] as const;
+};
+
+export const getGetApiAdminProblemsWorkflowsIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminProblemsWorkflowsIdQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>
+  > = ({ signal }) =>
+    getApiAdminProblemsWorkflowsId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(id)),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminProblemsWorkflowsIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>
+>;
+export type GetApiAdminProblemsWorkflowsIdQueryError = void;
+
+/**
+ * @summary Get Workflow
+ */
+
+export function useGetApiAdminProblemsWorkflowsId<
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminProblemsWorkflowsIdQueryOptions(
+    id,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Delete Workflow
+ */
+export const deleteApiAdminProblemsWorkflowsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<void>(
+    { url: `/api/admin/problems/workflows/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiAdminProblemsWorkflowsIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiAdminProblemsWorkflowsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiAdminProblemsWorkflowsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiAdminProblemsWorkflowsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>
+>;
+
+export type DeleteApiAdminProblemsWorkflowsIdMutationError = void;
+
+/**
+ * @summary Delete Workflow
+ */
+export const useDeleteApiAdminProblemsWorkflowsId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiAdminProblemsWorkflowsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getDeleteApiAdminProblemsWorkflowsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Abandon Workflow
+ */
+export const postApiAdminProblemsWorkflowsIdAbandon = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/abandon`,
+      method: "POST",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdAbandonMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdAbandon"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdAbandon(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdAbandonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>
+>;
+
+export type PostApiAdminProblemsWorkflowsIdAbandonMutationError = void;
+
+/**
+ * @summary Abandon Workflow
+ */
+export const usePostApiAdminProblemsWorkflowsIdAbandon = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdAbandon>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdAbandonMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Grab Release
+ */
+export const postApiAdminProblemsWorkflowsIdGrab = (
+  id: MaybeRef<Uuid>,
+  grabReleaseRequest: MaybeRef<GrabReleaseRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  grabReleaseRequest = unref(grabReleaseRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/grab`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: grabReleaseRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdGrabMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>,
+    TError,
+    { id: Uuid; data: GrabReleaseRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>,
+  TError,
+  { id: Uuid; data: GrabReleaseRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdGrab"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>,
+    { id: Uuid; data: GrabReleaseRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdGrab(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdGrabMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>
+>;
+export type PostApiAdminProblemsWorkflowsIdGrabMutationBody =
+  GrabReleaseRequest;
+export type PostApiAdminProblemsWorkflowsIdGrabMutationError = void;
+
+/**
+ * @summary Grab Release
+ */
+export const usePostApiAdminProblemsWorkflowsIdGrab = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>,
+      TError,
+      { id: Uuid; data: GrabReleaseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdGrab>>,
+  TError,
+  { id: Uuid; data: GrabReleaseRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdGrabMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Movie
+ */
+export const postApiAdminProblemsWorkflowsIdMovie = (
+  id: MaybeRef<Uuid>,
+  selectMovieRequest: MaybeRef<SelectMovieRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectMovieRequest = unref(selectMovieRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/movie`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectMovieRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdMovieMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>,
+    TError,
+    { id: Uuid; data: SelectMovieRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>,
+  TError,
+  { id: Uuid; data: SelectMovieRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdMovie"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>,
+    { id: Uuid; data: SelectMovieRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdMovie(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdMovieMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>
+>;
+export type PostApiAdminProblemsWorkflowsIdMovieMutationBody =
+  SelectMovieRequest;
+export type PostApiAdminProblemsWorkflowsIdMovieMutationError = void;
+
+/**
+ * @summary Select Movie
+ */
+export const usePostApiAdminProblemsWorkflowsIdMovie = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>,
+      TError,
+      { id: Uuid; data: SelectMovieRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdMovie>>,
+  TError,
+  { id: Uuid; data: SelectMovieRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdMovieMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Problem
+ */
+export const postApiAdminProblemsWorkflowsIdProblem = (
+  id: MaybeRef<Uuid>,
+  selectProblemRequest: MaybeRef<SelectProblemRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectProblemRequest = unref(selectProblemRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/problem`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectProblemRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdProblemMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>,
+    TError,
+    { id: Uuid; data: SelectProblemRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>,
+  TError,
+  { id: Uuid; data: SelectProblemRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdProblem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>,
+    { id: Uuid; data: SelectProblemRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdProblem(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdProblemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>
+>;
+export type PostApiAdminProblemsWorkflowsIdProblemMutationBody =
+  SelectProblemRequest;
+export type PostApiAdminProblemsWorkflowsIdProblemMutationError = void;
+
+/**
+ * @summary Select Problem
+ */
+export const usePostApiAdminProblemsWorkflowsIdProblem = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>,
+      TError,
+      { id: Uuid; data: SelectProblemRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdProblem>>,
+  TError,
+  { id: Uuid; data: SelectProblemRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdProblemMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List Releases
+ */
+export const getApiAdminProblemsWorkflowsIdReleases = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemReleaseDto[]>(
+    {
+      url: `/api/admin/problems/workflows/${id}/releases`,
+      method: "GET",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiAdminProblemsWorkflowsIdReleasesQueryKey = (
+  id: MaybeRef<Uuid>,
+) => {
+  return ["api", "admin", "problems", "workflows", id, "releases"] as const;
+};
+
+export const getGetApiAdminProblemsWorkflowsIdReleasesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminProblemsWorkflowsIdReleasesQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>
+  > = ({ signal }) =>
+    getApiAdminProblemsWorkflowsIdReleases(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(id)),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminProblemsWorkflowsIdReleasesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>
+>;
+export type GetApiAdminProblemsWorkflowsIdReleasesQueryError = void;
+
+/**
+ * @summary List Releases
+ */
+
+export function useGetApiAdminProblemsWorkflowsIdReleases<
+  TData = Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminProblemsWorkflowsIdReleases>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminProblemsWorkflowsIdReleasesQueryOptions(
+    id,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Resolve Workflow
+ */
+export const postApiAdminProblemsWorkflowsIdResolve = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/resolve`,
+      method: "POST",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdResolveMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdResolve"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdResolve(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdResolveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>
+>;
+
+export type PostApiAdminProblemsWorkflowsIdResolveMutationError = void;
+
+/**
+ * @summary Resolve Workflow
+ */
+export const usePostApiAdminProblemsWorkflowsIdResolve = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdResolve>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdResolveMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Series
+ */
+export const postApiAdminProblemsWorkflowsIdSeries = (
+  id: MaybeRef<Uuid>,
+  selectSeriesRequest: MaybeRef<SelectSeriesRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectSeriesRequest = unref(selectSeriesRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/admin/problems/workflows/${id}/series`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectSeriesRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminProblemsWorkflowsIdSeriesMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>,
+    TError,
+    { id: Uuid; data: SelectSeriesRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>,
+  TError,
+  { id: Uuid; data: SelectSeriesRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminProblemsWorkflowsIdSeries"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>,
+    { id: Uuid; data: SelectSeriesRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiAdminProblemsWorkflowsIdSeries(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminProblemsWorkflowsIdSeriesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>
+>;
+export type PostApiAdminProblemsWorkflowsIdSeriesMutationBody =
+  SelectSeriesRequest;
+export type PostApiAdminProblemsWorkflowsIdSeriesMutationError = void;
+
+/**
+ * @summary Select Series
+ */
+export const usePostApiAdminProblemsWorkflowsIdSeries = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>,
+      TError,
+      { id: Uuid; data: SelectSeriesRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminProblemsWorkflowsIdSeries>>,
+  TError,
+  { id: Uuid; data: SelectSeriesRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminProblemsWorkflowsIdSeriesMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Import Backup
  */
 export const postApiAdminStatisticsImport = (
@@ -1842,874 +2816,6 @@ export function useGetApiApplicationsIdLogo<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiApplicationsIdLogoQueryOptions(id, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<
-    QueryKey,
-    TData,
-    TError
-  >;
-
-  return query;
-}
-
-/**
- * @summary Search Movies
- */
-export const getApiCorrectorMovies = (
-  params: MaybeRef<GetApiCorrectorMoviesParams>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  params = unref(params);
-
-  return customInstance<CorrectorMovieDto[]>(
-    {
-      url: `/api/corrector/movies`,
-      method: "GET",
-      params: unref(params),
-      signal,
-    },
-    options,
-  );
-};
-
-export const getGetApiCorrectorMoviesQueryKey = (
-  params: MaybeRef<GetApiCorrectorMoviesParams>,
-) => {
-  return ["api", "corrector", "movies", ...(params ? [params] : [])] as const;
-};
-
-export const getGetApiCorrectorMoviesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiCorrectorMovies>>,
-  TError = unknown,
->(
-  params: MaybeRef<GetApiCorrectorMoviesParams>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorMovies>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = getGetApiCorrectorMoviesQueryKey(params);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getApiCorrectorMovies>>
-  > = ({ signal }) => getApiCorrectorMovies(params, requestOptions, signal);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiCorrectorMovies>>,
-    TError,
-    TData
-  >;
-};
-
-export type GetApiCorrectorMoviesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiCorrectorMovies>>
->;
-export type GetApiCorrectorMoviesQueryError = unknown;
-
-/**
- * @summary Search Movies
- */
-
-export function useGetApiCorrectorMovies<
-  TData = Awaited<ReturnType<typeof getApiCorrectorMovies>>,
-  TError = unknown,
->(
-  params: MaybeRef<GetApiCorrectorMoviesParams>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorMovies>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryReturnType<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetApiCorrectorMoviesQueryOptions(params, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<
-    QueryKey,
-    TData,
-    TError
-  >;
-
-  return query;
-}
-
-/**
- * @summary List Workflows
- */
-export const getApiCorrectorWorkflows = (
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<CorrectorWorkflowDto[]>(
-    { url: `/api/corrector/workflows`, method: "GET", signal },
-    options,
-  );
-};
-
-export const getGetApiCorrectorWorkflowsQueryKey = () => {
-  return ["api", "corrector", "workflows"] as const;
-};
-
-export const getGetApiCorrectorWorkflowsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflows>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<
-      Awaited<ReturnType<typeof getApiCorrectorWorkflows>>,
-      TError,
-      TData
-    >
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = getGetApiCorrectorWorkflowsQueryKey();
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflows>>
-  > = ({ signal }) => getApiCorrectorWorkflows(requestOptions, signal);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflows>>,
-    TError,
-    TData
-  >;
-};
-
-export type GetApiCorrectorWorkflowsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiCorrectorWorkflows>>
->;
-export type GetApiCorrectorWorkflowsQueryError = unknown;
-
-/**
- * @summary List Workflows
- */
-
-export function useGetApiCorrectorWorkflows<
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflows>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorWorkflows>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryReturnType<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetApiCorrectorWorkflowsQueryOptions(options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<
-    QueryKey,
-    TData,
-    TError
-  >;
-
-  return query;
-}
-
-/**
- * @summary Create Workflow
- */
-export const postApiCorrectorWorkflows = (
-  createWorkflowRequest: MaybeRef<CreateWorkflowRequest>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  createWorkflowRequest = unref(createWorkflowRequest);
-
-  return customInstance<CorrectorWorkflowDto>(
-    {
-      url: `/api/corrector/workflows`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: createWorkflowRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiCorrectorWorkflowsMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflows>>,
-    TError,
-    { data: CreateWorkflowRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflows>>,
-  TError,
-  { data: CreateWorkflowRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiCorrectorWorkflows"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflows>>,
-    { data: CreateWorkflowRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postApiCorrectorWorkflows(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiCorrectorWorkflowsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflows>>
->;
-export type PostApiCorrectorWorkflowsMutationBody = CreateWorkflowRequest;
-export type PostApiCorrectorWorkflowsMutationError = void;
-
-/**
- * @summary Create Workflow
- */
-export const usePostApiCorrectorWorkflows = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiCorrectorWorkflows>>,
-      TError,
-      { data: CreateWorkflowRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflows>>,
-  TError,
-  { data: CreateWorkflowRequest },
-  TContext
-> => {
-  const mutationOptions = getPostApiCorrectorWorkflowsMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * @summary Get Workflow
- */
-export const getApiCorrectorWorkflowsId = (
-  id: MaybeRef<Uuid>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-
-  return customInstance<CorrectorWorkflowDto>(
-    { url: `/api/corrector/workflows/${id}`, method: "GET", signal },
-    options,
-  );
-};
-
-export const getGetApiCorrectorWorkflowsIdQueryKey = (id: MaybeRef<Uuid>) => {
-  return ["api", "corrector", "workflows", id] as const;
-};
-
-export const getGetApiCorrectorWorkflowsIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>,
-  TError = unknown,
->(
-  id: MaybeRef<Uuid>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = getGetApiCorrectorWorkflowsIdQueryKey(id);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>
-  > = ({ signal }) => getApiCorrectorWorkflowsId(id, requestOptions, signal);
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: computed(() => !!unref(id)),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>,
-    TError,
-    TData
-  >;
-};
-
-export type GetApiCorrectorWorkflowsIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>
->;
-export type GetApiCorrectorWorkflowsIdQueryError = unknown;
-
-/**
- * @summary Get Workflow
- */
-
-export function useGetApiCorrectorWorkflowsId<
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>,
-  TError = unknown,
->(
-  id: MaybeRef<Uuid>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorWorkflowsId>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryReturnType<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetApiCorrectorWorkflowsIdQueryOptions(id, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<
-    QueryKey,
-    TData,
-    TError
-  >;
-
-  return query;
-}
-
-/**
- * @summary Abandon Workflow
- */
-export const postApiCorrectorWorkflowsIdAbandon = (
-  id: MaybeRef<Uuid>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-
-  return customInstance<CorrectorWorkflowDto>(
-    { url: `/api/corrector/workflows/${id}/abandon`, method: "POST", signal },
-    options,
-  );
-};
-
-export const getPostApiCorrectorWorkflowsIdAbandonMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>,
-    TError,
-    { id: Uuid },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>,
-  TError,
-  { id: Uuid },
-  TContext
-> => {
-  const mutationKey = ["postApiCorrectorWorkflowsIdAbandon"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>,
-    { id: Uuid }
-  > = (props) => {
-    const { id } = props ?? {};
-
-    return postApiCorrectorWorkflowsIdAbandon(id, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiCorrectorWorkflowsIdAbandonMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>
->;
-
-export type PostApiCorrectorWorkflowsIdAbandonMutationError = unknown;
-
-/**
- * @summary Abandon Workflow
- */
-export const usePostApiCorrectorWorkflowsIdAbandon = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>,
-      TError,
-      { id: Uuid },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdAbandon>>,
-  TError,
-  { id: Uuid },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiCorrectorWorkflowsIdAbandonMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * @summary Grab Release
- */
-export const postApiCorrectorWorkflowsIdGrab = (
-  id: MaybeRef<Uuid>,
-  grabReleaseRequest: MaybeRef<GrabReleaseRequest>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-  grabReleaseRequest = unref(grabReleaseRequest);
-
-  return customInstance<CorrectorWorkflowDto>(
-    {
-      url: `/api/corrector/workflows/${id}/grab`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: grabReleaseRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiCorrectorWorkflowsIdGrabMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>,
-    TError,
-    { id: Uuid; data: GrabReleaseRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>,
-  TError,
-  { id: Uuid; data: GrabReleaseRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiCorrectorWorkflowsIdGrab"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>,
-    { id: Uuid; data: GrabReleaseRequest }
-  > = (props) => {
-    const { id, data } = props ?? {};
-
-    return postApiCorrectorWorkflowsIdGrab(id, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiCorrectorWorkflowsIdGrabMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>
->;
-export type PostApiCorrectorWorkflowsIdGrabMutationBody = GrabReleaseRequest;
-export type PostApiCorrectorWorkflowsIdGrabMutationError = void;
-
-/**
- * @summary Grab Release
- */
-export const usePostApiCorrectorWorkflowsIdGrab = <
-  TError = void,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>,
-      TError,
-      { id: Uuid; data: GrabReleaseRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdGrab>>,
-  TError,
-  { id: Uuid; data: GrabReleaseRequest },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiCorrectorWorkflowsIdGrabMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * @summary Select Movie
- */
-export const postApiCorrectorWorkflowsIdMovie = (
-  id: MaybeRef<Uuid>,
-  selectMovieRequest: MaybeRef<SelectMovieRequest>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-  selectMovieRequest = unref(selectMovieRequest);
-
-  return customInstance<CorrectorWorkflowDto>(
-    {
-      url: `/api/corrector/workflows/${id}/movie`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: selectMovieRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiCorrectorWorkflowsIdMovieMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>,
-    TError,
-    { id: Uuid; data: SelectMovieRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>,
-  TError,
-  { id: Uuid; data: SelectMovieRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiCorrectorWorkflowsIdMovie"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>,
-    { id: Uuid; data: SelectMovieRequest }
-  > = (props) => {
-    const { id, data } = props ?? {};
-
-    return postApiCorrectorWorkflowsIdMovie(id, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiCorrectorWorkflowsIdMovieMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>
->;
-export type PostApiCorrectorWorkflowsIdMovieMutationBody = SelectMovieRequest;
-export type PostApiCorrectorWorkflowsIdMovieMutationError = void;
-
-/**
- * @summary Select Movie
- */
-export const usePostApiCorrectorWorkflowsIdMovie = <
-  TError = void,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>,
-      TError,
-      { id: Uuid; data: SelectMovieRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdMovie>>,
-  TError,
-  { id: Uuid; data: SelectMovieRequest },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiCorrectorWorkflowsIdMovieMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * @summary Select Problem
- */
-export const postApiCorrectorWorkflowsIdProblem = (
-  id: MaybeRef<Uuid>,
-  selectProblemRequest: MaybeRef<SelectProblemRequest>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-  selectProblemRequest = unref(selectProblemRequest);
-
-  return customInstance<CorrectorWorkflowDto>(
-    {
-      url: `/api/corrector/workflows/${id}/problem`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: selectProblemRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiCorrectorWorkflowsIdProblemMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>,
-    TError,
-    { id: Uuid; data: SelectProblemRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>,
-  TError,
-  { id: Uuid; data: SelectProblemRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiCorrectorWorkflowsIdProblem"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>,
-    { id: Uuid; data: SelectProblemRequest }
-  > = (props) => {
-    const { id, data } = props ?? {};
-
-    return postApiCorrectorWorkflowsIdProblem(id, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiCorrectorWorkflowsIdProblemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>
->;
-export type PostApiCorrectorWorkflowsIdProblemMutationBody =
-  SelectProblemRequest;
-export type PostApiCorrectorWorkflowsIdProblemMutationError = void;
-
-/**
- * @summary Select Problem
- */
-export const usePostApiCorrectorWorkflowsIdProblem = <
-  TError = void,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>,
-      TError,
-      { id: Uuid; data: SelectProblemRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof postApiCorrectorWorkflowsIdProblem>>,
-  TError,
-  { id: Uuid; data: SelectProblemRequest },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiCorrectorWorkflowsIdProblemMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * @summary List Releases
- */
-export const getApiCorrectorWorkflowsIdReleases = (
-  id: MaybeRef<Uuid>,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  id = unref(id);
-
-  return customInstance<CorrectorReleaseDto[]>(
-    { url: `/api/corrector/workflows/${id}/releases`, method: "GET", signal },
-    options,
-  );
-};
-
-export const getGetApiCorrectorWorkflowsIdReleasesQueryKey = (
-  id: MaybeRef<Uuid>,
-) => {
-  return ["api", "corrector", "workflows", id, "releases"] as const;
-};
-
-export const getGetApiCorrectorWorkflowsIdReleasesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>,
-  TError = unknown,
->(
-  id: MaybeRef<Uuid>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = getGetApiCorrectorWorkflowsIdReleasesQueryKey(id);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>
-  > = ({ signal }) =>
-    getApiCorrectorWorkflowsIdReleases(id, requestOptions, signal);
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: computed(() => !!unref(id)),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>,
-    TError,
-    TData
-  >;
-};
-
-export type GetApiCorrectorWorkflowsIdReleasesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>
->;
-export type GetApiCorrectorWorkflowsIdReleasesQueryError = unknown;
-
-/**
- * @summary List Releases
- */
-
-export function useGetApiCorrectorWorkflowsIdReleases<
-  TData = Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>,
-  TError = unknown,
->(
-  id: MaybeRef<Uuid>,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiCorrectorWorkflowsIdReleases>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryReturnType<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetApiCorrectorWorkflowsIdReleasesQueryOptions(
-    id,
-    options,
-  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
     TData,
@@ -3826,6 +3932,1162 @@ export const usePostApiNotificationsSonarr = <
   TContext
 > => {
   const mutationOptions = getPostApiNotificationsSonarrMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Search Movies
+ */
+export const getApiProblemsMovies = (
+  params: MaybeRef<GetApiProblemsMoviesParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<ProblemMovieDto[]>(
+    {
+      url: `/api/problems/movies`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiProblemsMoviesQueryKey = (
+  params: MaybeRef<GetApiProblemsMoviesParams>,
+) => {
+  return ["api", "problems", "movies", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiProblemsMoviesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiProblemsMovies>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiProblemsMoviesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsMovies>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiProblemsMoviesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiProblemsMovies>>
+  > = ({ signal }) => getApiProblemsMovies(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiProblemsMovies>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiProblemsMoviesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiProblemsMovies>>
+>;
+export type GetApiProblemsMoviesQueryError = unknown;
+
+/**
+ * @summary Search Movies
+ */
+
+export function useGetApiProblemsMovies<
+  TData = Awaited<ReturnType<typeof getApiProblemsMovies>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiProblemsMoviesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsMovies>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiProblemsMoviesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Search Series
+ */
+export const getApiProblemsSeries = (
+  params: MaybeRef<GetApiProblemsSeriesParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<ProblemSeriesDto[]>(
+    {
+      url: `/api/problems/series`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiProblemsSeriesQueryKey = (
+  params: MaybeRef<GetApiProblemsSeriesParams>,
+) => {
+  return ["api", "problems", "series", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiProblemsSeriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiProblemsSeries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiProblemsSeriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsSeries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiProblemsSeriesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiProblemsSeries>>
+  > = ({ signal }) => getApiProblemsSeries(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiProblemsSeries>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiProblemsSeriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiProblemsSeries>>
+>;
+export type GetApiProblemsSeriesQueryError = unknown;
+
+/**
+ * @summary Search Series
+ */
+
+export function useGetApiProblemsSeries<
+  TData = Awaited<ReturnType<typeof getApiProblemsSeries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiProblemsSeriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsSeries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiProblemsSeriesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary List Workflows
+ */
+export const getApiProblemsWorkflows = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<ProblemWorkflowDto[]>(
+    { url: `/api/problems/workflows`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiProblemsWorkflowsQueryKey = () => {
+  return ["api", "problems", "workflows"] as const;
+};
+
+export const getGetApiProblemsWorkflowsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflows>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiProblemsWorkflows>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiProblemsWorkflowsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiProblemsWorkflows>>
+  > = ({ signal }) => getApiProblemsWorkflows(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiProblemsWorkflows>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiProblemsWorkflowsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiProblemsWorkflows>>
+>;
+export type GetApiProblemsWorkflowsQueryError = unknown;
+
+/**
+ * @summary List Workflows
+ */
+
+export function useGetApiProblemsWorkflows<
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflows>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsWorkflows>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiProblemsWorkflowsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Create Workflow
+ */
+export const postApiProblemsWorkflows = (
+  createWorkflowRequest: MaybeRef<CreateWorkflowRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  createWorkflowRequest = unref(createWorkflowRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/problems/workflows`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createWorkflowRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflows>>,
+    TError,
+    { data: CreateWorkflowRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflows>>,
+  TError,
+  { data: CreateWorkflowRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflows"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflows>>,
+    { data: CreateWorkflowRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiProblemsWorkflows(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflows>>
+>;
+export type PostApiProblemsWorkflowsMutationBody = CreateWorkflowRequest;
+export type PostApiProblemsWorkflowsMutationError = void;
+
+/**
+ * @summary Create Workflow
+ */
+export const usePostApiProblemsWorkflows = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflows>>,
+      TError,
+      { data: CreateWorkflowRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflows>>,
+  TError,
+  { data: CreateWorkflowRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiProblemsWorkflowsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get Workflow
+ */
+export const getApiProblemsWorkflowsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemWorkflowDto>(
+    { url: `/api/problems/workflows/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiProblemsWorkflowsIdQueryKey = (id: MaybeRef<Uuid>) => {
+  return ["api", "problems", "workflows", id] as const;
+};
+
+export const getGetApiProblemsWorkflowsIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>,
+  TError = unknown,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiProblemsWorkflowsIdQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>
+  > = ({ signal }) => getApiProblemsWorkflowsId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(id)),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiProblemsWorkflowsIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>
+>;
+export type GetApiProblemsWorkflowsIdQueryError = unknown;
+
+/**
+ * @summary Get Workflow
+ */
+
+export function useGetApiProblemsWorkflowsId<
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>,
+  TError = unknown,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsWorkflowsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiProblemsWorkflowsIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Abandon Workflow
+ */
+export const postApiProblemsWorkflowsIdAbandon = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemWorkflowDto>(
+    { url: `/api/problems/workflows/${id}/abandon`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdAbandonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdAbandon"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiProblemsWorkflowsIdAbandon(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdAbandonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>
+>;
+
+export type PostApiProblemsWorkflowsIdAbandonMutationError = unknown;
+
+/**
+ * @summary Abandon Workflow
+ */
+export const usePostApiProblemsWorkflowsIdAbandon = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdAbandon>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdAbandonMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Grab Release
+ */
+export const postApiProblemsWorkflowsIdGrab = (
+  id: MaybeRef<Uuid>,
+  grabReleaseRequest: MaybeRef<GrabReleaseRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  grabReleaseRequest = unref(grabReleaseRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/problems/workflows/${id}/grab`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: grabReleaseRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdGrabMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>,
+    TError,
+    { id: Uuid; data: GrabReleaseRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>,
+  TError,
+  { id: Uuid; data: GrabReleaseRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdGrab"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>,
+    { id: Uuid; data: GrabReleaseRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiProblemsWorkflowsIdGrab(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdGrabMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>
+>;
+export type PostApiProblemsWorkflowsIdGrabMutationBody = GrabReleaseRequest;
+export type PostApiProblemsWorkflowsIdGrabMutationError = void;
+
+/**
+ * @summary Grab Release
+ */
+export const usePostApiProblemsWorkflowsIdGrab = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>,
+      TError,
+      { id: Uuid; data: GrabReleaseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdGrab>>,
+  TError,
+  { id: Uuid; data: GrabReleaseRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdGrabMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Movie
+ */
+export const postApiProblemsWorkflowsIdMovie = (
+  id: MaybeRef<Uuid>,
+  selectMovieRequest: MaybeRef<SelectMovieRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectMovieRequest = unref(selectMovieRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/problems/workflows/${id}/movie`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectMovieRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdMovieMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>,
+    TError,
+    { id: Uuid; data: SelectMovieRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>,
+  TError,
+  { id: Uuid; data: SelectMovieRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdMovie"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>,
+    { id: Uuid; data: SelectMovieRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiProblemsWorkflowsIdMovie(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdMovieMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>
+>;
+export type PostApiProblemsWorkflowsIdMovieMutationBody = SelectMovieRequest;
+export type PostApiProblemsWorkflowsIdMovieMutationError = void;
+
+/**
+ * @summary Select Movie
+ */
+export const usePostApiProblemsWorkflowsIdMovie = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>,
+      TError,
+      { id: Uuid; data: SelectMovieRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdMovie>>,
+  TError,
+  { id: Uuid; data: SelectMovieRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdMovieMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Problem
+ */
+export const postApiProblemsWorkflowsIdProblem = (
+  id: MaybeRef<Uuid>,
+  selectProblemRequest: MaybeRef<SelectProblemRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectProblemRequest = unref(selectProblemRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/problems/workflows/${id}/problem`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectProblemRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdProblemMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>,
+    TError,
+    { id: Uuid; data: SelectProblemRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>,
+  TError,
+  { id: Uuid; data: SelectProblemRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdProblem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>,
+    { id: Uuid; data: SelectProblemRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiProblemsWorkflowsIdProblem(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdProblemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>
+>;
+export type PostApiProblemsWorkflowsIdProblemMutationBody =
+  SelectProblemRequest;
+export type PostApiProblemsWorkflowsIdProblemMutationError = void;
+
+/**
+ * @summary Select Problem
+ */
+export const usePostApiProblemsWorkflowsIdProblem = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>,
+      TError,
+      { id: Uuid; data: SelectProblemRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdProblem>>,
+  TError,
+  { id: Uuid; data: SelectProblemRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdProblemMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List Releases
+ */
+export const getApiProblemsWorkflowsIdReleases = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemReleaseDto[]>(
+    { url: `/api/problems/workflows/${id}/releases`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiProblemsWorkflowsIdReleasesQueryKey = (
+  id: MaybeRef<Uuid>,
+) => {
+  return ["api", "problems", "workflows", id, "releases"] as const;
+};
+
+export const getGetApiProblemsWorkflowsIdReleasesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>,
+  TError = unknown,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiProblemsWorkflowsIdReleasesQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>
+  > = ({ signal }) =>
+    getApiProblemsWorkflowsIdReleases(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(id)),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiProblemsWorkflowsIdReleasesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>
+>;
+export type GetApiProblemsWorkflowsIdReleasesQueryError = unknown;
+
+/**
+ * @summary List Releases
+ */
+
+export function useGetApiProblemsWorkflowsIdReleases<
+  TData = Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>,
+  TError = unknown,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiProblemsWorkflowsIdReleases>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiProblemsWorkflowsIdReleasesQueryOptions(
+    id,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Resolve Workflow
+ */
+export const postApiProblemsWorkflowsIdResolve = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<ProblemWorkflowDto>(
+    { url: `/api/problems/workflows/${id}/resolve`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdResolveMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdResolve"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiProblemsWorkflowsIdResolve(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdResolveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>
+>;
+
+export type PostApiProblemsWorkflowsIdResolveMutationError = unknown;
+
+/**
+ * @summary Resolve Workflow
+ */
+export const usePostApiProblemsWorkflowsIdResolve = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdResolve>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdResolveMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Select Series
+ */
+export const postApiProblemsWorkflowsIdSeries = (
+  id: MaybeRef<Uuid>,
+  selectSeriesRequest: MaybeRef<SelectSeriesRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+  selectSeriesRequest = unref(selectSeriesRequest);
+
+  return customInstance<ProblemWorkflowDto>(
+    {
+      url: `/api/problems/workflows/${id}/series`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: selectSeriesRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiProblemsWorkflowsIdSeriesMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>,
+    TError,
+    { id: Uuid; data: SelectSeriesRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>,
+  TError,
+  { id: Uuid; data: SelectSeriesRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiProblemsWorkflowsIdSeries"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>,
+    { id: Uuid; data: SelectSeriesRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postApiProblemsWorkflowsIdSeries(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiProblemsWorkflowsIdSeriesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>
+>;
+export type PostApiProblemsWorkflowsIdSeriesMutationBody = SelectSeriesRequest;
+export type PostApiProblemsWorkflowsIdSeriesMutationError = void;
+
+/**
+ * @summary Select Series
+ */
+export const usePostApiProblemsWorkflowsIdSeries = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>,
+      TError,
+      { id: Uuid; data: SelectSeriesRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiProblemsWorkflowsIdSeries>>,
+  TError,
+  { id: Uuid; data: SelectSeriesRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiProblemsWorkflowsIdSeriesMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

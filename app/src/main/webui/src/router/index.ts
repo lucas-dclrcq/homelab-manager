@@ -15,9 +15,9 @@ const router = createRouter({
       component: () => import('../pages/ApplicationsPage.vue'),
     },
     {
-      path: '/corrector',
-      name: 'corrector',
-      component: () => import('../pages/CorrectorPage.vue'),
+      path: '/problems',
+      name: 'problems',
+      component: () => import('../pages/ProblemsPage.vue'),
     },
     {
       path: '/finances',
@@ -30,9 +30,9 @@ const router = createRouter({
       component: () => import('../pages/StatisticsPage.vue'),
     },
     {
-      path: '/corrector/:id',
-      name: 'corrector-workflow',
-      component: () => import('../pages/CorrectorWorkflowPage.vue'),
+      path: '/problems/:id',
+      name: 'problem-workflow',
+      component: () => import('../pages/ProblemWorkflowPage.vue'),
     },
     {
       path: '/admin',
@@ -66,6 +66,18 @@ const router = createRouter({
       path: '/admin/statistics',
       name: 'admin-statistics',
       component: () => import('../pages/AdminStatisticsPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/problems',
+      name: 'admin-problems',
+      component: () => import('../pages/AdminProblemsPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/problems/:id',
+      name: 'admin-problem-workflow',
+      component: () => import('../pages/ProblemWorkflowPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

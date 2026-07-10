@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type MovieSnapshotYear = number | null;
+export type ProblemSeriesDtoPosterUrl = string | null;

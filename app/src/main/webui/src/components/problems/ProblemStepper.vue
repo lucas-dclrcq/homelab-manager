@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import UiIcon from '../ui/UiIcon.vue'
-import { wizardSteps } from '../../lib/corrector'
+import type { WizardStep } from '../../lib/problems'
 
-defineProps<{ currentIndex: number }>()
+defineProps<{ steps: WizardStep[]; currentIndex: number }>()
 </script>
 
 <template>
   <ol class="flex flex-wrap items-center gap-2">
     <li
-      v-for="(step, index) in wizardSteps"
+      v-for="(step, index) in steps"
       :key="step.key"
       class="flex items-center gap-2"
     >
@@ -30,7 +30,7 @@ defineProps<{ currentIndex: number }>()
         {{ step.label }}
       </span>
       <UiIcon
-        v-if="index < wizardSteps.length - 1"
+        v-if="index < steps.length - 1"
         name="chevron-right"
         class="size-4 text-line"
       />

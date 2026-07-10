@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type MovieSnapshotOverview = string | null;
+export type ProblemMovieDtoPosterUrl = string | null;

@@ -5,6 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type GetApiCorrectorMoviesParams = {
-  query: string | null;
-};
+export type ProblemReleaseDtoSize = number | null;

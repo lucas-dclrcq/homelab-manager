@@ -4,5 +4,6 @@
  * Homelab Manager API
  * OpenAPI spec version: 0.0.1
  */
+import type { LocalDateTime } from "./localDateTime";
 
-export type MovieSnapshotPosterUrl = string | null;
+export type ProblemWorkflowDtoCompletedAt = LocalDateTime | null;

@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type MovieSnapshotCurrentQuality = string | null;
+export type SelectSeriesRequestSonarrSeriesId = number | null;

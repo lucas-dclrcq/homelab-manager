@@ -4,6 +4,5 @@
  * Homelab Manager API
  * OpenAPI spec version: 0.0.1
  */
-import type { LocalDateTime } from "./localDateTime";
 
-export type CorrectorWorkflowDtoCompletedAt = LocalDateTime | null;
+export type ProblemSeriesDtoYear = number | null;
