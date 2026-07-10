@@ -7,12 +7,12 @@ import de.connect2x.trixnity.core.model.EventId
 import de.connect2x.trixnity.core.model.RoomId
 import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
+import org.hoohoot.homelab.manager.notifications.domain.ports.ViewingStats
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class TopWatchersMatrixCommand(private val jellystatService: JellystatService) : PrefixedBotCommand() {
+class TopWatchersMatrixCommand(private val viewingStats: ViewingStats) : PrefixedBotCommand() {
     override val name: String = "top-watchers"
     override val help: String = "List the top 10 watchers on Hoohoot (usage: !johnny top-watchers)"
     override val autoAcknowledge = true
@@ -26,7 +26,7 @@ class TopWatchersMatrixCommand(private val jellystatService: JellystatService) :
         textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         Log.info("Top-watchers command requested by ${sender.localpart}")
-        val topWatchers = jellystatService.getTopWatchers(10)
+        val topWatchers = viewingStats.getTopWatchers(10)
 
         val message = """
                 <h2>🏆 Top ten watchers on hoohoot 🏆</h2>

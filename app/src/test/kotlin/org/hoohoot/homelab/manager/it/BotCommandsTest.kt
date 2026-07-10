@@ -6,7 +6,9 @@ import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.hoohoot.homelab.manager.it.config.PlaybackSessionSeed
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
+import org.hoohoot.homelab.manager.statistics.domain.MediaType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -87,7 +89,17 @@ internal class BotCommandsTest {
     @Test
     fun `who-watched should return watcher info`() {
         stubJellyfinSearch()
-        stubJellystatItemHistory()
+        PlaybackSessionSeed.insertSession(
+            userName = "alice",
+            userId = "bot-alice",
+            itemId = "bb-s05e01",
+            itemName = "S05E01 - Live Free or Die",
+            mediaType = MediaType.EPISODE,
+            seriesId = "abc123",
+            seriesName = "Breaking Bad",
+            seasonNumber = 5,
+            episodeNumber = 1,
+        )
 
         synapseTestClient.sendMessage(roomId, "!$botPrefix who-watched Breaking Bad")
 
@@ -99,10 +111,19 @@ internal class BotCommandsTest {
 
     @Test
     fun `top-watched should return top watched media`() {
-        stubJellystatMostPopular("Series", """[{"unique_viewers": "5", "Name": "The Bear"}]""")
-        stubJellystatMostPopular("Movie", """[{"unique_viewers": "3", "Name": "Dune"}]""")
-        stubJellystatMostViewed("Series", """[{"Plays": "10", "total_playback_duration": "36000", "Name": "The Bear"}]""")
-        stubJellystatMostViewed("Movie", """[{"Plays": "8", "total_playback_duration": "18000", "Name": "Dune"}]""")
+        repeat(3) { viewer ->
+            PlaybackSessionSeed.insertSession(
+                userName = "bear-viewer-$viewer",
+                itemId = "the-bear-s01e01",
+                itemName = "System",
+                mediaType = MediaType.EPISODE,
+                seriesId = "the-bear",
+                seriesName = "The Bear",
+                seasonNumber = 1,
+                episodeNumber = 1,
+            )
+        }
+        PlaybackSessionSeed.insertSession(userName = "bear-viewer-0", itemName = "Dune", mediaType = MediaType.MOVIE)
 
         synapseTestClient.sendMessage(roomId, "!$botPrefix top-watched last-week")
 
@@ -114,7 +135,10 @@ internal class BotCommandsTest {
 
     @Test
     fun `top-watchers should return top watchers list`() {
-        stubJellystatUserActivity()
+        // Grosses durées : alice et bob doivent rester dans le top 10 all-time malgré
+        // les sessions seedées par les autres classes de test (base partagée)
+        PlaybackSessionSeed.insertSession(userName = "alice", userId = "bot-alice", itemName = "Marathon Movie", mediaType = MediaType.MOVIE, durationSeconds = 180000)
+        PlaybackSessionSeed.insertSession(userName = "bob", userId = "bot-bob", itemName = "Marathon Movie", mediaType = MediaType.MOVIE, durationSeconds = 90000)
 
         synapseTestClient.sendMessage(roomId, "!$botPrefix top-watchers")
 
@@ -150,65 +174,4 @@ internal class BotCommandsTest {
         )
     }
 
-    private fun stubJellystatItemHistory() {
-        wireMock.register(
-            post(urlPathEqualTo("/api/getItemHistory"))
-                .willReturn(
-                    aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            """{
-                            "current_page": 1, "pages": 1, "size": 50, "sort": "", "desc": true,
-                            "results": [
-                                {"UserName": "alice", "EpisodeNumber": 1, "SeasonNumber": 5, "FullName": "S05E01 - Live Free or Die"}
-                            ]
-                        }"""
-                        )
-                )
-        )
-    }
-
-    private fun stubJellystatMostPopular(type: String, responseBody: String) {
-        wireMock.register(
-            post(urlPathEqualTo("/stats/getMostPopularByType"))
-                .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
-                .willReturn(
-                    aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(responseBody)
-                )
-        )
-    }
-
-    private fun stubJellystatMostViewed(type: String, responseBody: String) {
-        wireMock.register(
-            post(urlPathEqualTo("/stats/getMostViewedByType"))
-                .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
-                .willReturn(
-                    aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(responseBody)
-                )
-        )
-    }
-
-    private fun stubJellystatUserActivity() {
-        wireMock.register(
-            get(urlPathEqualTo("/stats/getAllUserActivity"))
-                .willReturn(
-                    aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            """[
-                            {"UserName": "alice", "TotalPlays": "50", "TotalWatchTime": "180000"},
-                            {"UserName": "bob", "TotalPlays": "30", "TotalWatchTime": "90000"}
-                        ]"""
-                        )
-                )
-        )
-    }
 }

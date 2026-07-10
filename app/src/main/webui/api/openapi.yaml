@@ -12,6 +12,7 @@ tags:
 - name: Corrector
 - name: Finances
 - name: Membres
+- name: Statistics
 components:
   schemas:
     ApplicationDto:
@@ -459,6 +460,29 @@ components:
           - integer
           - "null"
           format: int64
+    HourActivityDto:
+      type: object
+      required:
+      - hour
+      - plays
+      - watchTimeSeconds
+      properties:
+        hour:
+          type: integer
+          format: int32
+        plays:
+          type: integer
+          format: int64
+        watchTimeSeconds:
+          type: integer
+          format: int64
+    ImportStartedDto:
+      type: object
+      required:
+      - jobIdentity
+      properties:
+        jobIdentity:
+          type: string
     JobExecutionDto:
       type: object
       required:
@@ -627,6 +651,11 @@ components:
           uniqueItems: true
           items:
             type: string
+    MediaKind:
+      type: string
+      enum:
+      - MOVIE
+      - SERIES
     MemberDto:
       type: object
       required:
@@ -695,6 +724,83 @@ components:
           type: array
           items:
             type: string
+    NowPlayingDto:
+      type: object
+      required:
+      - userName
+      - itemName
+      - seriesName
+      - seasonNumber
+      - episodeNumber
+      - mediaType
+      - progressPercent
+      - paused
+      - client
+      - platform
+      - startedAt
+      properties:
+        userName:
+          type: string
+        itemName:
+          type: string
+        seriesName:
+          type:
+          - string
+          - "null"
+        seasonNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+        episodeNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+        mediaType:
+          type: string
+        progressPercent:
+          type:
+          - number
+          - "null"
+          format: double
+        paused:
+          type: boolean
+        client:
+          type:
+          - string
+          - "null"
+        platform:
+          type: string
+        startedAt:
+          $ref: "#/components/schemas/LocalDateTime"
+    PlatformShareDto:
+      type: object
+      required:
+      - platform
+      - plays
+      - watchTimeSeconds
+      properties:
+        platform:
+          type: string
+        plays:
+          type: integer
+          format: int64
+        watchTimeSeconds:
+          type: integer
+          format: int64
+    PlaysOverTimeDto:
+      type: object
+      required:
+      - granularity
+      - points
+      properties:
+        granularity:
+          $ref: "#/components/schemas/TimeGranularity"
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimePointDto"
     RadarrWebhookMovie:
       type: object
       properties:
@@ -1009,6 +1115,62 @@ components:
           - "null"
           items:
             type: string
+    SortDirection:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    StatisticsSummaryDto:
+      type: object
+      required:
+      - totalWatchTimeSeconds
+      - playCount
+      - completedItems
+      - peakHour
+      properties:
+        totalWatchTimeSeconds:
+          type: integer
+          format: int64
+        playCount:
+          type: integer
+          format: int64
+        completedItems:
+          type: integer
+          format: int64
+        peakHour:
+          type:
+          - integer
+          - "null"
+          format: int32
+    StatsPeriod:
+      type: string
+      enum:
+      - TODAY
+      - THIS_WEEK
+      - THIS_MONTH
+      - THIS_YEAR
+      - ALL_TIME
+    TimeGranularity:
+      type: string
+      enum:
+      - HOUR
+      - DAY
+      - MONTH
+    TimePointDto:
+      type: object
+      required:
+      - bucketStart
+      - plays
+      - watchTimeSeconds
+      properties:
+        bucketStart:
+          $ref: "#/components/schemas/LocalDateTime"
+        plays:
+          type: integer
+          format: int64
+        watchTimeSeconds:
+          type: integer
+          format: int64
     TimelineEventDto:
       type: object
       required:
@@ -1056,10 +1218,85 @@ components:
         totalCount:
           type: integer
           format: int64
+    TopMediaDto:
+      type: object
+      required:
+      - name
+      - plays
+      - watchTimeSeconds
+      - uniqueViewers
+      - completionRate
+      - bingeScore
+      properties:
+        name:
+          type: string
+        plays:
+          type: integer
+          format: int64
+        watchTimeSeconds:
+          type: integer
+          format: int64
+        uniqueViewers:
+          type: integer
+          format: int64
+        completionRate:
+          type:
+          - number
+          - "null"
+          format: double
+        bingeScore:
+          type:
+          - integer
+          - "null"
+          format: int32
+    TopMediaSort:
+      type: string
+      enum:
+      - NAME
+      - PLAYS
+      - WATCH_TIME
+      - UNIQUE_VIEWERS
+      - COMPLETION_RATE
+      - BINGE_SCORE
+    TopUserDto:
+      type: object
+      required:
+      - userName
+      - watchTimeSeconds
+      - itemsWatched
+      - playCount
+      properties:
+        userName:
+          type: string
+        watchTimeSeconds:
+          type: integer
+          format: int64
+        itemsWatched:
+          type: integer
+          format: int64
+        playCount:
+          type: integer
+          format: int64
     UUID:
       type: string
       format: uuid
       pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    WeekdayActivityDto:
+      type: object
+      required:
+      - isoDayOfWeek
+      - plays
+      - watchTimeSeconds
+      properties:
+        isoDayOfWeek:
+          type: integer
+          format: int32
+        plays:
+          type: integer
+          format: int64
+        watchTimeSeconds:
+          type: integer
+          format: int64
 paths:
   /api/admin/finances/entries:
     post:
@@ -1382,6 +1619,39 @@ paths:
         "403":
           description: Not Allowed
       summary: Run Job
+      security:
+      - SecurityScheme:
+        - admin
+  /api/admin/statistics/import:
+    post:
+      tags:
+      - Statistics
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type:
+                  - string
+                  - "null"
+                  format: binary
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportStartedDto"
+          description: Accepted
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Import Backup
       security:
       - SecurityScheme:
         - admin
@@ -1996,6 +2266,191 @@ paths:
         "400":
           description: Bad Request
       summary: Handle Sonarr Notification
+  /api/statistics/activity-by-hour:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HourActivityDto"
+      summary: Get Activity By Hour
+  /api/statistics/activity-by-weekday:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeekdayActivityDto"
+      summary: Get Activity By Weekday
+  /api/statistics/now-playing:
+    get:
+      tags:
+      - Statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NowPlayingDto"
+      summary: Get Now Playing
+  /api/statistics/platforms:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlatformShareDto"
+      summary: Get Platforms
+  /api/statistics/plays-over-time:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaysOverTimeDto"
+      summary: Get Plays Over Time
+  /api/statistics/summary:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatisticsSummaryDto"
+      summary: Get Summary
+  /api/statistics/top-media:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: order
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/SortDirection"
+          - type: "null"
+        required: true
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      - name: sort
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/TopMediaSort"
+          - type: "null"
+        required: true
+      - name: type
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/MediaKind"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopMediaDto"
+      summary: Get Top Media
+  /api/statistics/top-users:
+    get:
+      tags:
+      - Statistics
+      parameters:
+      - name: period
+        in: query
+        schema:
+          anyOf:
+          - $ref: "#/components/schemas/StatsPeriod"
+          - type: "null"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopUserDto"
+      summary: Get Top Users
   /api/stats:
     get:
       tags:

@@ -49,7 +49,7 @@ class JobsResource(
     @GET
     suspend fun listJobs(): List<JobStatusDto> {
         val lastExecutions = jobExecutionRepository.findAll().associateBy { it.jobIdentity }
-        return scheduler.scheduledJobs
+        val scheduled = scheduler.scheduledJobs
             .sortedBy { it.id }
             .map { trigger ->
                 val managedJob = jobRunner.find(trigger.id)
@@ -63,6 +63,22 @@ class JobsResource(
                     lastExecution = lastExecutions[trigger.id]?.toDto(),
                 )
             }
+        // Jobs à déclenchement manuel uniquement (ex : import Jellystat), inconnus du scheduler
+        val manualOnly = jobRunner.all()
+            .filter { job -> !isScheduled(job.identity) }
+            .sortedBy { it.identity }
+            .map { job ->
+                JobStatusDto(
+                    identity = job.identity,
+                    displayName = job.displayName,
+                    schedule = job.schedule,
+                    nextFireTime = null,
+                    paused = false,
+                    runnable = true,
+                    lastExecution = lastExecutions[job.identity]?.toDto(),
+                )
+            }
+        return scheduled + manualOnly
     }
 
     @POST

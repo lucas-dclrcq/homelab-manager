@@ -1,0 +1,85 @@
+[
+  { "jf_libraries": [{ "Id": "lib-1", "Name": "Movies", "Type": "CollectionFolder" }] },
+  {
+    "jf_library_items": [
+      { "Id": "movie-1", "Name": "Merlin l'enchanteur", "Type": "Movie", "RunTimeTicks": "47520000000" },
+      { "Id": "audio-1", "Name": "Some Song", "Type": "Audio", "RunTimeTicks": "1800000000" }
+    ]
+  },
+  { "jf_library_seasons": [] },
+  {
+    "jf_library_episodes": [
+      {
+        "Id": "row-ep-1",
+        "EpisodeId": "ep-1",
+        "Name": "Épisode 2",
+        "RunTimeTicks": "14450400000",
+        "IndexNumber": 2,
+        "ParentIndexNumber": 1,
+        "SeriesId": "series-1",
+        "SeasonName": "Season 1",
+        "SeriesName": "Funboys"
+      }
+    ]
+  },
+  { "jf_users": [{ "Id": "user-1", "Name": "oknozor" }] },
+  {
+    "jf_playback_activity": [
+      {
+        "Id": "import-key-episode",
+        "UserId": "user-1",
+        "UserName": "oknozor",
+        "Client": "Jellyfin Web",
+        "DeviceName": "Firefox",
+        "NowPlayingItemId": "series-1",
+        "NowPlayingItemName": "Épisode 2",
+        "SeasonId": "season-1",
+        "SeriesName": "Funboys (2025) [tvdbid-459343]",
+        "EpisodeId": "ep-1",
+        "PlaybackDuration": "1300",
+        "ActivityDateInserted": "2026-02-01T14:39:47.712Z",
+        "MediaStreams": [{ "Codec": "h264", "Type": "Video", "BitRate": 6252015 }],
+        "PlayState": { "PositionTicks": 19160, "IsPaused": false }
+      },
+      {
+        "Id": "import-key-movie",
+        "UserId": "user-2",
+        "UserName": "the_gamble",
+        "Client": "Jellyfin Android TV",
+        "DeviceName": "Smart TV Pro",
+        "NowPlayingItemId": "movie-1",
+        "NowPlayingItemName": "Merlin l'enchanteur",
+        "SeriesName": null,
+        "EpisodeId": null,
+        "PlaybackDuration": "3000",
+        "ActivityDateInserted": "2026-02-07T16:30:36.803Z",
+        "MediaStreams": [],
+        "PlayState": { "PositionTicks": 0, "IsPaused": false }
+      },
+      {
+        "Id": "import-key-too-short",
+        "UserId": "user-1",
+        "UserName": "oknozor",
+        "Client": "Jellyfin Web",
+        "NowPlayingItemId": "movie-1",
+        "NowPlayingItemName": "Merlin l'enchanteur",
+        "EpisodeId": null,
+        "PlaybackDuration": "30",
+        "ActivityDateInserted": "2026-02-08T10:00:00.000Z"
+      },
+      {
+        "Id": "import-key-audio",
+        "UserId": "user-1",
+        "UserName": "oknozor",
+        "Client": "Jellyfin Web",
+        "NowPlayingItemId": "audio-1",
+        "NowPlayingItemName": "Some Song",
+        "EpisodeId": null,
+        "PlaybackDuration": "500",
+        "ActivityDateInserted": "2026-02-08T11:00:00.000Z"
+      }
+    ]
+  },
+  { "jf_playback_reporting_plugin_data": [] },
+  { "jf_item_info": [] }
+]

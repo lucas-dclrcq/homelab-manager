@@ -7,13 +7,13 @@ import de.connect2x.trixnity.core.model.UserId
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.TopWatchedPeriod
+import org.hoohoot.homelab.manager.notifications.domain.ports.ViewingStats
+import org.hoohoot.homelab.manager.notifications.domain.TopWatchedPeriod
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
-class TopWatchedMatrixCommand(private val jellystatService: JellystatService) : PrefixedBotCommand() {
+class TopWatchedMatrixCommand(private val viewingStats: ViewingStats) : PrefixedBotCommand() {
     override val name: String = "top-watched"
     override val help: String = "List the top watched medias for a period. (usage: !johnny top-watched <last-week|last-month|last-year>)"
     override val autoAcknowledge = true
@@ -34,7 +34,7 @@ class TopWatchedMatrixCommand(private val jellystatService: JellystatService) : 
             else -> throw IllegalArgumentException("Unsupported period: $parameters")
         }
 
-        val topWatched = jellystatService.getTopWatched(topWatchedPeriod)
+        val topWatched = viewingStats.getTopWatched(topWatchedPeriod)
 
         val message = """
                 <h1>🥇 Top watch for ${topWatched.period} 🥇</h1>

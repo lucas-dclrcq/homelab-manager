@@ -38,14 +38,27 @@ import type {
   GetApiFinancesEntriesParams,
   GetApiFinancesMonthlyParams,
   GetApiFinancesSummaryParams,
+  GetApiStatisticsActivityByHourParams,
+  GetApiStatisticsActivityByWeekdayParams,
+  GetApiStatisticsPlatformsParams,
+  GetApiStatisticsPlaysOverTimeParams,
+  GetApiStatisticsSummaryParams,
+  GetApiStatisticsTopMediaParams,
+  GetApiStatisticsTopUsersParams,
   GetApiTimelineParams,
   GrabReleaseRequest,
+  HourActivityDto,
+  ImportStartedDto,
   JobStatusDto,
   LibraryStats,
   LidarrWebhookPayload,
   MeDto,
   MemberDto,
   MonthlyTotalsDto,
+  NowPlayingDto,
+  PlatformShareDto,
+  PlaysOverTimeDto,
+  PostApiAdminStatisticsImportBody,
   PostApiApplicationsBody,
   PutApiApplicationsIdBody,
   RadarrWebhookPayload,
@@ -55,8 +68,12 @@ import type {
   SelectMovieRequest,
   SelectProblemRequest,
   SonarrWebhookPayload,
+  StatisticsSummaryDto,
   TimelinePageDto,
+  TopMediaDto,
+  TopUserDto,
   Uuid,
+  WeekdayActivityDto,
 } from "../model";
 
 import { customInstance } from "../axios-instance";
@@ -1230,6 +1247,106 @@ export const usePostApiAdminJobsIdentityRun = <
 > => {
   const mutationOptions =
     getPostApiAdminJobsIdentityRunMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Import Backup
+ */
+export const postApiAdminStatisticsImport = (
+  postApiAdminStatisticsImportBody: MaybeRef<PostApiAdminStatisticsImportBody>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  postApiAdminStatisticsImportBody = unref(postApiAdminStatisticsImportBody);
+  const formData = new FormData();
+  if (postApiAdminStatisticsImportBody.file !== null) {
+    formData.append("file", postApiAdminStatisticsImportBody.file);
+  }
+
+  return customInstance<ImportStartedDto>(
+    {
+      url: `/api/admin/statistics/import`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminStatisticsImportMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminStatisticsImport>>,
+    TError,
+    { data: PostApiAdminStatisticsImportBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminStatisticsImport>>,
+  TError,
+  { data: PostApiAdminStatisticsImportBody },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminStatisticsImport"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminStatisticsImport>>,
+    { data: PostApiAdminStatisticsImportBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAdminStatisticsImport(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminStatisticsImportMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminStatisticsImport>>
+>;
+export type PostApiAdminStatisticsImportMutationBody =
+  PostApiAdminStatisticsImportBody;
+export type PostApiAdminStatisticsImportMutationError = void;
+
+/**
+ * @summary Import Backup
+ */
+export const usePostApiAdminStatisticsImport = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminStatisticsImport>>,
+      TError,
+      { data: PostApiAdminStatisticsImportBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminStatisticsImport>>,
+  TError,
+  { data: PostApiAdminStatisticsImportBody },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminStatisticsImportMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -3712,6 +3829,853 @@ export const usePostApiNotificationsSonarr = <
 
   return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * @summary Get Activity By Hour
+ */
+export const getApiStatisticsActivityByHour = (
+  params: MaybeRef<GetApiStatisticsActivityByHourParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<HourActivityDto[]>(
+    {
+      url: `/api/statistics/activity-by-hour`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsActivityByHourQueryKey = (
+  params: MaybeRef<GetApiStatisticsActivityByHourParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "activity-by-hour",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsActivityByHourQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsActivityByHourParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsActivityByHourQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>
+  > = ({ signal }) =>
+    getApiStatisticsActivityByHour(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsActivityByHourQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>
+>;
+export type GetApiStatisticsActivityByHourQueryError = unknown;
+
+/**
+ * @summary Get Activity By Hour
+ */
+
+export function useGetApiStatisticsActivityByHour<
+  TData = Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsActivityByHourParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsActivityByHour>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsActivityByHourQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Activity By Weekday
+ */
+export const getApiStatisticsActivityByWeekday = (
+  params: MaybeRef<GetApiStatisticsActivityByWeekdayParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<WeekdayActivityDto[]>(
+    {
+      url: `/api/statistics/activity-by-weekday`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsActivityByWeekdayQueryKey = (
+  params: MaybeRef<GetApiStatisticsActivityByWeekdayParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "activity-by-weekday",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsActivityByWeekdayQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsActivityByWeekdayParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsActivityByWeekdayQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>
+  > = ({ signal }) =>
+    getApiStatisticsActivityByWeekday(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsActivityByWeekdayQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>
+>;
+export type GetApiStatisticsActivityByWeekdayQueryError = unknown;
+
+/**
+ * @summary Get Activity By Weekday
+ */
+
+export function useGetApiStatisticsActivityByWeekday<
+  TData = Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsActivityByWeekdayParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsActivityByWeekday>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsActivityByWeekdayQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Now Playing
+ */
+export const getApiStatisticsNowPlaying = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<NowPlayingDto[]>(
+    { url: `/api/statistics/now-playing`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiStatisticsNowPlayingQueryKey = () => {
+  return ["api", "statistics", "now-playing"] as const;
+};
+
+export const getGetApiStatisticsNowPlayingQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsNowPlayingQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>
+  > = ({ signal }) => getApiStatisticsNowPlaying(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsNowPlayingQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>
+>;
+export type GetApiStatisticsNowPlayingQueryError = unknown;
+
+/**
+ * @summary Get Now Playing
+ */
+
+export function useGetApiStatisticsNowPlaying<
+  TData = Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsNowPlaying>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsNowPlayingQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Platforms
+ */
+export const getApiStatisticsPlatforms = (
+  params: MaybeRef<GetApiStatisticsPlatformsParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<PlatformShareDto[]>(
+    {
+      url: `/api/statistics/platforms`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsPlatformsQueryKey = (
+  params: MaybeRef<GetApiStatisticsPlatformsParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "platforms",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsPlatformsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsPlatforms>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsPlatformsParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsPlatforms>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsPlatformsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsPlatforms>>
+  > = ({ signal }) => getApiStatisticsPlatforms(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsPlatforms>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsPlatformsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsPlatforms>>
+>;
+export type GetApiStatisticsPlatformsQueryError = unknown;
+
+/**
+ * @summary Get Platforms
+ */
+
+export function useGetApiStatisticsPlatforms<
+  TData = Awaited<ReturnType<typeof getApiStatisticsPlatforms>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsPlatformsParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsPlatforms>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsPlatformsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Plays Over Time
+ */
+export const getApiStatisticsPlaysOverTime = (
+  params: MaybeRef<GetApiStatisticsPlaysOverTimeParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<PlaysOverTimeDto>(
+    {
+      url: `/api/statistics/plays-over-time`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsPlaysOverTimeQueryKey = (
+  params: MaybeRef<GetApiStatisticsPlaysOverTimeParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "plays-over-time",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsPlaysOverTimeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsPlaysOverTimeParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsPlaysOverTimeQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>
+  > = ({ signal }) =>
+    getApiStatisticsPlaysOverTime(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsPlaysOverTimeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>
+>;
+export type GetApiStatisticsPlaysOverTimeQueryError = unknown;
+
+/**
+ * @summary Get Plays Over Time
+ */
+
+export function useGetApiStatisticsPlaysOverTime<
+  TData = Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsPlaysOverTimeParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsPlaysOverTime>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsPlaysOverTimeQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Summary
+ */
+export const getApiStatisticsSummary = (
+  params: MaybeRef<GetApiStatisticsSummaryParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<StatisticsSummaryDto>(
+    {
+      url: `/api/statistics/summary`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsSummaryQueryKey = (
+  params: MaybeRef<GetApiStatisticsSummaryParams>,
+) => {
+  return ["api", "statistics", "summary", ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiStatisticsSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsSummary>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsSummaryParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsSummaryQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsSummary>>
+  > = ({ signal }) => getApiStatisticsSummary(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsSummary>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsSummary>>
+>;
+export type GetApiStatisticsSummaryQueryError = unknown;
+
+/**
+ * @summary Get Summary
+ */
+
+export function useGetApiStatisticsSummary<
+  TData = Awaited<ReturnType<typeof getApiStatisticsSummary>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsSummaryParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsSummaryQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Top Media
+ */
+export const getApiStatisticsTopMedia = (
+  params: MaybeRef<GetApiStatisticsTopMediaParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<TopMediaDto[]>(
+    {
+      url: `/api/statistics/top-media`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsTopMediaQueryKey = (
+  params: MaybeRef<GetApiStatisticsTopMediaParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "top-media",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsTopMediaQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsTopMedia>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsTopMediaParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsTopMedia>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsTopMediaQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsTopMedia>>
+  > = ({ signal }) => getApiStatisticsTopMedia(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsTopMedia>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsTopMediaQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsTopMedia>>
+>;
+export type GetApiStatisticsTopMediaQueryError = unknown;
+
+/**
+ * @summary Get Top Media
+ */
+
+export function useGetApiStatisticsTopMedia<
+  TData = Awaited<ReturnType<typeof getApiStatisticsTopMedia>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsTopMediaParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsTopMedia>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsTopMediaQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Top Users
+ */
+export const getApiStatisticsTopUsers = (
+  params: MaybeRef<GetApiStatisticsTopUsersParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<TopUserDto[]>(
+    {
+      url: `/api/statistics/top-users`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsTopUsersQueryKey = (
+  params: MaybeRef<GetApiStatisticsTopUsersParams>,
+) => {
+  return [
+    "api",
+    "statistics",
+    "top-users",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsTopUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsTopUsers>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsTopUsersParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsTopUsers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiStatisticsTopUsersQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsTopUsers>>
+  > = ({ signal }) => getApiStatisticsTopUsers(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsTopUsers>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiStatisticsTopUsersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsTopUsers>>
+>;
+export type GetApiStatisticsTopUsersQueryError = unknown;
+
+/**
+ * @summary Get Top Users
+ */
+
+export function useGetApiStatisticsTopUsers<
+  TData = Awaited<ReturnType<typeof getApiStatisticsTopUsers>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiStatisticsTopUsersParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsTopUsers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsTopUsersQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
 
 /**
  * @summary Get Stats

@@ -11,8 +11,10 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.assertj.core.api.Assertions.assertThat
+import org.hoohoot.homelab.manager.it.config.PlaybackSessionSeed
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
+import org.hoohoot.homelab.manager.statistics.domain.MediaType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -34,6 +36,34 @@ internal class WeeklyReportNotificationsTest {
         mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
         wireMock.resetMappings()
+        // Le rapport agrège playback_session sur 7 jours glissants : purge pour que
+        // les sessions seedées par les autres classes de test ne polluent pas les tops
+        PlaybackSessionSeed.deleteAll()
+    }
+
+    private fun seedMovieViewers(title: String, viewers: Int) {
+        repeat(viewers) { viewer ->
+            PlaybackSessionSeed.insertSession(
+                userName = "$title-viewer-$viewer",
+                itemName = title,
+                mediaType = MediaType.MOVIE,
+            )
+        }
+    }
+
+    private fun seedSeriesViewers(title: String, viewers: Int) {
+        repeat(viewers) { viewer ->
+            PlaybackSessionSeed.insertSession(
+                userName = "$title-viewer-$viewer",
+                itemId = "$title-s01e01",
+                itemName = "Episode 1",
+                mediaType = MediaType.EPISODE,
+                seriesId = title,
+                seriesName = title,
+                seasonNumber = 1,
+                episodeNumber = 1,
+            )
+        }
     }
 
     @Test
@@ -55,16 +85,11 @@ internal class WeeklyReportNotificationsTest {
             {"title": "GNX", "releaseDate": "2025-03-18", "artist": {"artistName": "Kendrick Lamar"}}
         ]""")
 
-        stubJellystatMostPopular("Movie", """[
-            {"unique_viewers": "5", "Name": "Dune: Part Two"},
-            {"unique_viewers": "3", "Name": "Oppenheimer"},
-            {"unique_viewers": "2", "Name": "Poor Things"}
-        ]""")
-
-        stubJellystatMostPopular("Series", """[
-            {"unique_viewers": "8", "Name": "The Bear"},
-            {"unique_viewers": "6", "Name": "Severance"}
-        ]""")
+        seedMovieViewers("Dune: Part Two", 5)
+        seedMovieViewers("Oppenheimer", 3)
+        seedMovieViewers("Poor Things", 2)
+        seedSeriesViewers("The Bear", 8)
+        seedSeriesViewers("Severance", 6)
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -116,8 +141,6 @@ internal class WeeklyReportNotificationsTest {
         ]""")
 
         stubLidarrCalendar("[]")
-        stubJellystatMostPopular("Movie", "[]")
-        stubJellystatMostPopular("Series", "[]")
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -140,8 +163,7 @@ internal class WeeklyReportNotificationsTest {
         stubSonarrCalendar("[]")
         stubLidarrCalendar("[]")
 
-        stubJellystatMostPopular("Movie", """[{"unique_viewers": "3", "Name": "Movie"}]""")
-        stubJellystatMostPopular("Series", "[]")
+        seedMovieViewers("Movie", 3)
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -159,8 +181,6 @@ internal class WeeklyReportNotificationsTest {
         stubRadarrCalendar("[]")
         stubSonarrCalendar("[]")
         stubLidarrCalendar("[]")
-        stubJellystatMostPopular("Movie", "[]")
-        stubJellystatMostPopular("Series", "[]")
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -179,13 +199,10 @@ internal class WeeklyReportNotificationsTest {
         stubSonarrCalendar("[]")
         stubLidarrCalendar("[]")
 
-        stubJellystatMostPopular("Movie", """[
-            {"unique_viewers": "10", "Name": "A"},
-            {"unique_viewers": "8", "Name": "B"},
-            {"unique_viewers": "5", "Name": "C"},
-            {"unique_viewers": "2", "Name": "D"}
-        ]""")
-        stubJellystatMostPopular("Series", "[]")
+        seedMovieViewers("A", 10)
+        seedMovieViewers("B", 8)
+        seedMovieViewers("C", 5)
+        seedMovieViewers("D", 2)
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -206,8 +223,6 @@ internal class WeeklyReportNotificationsTest {
         ]""")
         stubSonarrCalendar("[]")
         stubLidarrCalendar("[]")
-        stubJellystatMostPopular("Movie", "[]")
-        stubJellystatMostPopular("Series", "[]")
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -226,8 +241,6 @@ internal class WeeklyReportNotificationsTest {
         ]""")
         stubSonarrCalendar("[]")
         stubLidarrCalendar("[]")
-        stubJellystatMostPopular("Movie", "[]")
-        stubJellystatMostPopular("Series", "[]")
 
         RestAssured.given().contentType(ContentType.JSON)
             .header("X-Api-Key", "secureapikey")
@@ -264,14 +277,6 @@ internal class WeeklyReportNotificationsTest {
         wireMock.register(
             get(urlPathEqualTo("/api/v1/calendar"))
                 .withHeader("X-Api-Key", equalTo("API_KEY"))
-                .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
-        )
-    }
-
-    private fun stubJellystatMostPopular(type: String, responseBody: String) {
-        wireMock.register(
-            post(urlPathEqualTo("/stats/getMostPopularByType"))
-                .withRequestBody(matchingJsonPath("$.type", equalTo(type)))
                 .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(responseBody))
         )
     }

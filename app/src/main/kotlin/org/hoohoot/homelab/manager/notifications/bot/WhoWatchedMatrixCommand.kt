@@ -8,17 +8,17 @@ import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.notifications.infra.jellyfin.JellyfinRestClient
-import org.hoohoot.homelab.manager.notifications.infra.jellyfin.searchSeries
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.JellystatService
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.MultipleSeriesFoundException
-import org.hoohoot.homelab.manager.notifications.infra.jellystat.NoSeriesFoundException
+import org.hoohoot.homelab.manager.shared.jellyfin.JellyfinRestClient
+import org.hoohoot.homelab.manager.shared.jellyfin.searchSeries
+import org.hoohoot.homelab.manager.notifications.domain.ports.ViewingStats
+import org.hoohoot.homelab.manager.notifications.domain.MultipleSeriesFoundException
+import org.hoohoot.homelab.manager.notifications.domain.NoSeriesFoundException
 import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.commands.PrefixedBotCommand
 
 @ApplicationScoped
 class WhoWatchedMatrixCommand(
-    private val jellystatService: JellystatService,
+    private val viewingStats: ViewingStats,
     @param:RestClient private val jellyfinRestClient: JellyfinRestClient
 ) : PrefixedBotCommand() {
     override val name: String = "who-watched"
@@ -47,7 +47,7 @@ class WhoWatchedMatrixCommand(
         }
 
         val firstFoundMedia = media.first()
-        val whoWatched = jellystatService.getWatchersInfo(firstFoundMedia.itemId, firstFoundMedia.name)
+        val whoWatched = viewingStats.getWatchersInfo(firstFoundMedia.itemId, firstFoundMedia.name)
 
         val body = """
             <h1>📺 Who watched last episode of ${whoWatched.tvShow} ? (${whoWatched.watchersCount} watchers)</h1>

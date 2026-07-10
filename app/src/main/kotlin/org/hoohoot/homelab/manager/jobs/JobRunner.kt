@@ -25,6 +25,8 @@ class JobRunner(
 ) {
     fun find(identity: String): ManagedJob? = managedJobs.firstOrNull { it.identity == identity }
 
+    fun all(): List<ManagedJob> = managedJobs.toList()
+
     suspend fun runNow(job: ManagedJob): JobRunResult = run(job, manual = true)
 
     suspend fun runScheduled(job: ManagedJob): JobRunResult = run(job, manual = false)

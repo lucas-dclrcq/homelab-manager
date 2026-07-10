@@ -25,6 +25,11 @@ const router = createRouter({
       component: () => import('../pages/FinancesPage.vue'),
     },
     {
+      path: '/statistics',
+      name: 'statistics',
+      component: () => import('../pages/StatisticsPage.vue'),
+    },
+    {
       path: '/corrector/:id',
       name: 'corrector-workflow',
       component: () => import('../pages/CorrectorWorkflowPage.vue'),
@@ -55,6 +60,12 @@ const router = createRouter({
       path: '/admin/members',
       name: 'admin-members',
       component: () => import('../pages/AdminMembersPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/statistics',
+      name: 'admin-statistics',
+      component: () => import('../pages/AdminStatisticsPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

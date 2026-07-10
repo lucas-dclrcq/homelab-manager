@@ -142,13 +142,12 @@ class CorrectorResource(
     suspend fun selectProblem(@PathParam("id") id: UUID, request: SelectProblemRequest): Response =
         selectProblemUseCase(id, username, request.problemType).toResponse()
 
-    // Proxy live : les guids des releases périment vite, on ne persiste rien ici
     @GET
     @Path("/workflows/{id}/releases")
     suspend fun listReleases(@PathParam("id") id: UUID): List<CorrectorReleaseDto> =
         when (val result = listReleasesUseCase(id, username)) {
             is ListReleasesResult.Ok -> result.releases.map { it.toReleaseDto() }
-            ListReleasesResult.NotFound -> throw NotFoundException()
+            is ListReleasesResult.NotFound -> throw NotFoundException()
             is ListReleasesResult.Conflict -> throw WebApplicationException(conflict(result.message))
         }
 
