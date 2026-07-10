@@ -60,8 +60,8 @@ internal class ProblemsTest {
                         {"id": 3, "title": "Un Prophète", "year": 2009},
                         {
                           "id": 5, "title": "Blade Runner 2049", "year": 2017, "hasFile": true,
-                          "qualityProfileId": 6,
-                          "movieFile": {"quality": {"quality": {"name": "WEBDL-2160p"}}, "languages": [{"id": 1, "name": "English"}]}
+                          "qualityProfileId": 4,
+                          "movieFile": {"quality": {"quality": {"name": "Bluray-1080p"}}, "languages": [{"id": 1, "name": "English"}]}
                         }
                     ]"""
                 )
@@ -149,13 +149,6 @@ internal class ProblemsTest {
                                 {"quality": {"id": 15, "name": "WEBRip-1080p", "resolution": 1080}, "allowed": true}
                             ]},
                             {"quality": {"id": 7, "name": "Bluray-1080p", "resolution": 1080}, "allowed": true}
-                          ]
-                        },
-                        {
-                          "id": 6, "name": "UHD-2160p", "cutoff": 19,
-                          "items": [
-                            {"quality": {"id": 7, "name": "Bluray-1080p", "resolution": 1080}, "allowed": true},
-                            {"quality": {"id": 19, "name": "Bluray-2160p", "resolution": 2160}, "allowed": true}
                           ]
                         }
                     ]"""
@@ -666,7 +659,7 @@ internal class ProblemsTest {
 
     @Test
     @TestSecurity(user = "alice", roles = ["admin", "user"])
-    fun `a 1080p multi torrent is recommended even when the profile targets 4k`() {
+    fun `a 2160p release is not recommended when the profile targets 1080p`() {
         val id = createWorkflow().getString("id")
         selectMovie(id, radarrMovieId = 5)
         selectProblem(id)
@@ -677,10 +670,9 @@ internal class ProblemsTest {
             .extract().jsonPath().getList<Map<String, Any>>("")
 
         val byGuid = releases.associateBy { it["guid"] }
-        // Le plancher est plafonné à 1080p : un upgrade 1080p MULTI reste recommandé même si le
-        // profil demande de la 4K (sinon on écarterait une release parfaitement valable).
+        // Profil 1080p : on recommande la 1080p MULTI, pas la 2160p (qualité au-dessus de la demandée)
         assertThat(byGuid["br-multi-1080"]!!["isRecommended"]).isEqualTo(true)
-        assertThat(byGuid["br-multi-2160"]!!["isRecommended"]).isEqualTo(true)
+        assertThat(byGuid["br-multi-2160"]!!["isRecommended"]).isEqualTo(false)
     }
 
     @Test

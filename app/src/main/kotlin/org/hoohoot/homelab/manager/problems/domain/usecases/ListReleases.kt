@@ -23,8 +23,6 @@ class ListReleases(
         // VOSTFR volontairement exclu : sous-titres, pas doublage
         private val VF_REGEX = Regex("""\b(MULTI|VF[FIQ2]?|FRENCH|TRUEFRENCH)\b""", RegexOption.IGNORE_CASE)
         private val RESOLUTION_REGEX = Regex("""(2160|1080|720|576|480)p""", RegexOption.IGNORE_CASE)
-        // Le 1080p est toujours considéré comme un bon upgrade, quel que soit le profil
-        private const val HD_RESOLUTION = 1080
 
         private fun resolutionOf(quality: String?): Int? =
             quality?.let { RESOLUTION_REGEX.find(it)?.groupValues?.get(1)?.toIntOrNull() }
@@ -53,15 +51,13 @@ class ListReleases(
     private fun Release.isFrench(): Boolean =
         languages.any { it.equals("French", ignoreCase = true) } || VF_REGEX.containsMatchIn(title)
 
-    // On recommande les torrents VF/MULTI en 1080p ou mieux. Si le profil Radarr vise plus bas
-    // (ex : 720p) on descend jusqu'à sa cible ; le plancher ne dépasse jamais 1080p pour ne jamais
-    // écarter un upgrade HD, même quand le profil demande de la 4K. Profil inconnu → permissif.
+    // On recommande les torrents VF/MULTI à la résolution EXACTE demandée par le profil Radarr :
+    // ni en dessous (downgrade), ni au-dessus (ex : pas de 2160p quand le profil vise 1080p).
+    // Profil inconnu → permissif (on ne peut pas filtrer sur la résolution).
     private fun Release.isRecommended(desiredResolution: Int?): Boolean {
         if (!protocol.equals("torrent", ignoreCase = true)) return false
         if (!VF_REGEX.containsMatchIn(title)) return false
         if (desiredResolution == null) return true
-        val releaseResolution = resolutionOf(quality) ?: return false
-        val floor = minOf(desiredResolution, HD_RESOLUTION)
-        return releaseResolution >= floor
+        return resolutionOf(quality) == desiredResolution
     }
 }
