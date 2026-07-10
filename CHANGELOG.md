@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.2...v0.1.3) (2026-07-10)
+
+
+### Features
+
+* **stats:** add currently playing + general stats on vieweing ([26902ba](https://github.com/lucas-dclrcq/homelab-manager/commit/26902ba48e96dd6845559d53732d2728cf854c0e))
+
 ## [0.1.2](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.1...v0.1.2) (2026-07-09)
 
 
