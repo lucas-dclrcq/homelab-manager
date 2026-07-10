@@ -14,8 +14,7 @@ AXIOS_INSTANCE.interceptors.response.use(
   (error) => {
     const status = error?.response?.status
     if (status === 401 || status === 499) {
-      // Session expired: full-page navigation restarts the server-side OIDC code flow
-      window.location.assign('/')
+      window.location.reload()
       return new Promise(() => {})
     }
     return Promise.reject(error)
