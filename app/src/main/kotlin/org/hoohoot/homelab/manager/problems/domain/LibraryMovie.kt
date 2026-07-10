@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.corrector.domain
+package org.hoohoot.homelab.manager.problems.domain
 
 data class LibraryMovie(
     val radarrMovieId: Int,

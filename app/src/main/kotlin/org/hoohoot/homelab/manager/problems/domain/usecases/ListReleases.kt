@@ -1,10 +1,10 @@
-package org.hoohoot.homelab.manager.corrector.domain.usecases
+package org.hoohoot.homelab.manager.problems.domain.usecases
 
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.corrector.domain.AnnotatedRelease
-import org.hoohoot.homelab.manager.corrector.domain.Release
-import org.hoohoot.homelab.manager.corrector.domain.ports.CorrectorWorkflows
-import org.hoohoot.homelab.manager.corrector.domain.ports.Releases
+import org.hoohoot.homelab.manager.problems.domain.AnnotatedRelease
+import org.hoohoot.homelab.manager.problems.domain.Release
+import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
+import org.hoohoot.homelab.manager.problems.domain.ports.Releases
 import java.util.UUID
 
 sealed interface ListReleasesResult {
@@ -15,7 +15,7 @@ sealed interface ListReleasesResult {
 
 @ApplicationScoped
 class ListReleases(
-    private val workflows: CorrectorWorkflows,
+    private val workflows: ProblemWorkflows,
     private val releases: Releases,
 ) {
     companion object {

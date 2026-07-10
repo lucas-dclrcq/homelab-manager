@@ -8,7 +8,7 @@ import org.hoohoot.homelab.manager.shared.arr.bazarr.BazarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
-import org.hoohoot.homelab.manager.corrector.domain.usecases.CompleteAwaitingWorkflows
+import org.hoohoot.homelab.manager.problems.domain.usecases.CompleteAwaitingWorkflows
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset

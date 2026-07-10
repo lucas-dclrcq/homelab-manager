@@ -1,35 +1,35 @@
-package org.hoohoot.homelab.manager.corrector.infra
+package org.hoohoot.homelab.manager.problems.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.corrector.domain.ports.CorrectorWorkflows
+import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
 import java.time.LocalDateTime
 import java.util.UUID
 
 @ApplicationScoped
-class CorrectorWorkflowRepository : CorrectorWorkflows {
+class ProblemWorkflowRepository : ProblemWorkflows {
 
-    override suspend fun listForUser(username: String): List<CorrectorWorkflowEntity> =
+    override suspend fun listForUser(username: String): List<ProblemWorkflowEntity> =
         Panache.withSession {
-            CorrectorWorkflowEntity
+            ProblemWorkflowEntity
                 .list("username = ?1", Sort.descending("updatedAt"), username)
         }.awaitSuspending()
 
-    override suspend fun findForUser(id: UUID, username: String): CorrectorWorkflowEntity? =
+    override suspend fun findForUser(id: UUID, username: String): ProblemWorkflowEntity? =
         Panache.withSession {
-            CorrectorWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
+            ProblemWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
         }.awaitSuspending()
 
-    override suspend fun save(entity: CorrectorWorkflowEntity): CorrectorWorkflowEntity =
+    override suspend fun save(entity: ProblemWorkflowEntity): ProblemWorkflowEntity =
         Panache.withTransaction {
-            entity.persist<CorrectorWorkflowEntity>()
+            entity.persist<ProblemWorkflowEntity>()
         }.awaitSuspending()
 
-    override suspend fun update(id: UUID, username: String, mutate: (CorrectorWorkflowEntity) -> Unit): CorrectorWorkflowEntity? =
+    override suspend fun update(id: UUID, username: String, mutate: (ProblemWorkflowEntity) -> Unit): ProblemWorkflowEntity? =
         Panache.withTransaction {
-            CorrectorWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
+            ProblemWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
                 .invoke { entity ->
                     entity?.let {
                         mutate(it)
@@ -42,10 +42,10 @@ class CorrectorWorkflowRepository : CorrectorWorkflows {
     override suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int {
         if (movieIdToImportedAt.isEmpty()) return 0
         return Panache.withTransaction {
-            CorrectorWorkflowEntity
+            ProblemWorkflowEntity
                 .list(
                     "status = ?1 and radarrMovieId in ?2",
-                    CorrectorWorkflowEntity.STATUS_AWAITING_IMPORT,
+                    ProblemWorkflowEntity.STATUS_AWAITING_IMPORT,
                     movieIdToImportedAt.keys,
                 )
                 .invoke { workflows ->
@@ -53,12 +53,12 @@ class CorrectorWorkflowRepository : CorrectorWorkflows {
                         val importedAt = movieIdToImportedAt[workflow.radarrMovieId] ?: return@forEach
                         val grabbedAt = workflow.grabbedAt
                         if (grabbedAt != null && importedAt.isAfter(grabbedAt)) {
-                            workflow.status = CorrectorWorkflowEntity.STATUS_COMPLETED
+                            workflow.status = ProblemWorkflowEntity.STATUS_COMPLETED
                             workflow.completedAt = LocalDateTime.now()
                             workflow.updatedAt = LocalDateTime.now()
                         }
                     }
                 }
-        }.awaitSuspending().count { it.status == CorrectorWorkflowEntity.STATUS_COMPLETED }
+        }.awaitSuspending().count { it.status == ProblemWorkflowEntity.STATUS_COMPLETED }
     }
 }

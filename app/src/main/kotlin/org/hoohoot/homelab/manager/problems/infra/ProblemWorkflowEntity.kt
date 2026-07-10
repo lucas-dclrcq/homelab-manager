@@ -1,4 +1,4 @@
-package org.hoohoot.homelab.manager.corrector.infra
+package org.hoohoot.homelab.manager.problems.infra
 
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanionBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
@@ -11,7 +11,7 @@ import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class MovieSnapshot(
+data class MediaSnapshot(
     val title: String? = null,
     val year: Int? = null,
     val posterUrl: String? = null,
@@ -30,14 +30,14 @@ data class GrabbedRelease(
 )
 
 // Objet racine obligatoire pour le client PG réactif (jamais une List à la racine du JSONB)
-data class CorrectorWorkflowState(
-    val movie: MovieSnapshot? = null,
+data class ProblemWorkflowState(
+    val media: MediaSnapshot? = null,
     val grabbedRelease: GrabbedRelease? = null,
 )
 
 @Entity
-@Table(name = "corrector_workflow")
-class CorrectorWorkflowEntity : PanacheEntityBase {
+@Table(name = "problem_workflow")
+class ProblemWorkflowEntity : PanacheEntityBase {
     @Id
     var id: UUID? = null
 
@@ -56,15 +56,18 @@ class CorrectorWorkflowEntity : PanacheEntityBase {
     @Column(name = "radarr_movie_id")
     var radarrMovieId: Int? = null
 
-    @Column(name = "movie_title")
-    var movieTitle: String? = null
+    @Column(name = "sonarr_series_id")
+    var sonarrSeriesId: Int? = null
+
+    @Column(name = "media_title")
+    var mediaTitle: String? = null
 
     @Column(name = "grabbed_at")
     var grabbedAt: LocalDateTime? = null
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "state", nullable = false)
-    var state: CorrectorWorkflowState = CorrectorWorkflowState()
+    var state: ProblemWorkflowState = ProblemWorkflowState()
 
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: LocalDateTime
@@ -75,7 +78,7 @@ class CorrectorWorkflowEntity : PanacheEntityBase {
     @Column(name = "completed_at")
     var completedAt: LocalDateTime? = null
 
-    companion object : PanacheCompanionBase<CorrectorWorkflowEntity, UUID> {
+    companion object : PanacheCompanionBase<ProblemWorkflowEntity, UUID> {
         const val MEDIA_TYPE_MOVIE = "movie"
 
         const val PROBLEM_VO_SHOULD_BE_FRENCH = "vo_should_be_french"

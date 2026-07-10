@@ -1,18 +1,18 @@
-package org.hoohoot.homelab.manager.corrector.infra
+package org.hoohoot.homelab.manager.problems.infra
 
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.hoohoot.homelab.manager.corrector.domain.LibraryMovie
-import org.hoohoot.homelab.manager.corrector.domain.Release
-import org.hoohoot.homelab.manager.corrector.domain.ports.MovieLibrary
-import org.hoohoot.homelab.manager.corrector.domain.ports.Releases
+import org.hoohoot.homelab.manager.problems.domain.LibraryMovie
+import org.hoohoot.homelab.manager.problems.domain.Release
+import org.hoohoot.homelab.manager.problems.domain.ports.MovieLibrary
+import org.hoohoot.homelab.manager.problems.domain.ports.Releases
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrGrabRequest
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRelease
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 
 @ApplicationScoped
-class RadarrCorrectorAdapter(
+class RadarrProblemsAdapter(
     @param:RestClient private val radarrRestClient: RadarrRestClient,
 ) : MovieLibrary, Releases {
 

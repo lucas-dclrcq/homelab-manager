@@ -13,11 +13,11 @@
   }, {
     "name" : "Portal"
   }, {
-    "name" : "Corrector"
-  }, {
     "name" : "Finances"
   }, {
     "name" : "Membres"
+  }, {
+    "name" : "Problems"
   }, {
     "name" : "Statistics"
   } ],
@@ -77,127 +77,6 @@
           },
           "type" : {
             "type" : [ "string", "null" ]
-          }
-        }
-      },
-      "CorrectorMovieDto" : {
-        "type" : "object",
-        "required" : [ "radarrMovieId", "title", "year", "posterUrl" ],
-        "properties" : {
-          "radarrMovieId" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "title" : {
-            "type" : "string"
-          },
-          "year" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int32"
-          },
-          "posterUrl" : {
-            "type" : [ "string", "null" ]
-          }
-        }
-      },
-      "CorrectorReleaseDto" : {
-        "type" : "object",
-        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections", "isFrench" ],
-        "properties" : {
-          "guid" : {
-            "type" : "string"
-          },
-          "indexerId" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "indexer" : {
-            "type" : [ "string", "null" ]
-          },
-          "title" : {
-            "type" : "string"
-          },
-          "quality" : {
-            "type" : [ "string", "null" ]
-          },
-          "size" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int64"
-          },
-          "age" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int32"
-          },
-          "seeders" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int32"
-          },
-          "leechers" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int32"
-          },
-          "protocol" : {
-            "type" : [ "string", "null" ]
-          },
-          "rejected" : {
-            "type" : "boolean"
-          },
-          "rejections" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "isFrench" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "CorrectorWorkflowDto" : {
-        "type" : "object",
-        "required" : [ "id", "mediaType", "status", "currentStep", "problemType", "movie", "grabbedRelease", "createdAt", "updatedAt", "completedAt" ],
-        "properties" : {
-          "id" : {
-            "$ref" : "#/components/schemas/UUID"
-          },
-          "mediaType" : {
-            "type" : "string"
-          },
-          "status" : {
-            "type" : "string"
-          },
-          "currentStep" : {
-            "type" : "string"
-          },
-          "problemType" : {
-            "type" : [ "string", "null" ]
-          },
-          "movie" : {
-            "anyOf" : [ {
-              "$ref" : "#/components/schemas/MovieSnapshot"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "grabbedRelease" : {
-            "anyOf" : [ {
-              "$ref" : "#/components/schemas/GrabbedRelease"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "createdAt" : {
-            "$ref" : "#/components/schemas/LocalDateTime"
-          },
-          "updatedAt" : {
-            "$ref" : "#/components/schemas/LocalDateTime"
-          },
-          "completedAt" : {
-            "anyOf" : [ {
-              "$ref" : "#/components/schemas/LocalDateTime"
-            }, {
-              "type" : "null"
-            } ]
           }
         }
       },
@@ -649,6 +528,33 @@
         "type" : "string",
         "enum" : [ "MOVIE", "SERIES" ]
       },
+      "MediaSnapshot" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : [ "string", "null" ]
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
+          },
+          "overview" : {
+            "type" : [ "string", "null" ]
+          },
+          "currentQuality" : {
+            "type" : [ "string", "null" ]
+          },
+          "currentLanguages" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
       "MemberDto" : {
         "type" : "object",
         "required" : [ "id", "username", "displayName", "email", "active", "fromAuthentik" ],
@@ -688,33 +594,6 @@
           "expensesCents" : {
             "type" : "integer",
             "format" : "int64"
-          }
-        }
-      },
-      "MovieSnapshot" : {
-        "type" : "object",
-        "properties" : {
-          "title" : {
-            "type" : [ "string", "null" ]
-          },
-          "year" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int32"
-          },
-          "posterUrl" : {
-            "type" : [ "string", "null" ]
-          },
-          "overview" : {
-            "type" : [ "string", "null" ]
-          },
-          "currentQuality" : {
-            "type" : [ "string", "null" ]
-          },
-          "currentLanguages" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
           }
         }
       },
@@ -789,6 +668,127 @@
             "items" : {
               "$ref" : "#/components/schemas/TimePointDto"
             }
+          }
+        }
+      },
+      "ProblemMovieDto" : {
+        "type" : "object",
+        "required" : [ "radarrMovieId", "title", "year", "posterUrl" ],
+        "properties" : {
+          "radarrMovieId" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "ProblemReleaseDto" : {
+        "type" : "object",
+        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections", "isFrench" ],
+        "properties" : {
+          "guid" : {
+            "type" : "string"
+          },
+          "indexerId" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "indexer" : {
+            "type" : [ "string", "null" ]
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "quality" : {
+            "type" : [ "string", "null" ]
+          },
+          "size" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "age" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "seeders" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "leechers" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "protocol" : {
+            "type" : [ "string", "null" ]
+          },
+          "rejected" : {
+            "type" : "boolean"
+          },
+          "rejections" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "isFrench" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ProblemWorkflowDto" : {
+        "type" : "object",
+        "required" : [ "id", "mediaType", "status", "currentStep", "problemType", "media", "grabbedRelease", "createdAt", "updatedAt", "completedAt" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "mediaType" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "currentStep" : {
+            "type" : "string"
+          },
+          "problemType" : {
+            "type" : [ "string", "null" ]
+          },
+          "media" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/MediaSnapshot"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "grabbedRelease" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/GrabbedRelease"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "completedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -2026,283 +2026,6 @@
         "summary" : "Get Logo"
       }
     },
-    "/api/corrector/movies" : {
-      "get" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "query",
-          "in" : "query",
-          "schema" : {
-            "type" : [ "string", "null" ]
-          },
-          "required" : true
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/CorrectorMovieDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary" : "Search Movies"
-      }
-    },
-    "/api/corrector/workflows" : {
-      "get" : {
-        "tags" : [ "Corrector" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary" : "List Workflows"
-      },
-      "post" : {
-        "tags" : [ "Corrector" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateWorkflowRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "201" : {
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            },
-            "description" : "Created"
-          },
-          "400" : {
-            "description" : "Bad Request"
-          }
-        },
-        "summary" : "Create Workflow"
-      }
-    },
-    "/api/corrector/workflows/{id}" : {
-      "get" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            }
-          }
-        },
-        "summary" : "Get Workflow"
-      }
-    },
-    "/api/corrector/workflows/{id}/abandon" : {
-      "post" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            }
-          }
-        },
-        "summary" : "Abandon Workflow"
-      }
-    },
-    "/api/corrector/workflows/{id}/grab" : {
-      "post" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/GrabReleaseRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request"
-          }
-        },
-        "summary" : "Grab Release"
-      }
-    },
-    "/api/corrector/workflows/{id}/movie" : {
-      "post" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/SelectMovieRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request"
-          }
-        },
-        "summary" : "Select Movie"
-      }
-    },
-    "/api/corrector/workflows/{id}/problem" : {
-      "post" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/SelectProblemRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CorrectorWorkflowDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request"
-          }
-        },
-        "summary" : "Select Problem"
-      }
-    },
-    "/api/corrector/workflows/{id}/releases" : {
-      "get" : {
-        "tags" : [ "Corrector" ],
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/UUID"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/CorrectorReleaseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary" : "List Releases"
-      }
-    },
     "/api/finances/energy" : {
       "get" : {
         "tags" : [ "Finances" ],
@@ -2630,6 +2353,283 @@
           }
         },
         "summary" : "Handle Sonarr Notification"
+      }
+    },
+    "/api/problems/movies" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "query",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "string", "null" ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProblemMovieDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Search Movies"
+      }
+    },
+    "/api/problems/workflows" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "List Workflows"
+      },
+      "post" : {
+        "tags" : [ "Problems" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateWorkflowRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            },
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Create Workflow"
+      }
+    },
+    "/api/problems/workflows/{id}" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Workflow"
+      }
+    },
+    "/api/problems/workflows/{id}/abandon" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Abandon Workflow"
+      }
+    },
+    "/api/problems/workflows/{id}/grab" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/GrabReleaseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Grab Release"
+      }
+    },
+    "/api/problems/workflows/{id}/movie" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectMovieRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Movie"
+      }
+    },
+    "/api/problems/workflows/{id}/problem" : {
+      "post" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SelectProblemRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemWorkflowDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Select Problem"
+      }
+    },
+    "/api/problems/workflows/{id}/releases" : {
+      "get" : {
+        "tags" : [ "Problems" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProblemReleaseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "List Releases"
       }
     },
     "/api/statistics/activity-by-hour" : {
@@ -2968,10 +2968,10 @@
     }
   },
   "servers" : [ {
-    "url" : "http://localhost:8080",
+    "url" : "http://localhost:8088",
     "description" : "Auto generated value"
   }, {
-    "url" : "http://0.0.0.0:8080",
+    "url" : "http://0.0.0.0:8088",
     "description" : "Auto generated value"
   } ]
 }

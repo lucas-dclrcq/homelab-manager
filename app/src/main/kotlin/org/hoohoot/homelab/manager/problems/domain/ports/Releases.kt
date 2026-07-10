@@ -1,6 +1,6 @@
-package org.hoohoot.homelab.manager.corrector.domain.ports
+package org.hoohoot.homelab.manager.problems.domain.ports
 
-import org.hoohoot.homelab.manager.corrector.domain.Release
+import org.hoohoot.homelab.manager.problems.domain.Release
 
 interface Releases {
     suspend fun searchForMovie(radarrMovieId: Int): List<Release>

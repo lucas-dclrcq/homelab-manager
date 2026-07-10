@@ -1,8 +1,8 @@
-package org.hoohoot.homelab.manager.corrector.domain.usecases
+package org.hoohoot.homelab.manager.problems.domain.usecases
 
 import jakarta.enterprise.context.ApplicationScoped
-import org.hoohoot.homelab.manager.corrector.domain.LibraryMovie
-import org.hoohoot.homelab.manager.corrector.domain.ports.MovieLibrary
+import org.hoohoot.homelab.manager.problems.domain.LibraryMovie
+import org.hoohoot.homelab.manager.problems.domain.ports.MovieLibrary
 import java.text.Normalizer
 
 @ApplicationScoped

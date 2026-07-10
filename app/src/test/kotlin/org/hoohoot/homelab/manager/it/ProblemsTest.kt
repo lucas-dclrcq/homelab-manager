@@ -18,7 +18,7 @@ import io.restassured.path.json.JsonPath
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.Response
 import org.assertj.core.api.Assertions.assertThat
-import org.hoohoot.homelab.manager.corrector.infra.CorrectorWorkflowEntity
+import org.hoohoot.homelab.manager.problems.infra.ProblemWorkflowEntity
 import org.hoohoot.homelab.manager.library.infra.MediaDownloadEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,7 +28,7 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @QuarkusTest
-internal class CorrectorTest {
+internal class ProblemsTest {
 
     @Inject
     lateinit var wireMock: WireMock
@@ -37,7 +37,7 @@ internal class CorrectorTest {
     fun setUp() {
         VertxContextSupport.subscribeAndAwait {
             Panache.withTransaction {
-                CorrectorWorkflowEntity.deleteAll().chain { _ -> MediaDownloadEntity.deleteAll() }
+                ProblemWorkflowEntity.deleteAll().chain { _ -> MediaDownloadEntity.deleteAll() }
             }
         }
 
@@ -111,32 +111,32 @@ internal class CorrectorTest {
 
     private fun createWorkflow(): JsonPath =
         RestAssured.given().contentType(ContentType.JSON).body("""{"mediaType": "movie"}""")
-            .`when`().post("/api/corrector/workflows")
+            .`when`().post("/api/problems/workflows")
             .then().statusCode(Response.Status.CREATED.statusCode)
             .extract().jsonPath()
 
     private fun selectMovie(id: String, radarrMovieId: Int = 1): JsonPath =
         RestAssured.given().contentType(ContentType.JSON).body("""{"radarrMovieId": $radarrMovieId}""")
-            .`when`().post("/api/corrector/workflows/$id/movie")
+            .`when`().post("/api/problems/workflows/$id/movie")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath()
 
     private fun selectProblem(id: String): JsonPath =
         RestAssured.given().contentType(ContentType.JSON).body("""{"problemType": "vo_should_be_french"}""")
-            .`when`().post("/api/corrector/workflows/$id/problem")
+            .`when`().post("/api/problems/workflows/$id/problem")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath()
 
     private fun grabRelease(id: String): JsonPath =
         RestAssured.given().contentType(ContentType.JSON)
             .body("""{"guid": "release-multi", "indexerId": 1, "title": "Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R", "indexer": "YGG", "quality": "WEBDL-1080p", "size": 8589934592}""")
-            .`when`().post("/api/corrector/workflows/$id/grab")
+            .`when`().post("/api/problems/workflows/$id/grab")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath()
 
     private fun getWorkflow(id: String): JsonPath =
         RestAssured.given()
-            .`when`().get("/api/corrector/workflows/$id")
+            .`when`().get("/api/problems/workflows/$id")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath()
 
@@ -178,14 +178,14 @@ internal class CorrectorTest {
         val id = UUID.randomUUID()
         VertxContextSupport.subscribeAndAwait {
             Panache.withTransaction {
-                val entity = CorrectorWorkflowEntity()
+                val entity = ProblemWorkflowEntity()
                 entity.id = id
                 entity.username = username
-                entity.mediaType = CorrectorWorkflowEntity.MEDIA_TYPE_MOVIE
-                entity.status = CorrectorWorkflowEntity.STATUS_IN_PROGRESS
+                entity.mediaType = ProblemWorkflowEntity.MEDIA_TYPE_MOVIE
+                entity.status = ProblemWorkflowEntity.STATUS_IN_PROGRESS
                 entity.createdAt = LocalDateTime.now()
                 entity.updatedAt = LocalDateTime.now()
-                entity.persist<CorrectorWorkflowEntity>()
+                entity.persist<ProblemWorkflowEntity>()
             }
         }
         return id
@@ -201,7 +201,7 @@ internal class CorrectorTest {
         assertThat(workflow.getString("currentStep")).isEqualTo("SELECT_MOVIE")
 
         val list = RestAssured.given()
-            .`when`().get("/api/corrector/workflows")
+            .`when`().get("/api/problems/workflows")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath().getList<Map<String, Any>>("")
         assertThat(list).hasSize(1)
@@ -212,7 +212,7 @@ internal class CorrectorTest {
     @TestSecurity(user = "alice", roles = ["admin", "user"])
     fun `creating a workflow for a series is rejected`() {
         RestAssured.given().contentType(ContentType.JSON).body("""{"mediaType": "series"}""")
-            .`when`().post("/api/corrector/workflows")
+            .`when`().post("/api/problems/workflows")
             .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
 
@@ -222,13 +222,13 @@ internal class CorrectorTest {
         val aliceWorkflowId = insertWorkflowFor("alice")
 
         val list = RestAssured.given()
-            .`when`().get("/api/corrector/workflows")
+            .`when`().get("/api/problems/workflows")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath().getList<Any>("")
         assertThat(list).isEmpty()
 
         RestAssured.given()
-            .`when`().get("/api/corrector/workflows/$aliceWorkflowId")
+            .`when`().get("/api/problems/workflows/$aliceWorkflowId")
             .then().statusCode(Response.Status.NOT_FOUND.statusCode)
     }
 
@@ -236,7 +236,7 @@ internal class CorrectorTest {
     @TestSecurity(user = "alice", roles = ["admin", "user"])
     fun `movie search filters the radarr library ignoring case and accents`() {
         val results = RestAssured.given().queryParam("query", "prophete")
-            .`when`().get("/api/corrector/movies")
+            .`when`().get("/api/problems/movies")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath().getList<Map<String, Any>>("")
 
@@ -253,11 +253,11 @@ internal class CorrectorTest {
         val workflow = selectMovie(id)
 
         assertThat(workflow.getString("currentStep")).isEqualTo("SELECT_PROBLEM")
-        assertThat(workflow.getString("movie.title")).isEqualTo("Dune: Part Two")
-        assertThat(workflow.getInt("movie.year")).isEqualTo(2024)
-        assertThat(workflow.getString("movie.posterUrl")).isEqualTo("https://img/dune2.jpg")
-        assertThat(workflow.getString("movie.currentQuality")).isEqualTo("WEBDL-1080p")
-        assertThat(workflow.getList<String>("movie.currentLanguages")).containsExactly("English")
+        assertThat(workflow.getString("media.title")).isEqualTo("Dune: Part Two")
+        assertThat(workflow.getInt("media.year")).isEqualTo(2024)
+        assertThat(workflow.getString("media.posterUrl")).isEqualTo("https://img/dune2.jpg")
+        assertThat(workflow.getString("media.currentQuality")).isEqualTo("WEBDL-1080p")
+        assertThat(workflow.getList<String>("media.currentLanguages")).containsExactly("English")
     }
 
     @Test
@@ -268,7 +268,7 @@ internal class CorrectorTest {
         selectProblem(id)
 
         val releases = RestAssured.given()
-            .`when`().get("/api/corrector/workflows/$id/releases")
+            .`when`().get("/api/problems/workflows/$id/releases")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath().getList<Map<String, Any>>("")
 
@@ -337,7 +337,7 @@ internal class CorrectorTest {
         selectMovie(id)
 
         RestAssured.given().contentType(ContentType.JSON).body("""{"guid": "release-multi", "indexerId": 1}""")
-            .`when`().post("/api/corrector/workflows/$id/grab")
+            .`when`().post("/api/problems/workflows/$id/grab")
             .then().statusCode(Response.Status.CONFLICT.statusCode)
     }
 
@@ -347,7 +347,7 @@ internal class CorrectorTest {
         val id = createWorkflow().getString("id")
 
         RestAssured.given().contentType(ContentType.JSON).body("""{}""")
-            .`when`().post("/api/corrector/workflows/$id/movie")
+            .`when`().post("/api/problems/workflows/$id/movie")
             .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
 
@@ -359,7 +359,7 @@ internal class CorrectorTest {
         selectProblem(id)
 
         RestAssured.given().contentType(ContentType.JSON).body("""{"indexerId": 1}""")
-            .`when`().post("/api/corrector/workflows/$id/grab")
+            .`when`().post("/api/problems/workflows/$id/grab")
             .then().statusCode(Response.Status.BAD_REQUEST.statusCode)
     }
 
@@ -369,7 +369,7 @@ internal class CorrectorTest {
         val id = createWorkflow().getString("id")
 
         RestAssured.given().contentType(ContentType.JSON).body("""{"problemType": "vo_should_be_french"}""")
-            .`when`().post("/api/corrector/workflows/$id/problem")
+            .`when`().post("/api/problems/workflows/$id/problem")
             .then().statusCode(Response.Status.CONFLICT.statusCode)
     }
 
@@ -379,7 +379,7 @@ internal class CorrectorTest {
         val id = createWorkflow().getString("id")
 
         val workflow = RestAssured.given()
-            .`when`().post("/api/corrector/workflows/$id/abandon")
+            .`when`().post("/api/problems/workflows/$id/abandon")
             .then().statusCode(Response.Status.OK.statusCode)
             .extract().jsonPath()
 
@@ -387,9 +387,9 @@ internal class CorrectorTest {
     }
 
     @Test
-    fun `anonymous users cannot access the corrector`() {
+    fun `anonymous users cannot access problems`() {
         RestAssured.given().redirects().follow(false)
-            .`when`().get("/api/corrector/workflows")
+            .`when`().get("/api/problems/workflows")
             .then().statusCode(Response.Status.UNAUTHORIZED.statusCode)
     }
 }
