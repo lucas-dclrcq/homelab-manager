@@ -22,8 +22,30 @@ data class RadarrMovie(
     val imdbId: String? = null,
     val overview: String? = null,
     val hasFile: Boolean? = null,
+    val qualityProfileId: Int? = null,
     val images: List<RadarrImage> = emptyList(),
     val movieFile: RadarrMovieFile? = null
+)
+
+data class RadarrQualityProfile(
+    val id: Int? = null,
+    val name: String? = null,
+    val cutoff: Int? = null,
+    val items: List<RadarrQualityProfileItem> = emptyList()
+)
+
+data class RadarrQualityProfileItem(
+    val id: Int? = null,
+    val name: String? = null,
+    val allowed: Boolean? = null,
+    val quality: RadarrQualityDefinition? = null,
+    val items: List<RadarrQualityProfileItem> = emptyList()
+)
+
+data class RadarrQualityDefinition(
+    val id: Int? = null,
+    val name: String? = null,
+    val resolution: Int? = null
 )
 
 data class RadarrImage(

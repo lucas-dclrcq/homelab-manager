@@ -48,6 +48,10 @@ interface RadarrRestClient {
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
 
+    @GET
+    @Path("/qualityprofile")
+    suspend fun getQualityProfiles(): List<RadarrQualityProfile>?
+
     // La recherche interactive interroge tous les indexers : doit dépasser le read-timeout de 120s
     @GET
     @Path("/release")

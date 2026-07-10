@@ -42,5 +42,6 @@ class SelectMovie(
         overview = overview,
         currentQuality = currentQuality,
         currentLanguages = currentLanguages,
+        desiredResolution = desiredResolution,
     )
 }

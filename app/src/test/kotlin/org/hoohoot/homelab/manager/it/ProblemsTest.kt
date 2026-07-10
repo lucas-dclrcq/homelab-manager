@@ -49,10 +49,10 @@ internal class ProblemsTest {
                     """[
                         {
                           "id": 1, "title": "Dune: Part Two", "year": 2024, "hasFile": true,
-                          "overview": "Paul Atreides mène la révolte.",
+                          "overview": "Paul Atreides mène la révolte.", "qualityProfileId": 4,
                           "images": [{"coverType": "poster", "remoteUrl": "https://img/dune2.jpg"}],
                           "movieFile": {
-                            "quality": {"quality": {"name": "WEBDL-1080p"}},
+                            "quality": {"quality": {"name": "Bluray-720p"}},
                             "languages": [{"id": 1, "name": "English"}]
                           }
                         },
@@ -124,6 +124,31 @@ internal class ProblemsTest {
         )
         wireMock.register(
             post(urlPathEqualTo("/api/v3/release")).willReturn(okJson("""{"guid": "release-multi", "indexerId": 1}"""))
+        )
+        // Profil « HD-1080p » : cutoff = groupe « WEB 1080p » (cas réel du profil Radarr par défaut)
+        wireMock.register(
+            get(urlPathEqualTo("/api/v3/qualityprofile")).willReturn(
+                okJson(
+                    """[
+                        {
+                          "id": 4, "name": "HD-1080p", "cutoff": 1003,
+                          "items": [
+                            {"quality": {"id": 1, "name": "SDTV", "resolution": 480}, "allowed": false},
+                            {"id": 1002, "name": "WEB 720p", "allowed": false, "items": [
+                                {"quality": {"id": 14, "name": "WEBRip-720p", "resolution": 720}, "allowed": false},
+                                {"quality": {"id": 5, "name": "WEBDL-720p", "resolution": 720}, "allowed": false}
+                            ]},
+                            {"quality": {"id": 6, "name": "Bluray-720p", "resolution": 720}, "allowed": false},
+                            {"id": 1003, "name": "WEB 1080p", "allowed": true, "items": [
+                                {"quality": {"id": 3, "name": "WEBDL-1080p", "resolution": 1080}, "allowed": true},
+                                {"quality": {"id": 15, "name": "WEBRip-1080p", "resolution": 1080}, "allowed": true}
+                            ]},
+                            {"quality": {"id": 7, "name": "Bluray-1080p", "resolution": 1080}, "allowed": true}
+                          ]
+                        }
+                    ]"""
+                )
+            )
         )
         wireMock.register(
             get(urlPathEqualTo("/api/v3/series")).willReturn(
@@ -308,8 +333,10 @@ internal class ProblemsTest {
         assertThat(workflow.getString("media.title")).isEqualTo("Dune: Part Two")
         assertThat(workflow.getInt("media.year")).isEqualTo(2024)
         assertThat(workflow.getString("media.posterUrl")).isEqualTo("https://img/dune2.jpg")
-        assertThat(workflow.getString("media.currentQuality")).isEqualTo("WEBDL-1080p")
+        assertThat(workflow.getString("media.currentQuality")).isEqualTo("Bluray-720p")
         assertThat(workflow.getList<String>("media.currentLanguages")).containsExactly("English")
+        // Résolution voulue issue du profil Radarr (cutoff), pas celle du fichier 720p actuel
+        assertThat(workflow.getString("media.desiredResolution")).isEqualTo("1080")
     }
 
     @Test
@@ -577,7 +604,7 @@ internal class ProblemsTest {
 
     @Test
     @TestSecurity(user = "alice", roles = ["admin", "user"])
-    fun `releases are recommended when torrent with a vf tag at the current file resolution even if rejected`() {
+    fun `releases are recommended when torrent with a vf tag at the desired resolution even if rejected`() {
         val id = createWorkflow().getString("id")
         selectMovie(id)
         selectProblem(id)
@@ -588,10 +615,11 @@ internal class ProblemsTest {
             .extract().jsonPath().getList<Map<String, Any>>("")
 
         val byGuid = releases.associateBy { it["guid"] }
-        // Rejetée par les règles Radarr mais torrent + MULTI + 1080p comme le fichier actuel
+        // Le fichier actuel est en 720p mais le profil demande du 1080p : on recommande l'upgrade
+        // MULTI 1080p, même s'il est rejeté par les règles Radarr (taille/format).
         assertThat(byGuid["release-multi"]!!["isRecommended"]).isEqualTo(true)
         assertThat(byGuid["release-multi"]!!["rejected"]).isEqualTo(true)
-        // 720p alors que le fichier actuel est en 1080p
+        // 720p alors que la qualité demandée est 1080p
         assertThat(byGuid["release-truefrench"]!!["isRecommended"]).isEqualTo(false)
         // usenet, et pas de tag VF dans le titre
         assertThat(byGuid["release-french-language"]!!["isRecommended"]).isEqualTo(false)
@@ -603,7 +631,8 @@ internal class ProblemsTest {
 
     @Test
     @TestSecurity(user = "alice", roles = ["admin", "user"])
-    fun `the resolution constraint is lifted when the movie has no readable quality`() {
+    fun `the resolution constraint is lifted when the desired resolution is unknown`() {
+        // Oppenheimer n'a pas de qualityProfileId : on ne connaît pas la résolution voulue → permissif
         val id = createWorkflow().getString("id")
         selectMovie(id, radarrMovieId = 2)
         selectProblem(id)

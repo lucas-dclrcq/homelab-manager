@@ -18,6 +18,8 @@ data class MediaSnapshot(
     val overview: String? = null,
     val currentQuality: String? = null,
     val currentLanguages: List<String> = emptyList(),
+    // Résolution voulue d'après le profil Radarr (ex : "1080"), sert de référence aux recommandations
+    val desiredResolution: String? = null,
 )
 
 data class GrabbedRelease(

@@ -566,6 +566,10 @@ components:
           type: array
           items:
             type: string
+        desiredResolution:
+          type:
+          - string
+          - "null"
     MemberDto:
       type: object
       required:

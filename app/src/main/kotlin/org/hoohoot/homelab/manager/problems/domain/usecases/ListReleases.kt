@@ -36,10 +36,11 @@ class ListReleases(
             return ListReleasesResult.Conflict("a problem must be selected first")
         }
         // Les règles Radarr rejettent la plupart des releases FR : on recommande nous-mêmes celles
-        // qui sont en torrent, à la résolution du fichier actuel, avec un tag VF/MULTI dans le titre.
-        val movieResolution = resolutionOf(workflow.state.media?.currentQuality)
+        // qui sont en torrent, à la résolution voulue (celle du profil Radarr), avec un tag VF/MULTI.
+        // On vise la qualité demandée, pas celle du fichier actuel : c'est souvent un upgrade.
+        val desiredResolution = workflow.state.media?.desiredResolution
         val annotated = releases.searchForMovie(movieId)
-            .map { AnnotatedRelease(it, it.isFrench(), it.isRecommended(movieResolution)) }
+            .map { AnnotatedRelease(it, it.isFrench(), it.isRecommended(desiredResolution)) }
             .sortedWith(
                 compareByDescending<AnnotatedRelease> { it.isRecommended }
                     .thenByDescending { it.isFrench }
@@ -51,8 +52,9 @@ class ListReleases(
     private fun Release.isFrench(): Boolean =
         languages.any { it.equals("French", ignoreCase = true) } || VF_REGEX.containsMatchIn(title)
 
-    private fun Release.isRecommended(movieResolution: String?): Boolean =
+    // desiredResolution vient du profil Radarr ; s'il est inconnu, on ne filtre pas sur la résolution
+    private fun Release.isRecommended(desiredResolution: String?): Boolean =
         protocol.equals("torrent", ignoreCase = true) &&
-            (movieResolution == null || resolutionOf(quality) == movieResolution) &&
+            (desiredResolution == null || resolutionOf(quality) == desiredResolution) &&
             VF_REGEX.containsMatchIn(title)
 }
