@@ -57,7 +57,12 @@ internal class ProblemsTest {
                           }
                         },
                         {"id": 2, "title": "Oppenheimer", "year": 2023},
-                        {"id": 3, "title": "Un Prophète", "year": 2009}
+                        {"id": 3, "title": "Un Prophète", "year": 2009},
+                        {
+                          "id": 5, "title": "Blade Runner 2049", "year": 2017, "hasFile": true,
+                          "qualityProfileId": 6,
+                          "movieFile": {"quality": {"quality": {"name": "WEBDL-2160p"}}, "languages": [{"id": 1, "name": "English"}]}
+                        }
                     ]"""
                 )
             )
@@ -145,6 +150,36 @@ internal class ProblemsTest {
                             ]},
                             {"quality": {"id": 7, "name": "Bluray-1080p", "resolution": 1080}, "allowed": true}
                           ]
+                        },
+                        {
+                          "id": 6, "name": "UHD-2160p", "cutoff": 19,
+                          "items": [
+                            {"quality": {"id": 7, "name": "Bluray-1080p", "resolution": 1080}, "allowed": true},
+                            {"quality": {"id": 19, "name": "Bluray-2160p", "resolution": 2160}, "allowed": true}
+                          ]
+                        }
+                    ]"""
+                )
+            )
+        )
+        // Blade Runner 2049 : releases FR pour le film au profil 4K (movieId 5)
+        wireMock.register(
+            get(urlPathEqualTo("/api/v3/release")).withQueryParam("movieId", equalTo("5")).willReturn(
+                okJson(
+                    """[
+                        {
+                          "guid": "br-multi-1080", "indexerId": 1, "indexer": "YGG",
+                          "title": "Blade.Runner.2049.2017.MULTI.1080p.BluRay.x264-Grp",
+                          "quality": {"quality": {"name": "Bluray-1080p"}},
+                          "languages": [], "protocol": "torrent",
+                          "size": 12884901888, "seeders": 90, "rejected": true, "rejections": ["Not 2160p"]
+                        },
+                        {
+                          "guid": "br-multi-2160", "indexerId": 1, "indexer": "YGG",
+                          "title": "Blade.Runner.2049.2017.MULTI.2160p.BluRay.x265-Grp",
+                          "quality": {"quality": {"name": "Bluray-2160p"}},
+                          "languages": [], "protocol": "torrent",
+                          "size": 51539607552, "seeders": 40, "rejected": false, "rejections": []
                         }
                     ]"""
                 )
@@ -627,6 +662,25 @@ internal class ProblemsTest {
         assertThat(byGuid["release-vostfr"]!!["isRecommended"]).isEqualTo(false)
         // Tri : recommandées d'abord
         assertThat(releases.first()["guid"]).isEqualTo("release-multi")
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `a 1080p multi torrent is recommended even when the profile targets 4k`() {
+        val id = createWorkflow().getString("id")
+        selectMovie(id, radarrMovieId = 5)
+        selectProblem(id)
+
+        val releases = RestAssured.given()
+            .`when`().get("/api/problems/workflows/$id/releases")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath().getList<Map<String, Any>>("")
+
+        val byGuid = releases.associateBy { it["guid"] }
+        // Le plancher est plafonné à 1080p : un upgrade 1080p MULTI reste recommandé même si le
+        // profil demande de la 4K (sinon on écarterait une release parfaitement valable).
+        assertThat(byGuid["br-multi-1080"]!!["isRecommended"]).isEqualTo(true)
+        assertThat(byGuid["br-multi-2160"]!!["isRecommended"]).isEqualTo(true)
     }
 
     @Test
