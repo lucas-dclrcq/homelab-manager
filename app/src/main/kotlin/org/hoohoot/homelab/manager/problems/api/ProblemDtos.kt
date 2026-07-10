@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.problems.api
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.core.Response
 import org.hoohoot.homelab.manager.problems.domain.AnnotatedRelease
@@ -42,8 +43,10 @@ data class ProblemReleaseDto(
     val protocol: String?,
     val rejected: Boolean,
     val rejections: List<String>,
-    val isFrench: Boolean,
-    val isRecommended: Boolean,
+    // Jackson retire le préfixe "is" des booléens Kotlin (isFrench -> "french"), ce qui casse
+    // le contrat OpenAPI/Orval (isFrench/isRecommended). On force le nom exposé.
+    @get:JsonProperty("isFrench") val isFrench: Boolean,
+    @get:JsonProperty("isRecommended") val isRecommended: Boolean,
 )
 
 data class ProblemWorkflowDto(
