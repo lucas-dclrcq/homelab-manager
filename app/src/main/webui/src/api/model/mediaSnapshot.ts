@@ -9,6 +9,7 @@ import type { MediaSnapshotYear } from "./mediaSnapshotYear";
 import type { MediaSnapshotPosterUrl } from "./mediaSnapshotPosterUrl";
 import type { MediaSnapshotOverview } from "./mediaSnapshotOverview";
 import type { MediaSnapshotCurrentQuality } from "./mediaSnapshotCurrentQuality";
+import type { MediaSnapshotDesiredResolution } from "./mediaSnapshotDesiredResolution";
 
 export interface MediaSnapshot {
   title?: MediaSnapshotTitle;
@@ -17,4 +18,5 @@ export interface MediaSnapshot {
   overview?: MediaSnapshotOverview;
   currentQuality?: MediaSnapshotCurrentQuality;
   currentLanguages?: string[];
+  desiredResolution?: MediaSnapshotDesiredResolution;
 }

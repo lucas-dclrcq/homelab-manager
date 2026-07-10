@@ -243,3 +243,4 @@ export * from "./topMediaSort";
 export * from "./topUserDto";
 export * from "./uuid";
 export * from "./weekdayActivityDto";
+export * from "./mediaSnapshotDesiredResolution";
