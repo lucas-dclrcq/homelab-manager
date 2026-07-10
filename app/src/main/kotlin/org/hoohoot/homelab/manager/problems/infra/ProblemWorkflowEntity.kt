@@ -33,6 +33,7 @@ data class GrabbedRelease(
 data class ProblemWorkflowState(
     val media: MediaSnapshot? = null,
     val grabbedRelease: GrabbedRelease? = null,
+    val description: String? = null,
 )
 
 @Entity
@@ -80,12 +81,16 @@ class ProblemWorkflowEntity : PanacheEntityBase {
 
     companion object : PanacheCompanionBase<ProblemWorkflowEntity, UUID> {
         const val MEDIA_TYPE_MOVIE = "movie"
+        const val MEDIA_TYPE_TV = "tv"
 
         const val PROBLEM_VO_SHOULD_BE_FRENCH = "vo_should_be_french"
+        const val PROBLEM_OTHER = "other"
 
         const val STATUS_IN_PROGRESS = "IN_PROGRESS"
         const val STATUS_AWAITING_IMPORT = "AWAITING_IMPORT"
+        const val STATUS_REPORTED = "REPORTED"
         const val STATUS_COMPLETED = "COMPLETED"
+        const val STATUS_RESOLVED = "RESOLVED"
         const val STATUS_ABANDONED = "ABANDONED"
     }
 }

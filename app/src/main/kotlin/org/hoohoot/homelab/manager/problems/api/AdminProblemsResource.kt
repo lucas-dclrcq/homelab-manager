@@ -1,43 +1,43 @@
 package org.hoohoot.homelab.manager.problems.api
 
-import io.quarkus.security.identity.SecurityIdentity
+import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
-import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.WebApplicationException
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.problems.domain.Accessor
 import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
 import org.hoohoot.homelab.manager.problems.domain.usecases.AbandonWorkflow
-import org.hoohoot.homelab.manager.problems.domain.usecases.CreateWorkflow
+import org.hoohoot.homelab.manager.problems.domain.usecases.DeleteWorkflow
 import org.hoohoot.homelab.manager.problems.domain.usecases.GrabRelease
 import org.hoohoot.homelab.manager.problems.domain.usecases.GrabRequest
 import org.hoohoot.homelab.manager.problems.domain.usecases.ListReleases
 import org.hoohoot.homelab.manager.problems.domain.usecases.ListReleasesResult
 import org.hoohoot.homelab.manager.problems.domain.usecases.ResolveWorkflow
-import org.hoohoot.homelab.manager.problems.domain.usecases.SearchLibrary
 import org.hoohoot.homelab.manager.problems.domain.usecases.SelectMovie
 import org.hoohoot.homelab.manager.problems.domain.usecases.SelectProblem
 import org.hoohoot.homelab.manager.problems.domain.usecases.SelectSeries
 import org.hoohoot.homelab.manager.shared.api.conflict
 import java.util.UUID
 
-@Path("/api/problems")
+// Reprise d'un problème par un admin : mêmes use cases que la resource user,
+// mais avec Accessor.Admin (accès à tous les workflows, sans réassignation)
+@Path("/api/admin/problems")
 @Produces(MediaType.APPLICATION_JSON)
+@RolesAllowed("admin")
 @Tag(name = "Problems")
-class ProblemsResource(
-    private val identity: SecurityIdentity,
+class AdminProblemsResource(
     private val workflows: ProblemWorkflows,
-    private val searchLibrary: SearchLibrary,
-    private val createWorkflowUseCase: CreateWorkflow,
     private val selectMovieUseCase: SelectMovie,
     private val selectSeriesUseCase: SelectSeries,
     private val selectProblemUseCase: SelectProblem,
@@ -45,40 +45,20 @@ class ProblemsResource(
     private val grabReleaseUseCase: GrabRelease,
     private val resolveWorkflowUseCase: ResolveWorkflow,
     private val abandonWorkflowUseCase: AbandonWorkflow,
+    private val deleteWorkflowUseCase: DeleteWorkflow,
 ) {
-    private val username: String get() = identity.principal.name
-    private val accessor: Accessor get() = Accessor.User(username)
+    private val accessor: Accessor = Accessor.Admin
 
     @GET
     @Path("/workflows")
-    suspend fun listWorkflows(): List<ProblemWorkflowDto> =
-        workflows.listForUser(username).map { it.toDto() }
-
-    @POST
-    @Path("/workflows")
-    @APIResponseSchema(value = ProblemWorkflowDto::class, responseCode = "201")
-    suspend fun createWorkflow(request: CreateWorkflowRequest): Response =
-        createWorkflowUseCase(username, request.mediaType).toResponse(Response.Status.CREATED)
+    suspend fun listWorkflows(): List<AdminProblemWorkflowDto> =
+        workflows.listAll().map { it.toAdminDto() }
 
     @GET
     @Path("/workflows/{id}")
-    suspend fun getWorkflow(@PathParam("id") id: UUID): ProblemWorkflowDto =
-        workflows.find(id, accessor)?.toDto()
+    suspend fun getWorkflow(@PathParam("id") id: UUID): AdminProblemWorkflowDto =
+        workflows.find(id, accessor)?.toAdminDto()
             ?: throw NotFoundException()
-
-    @GET
-    @Path("/movies")
-    suspend fun searchMovies(@QueryParam("query") query: String?): List<ProblemMovieDto> {
-        if (query.isNullOrBlank() || query.trim().length < 2) return emptyList()
-        return searchLibrary.movies(query).map { it.toMovieDto() }
-    }
-
-    @GET
-    @Path("/series")
-    suspend fun searchSeries(@QueryParam("query") query: String?): List<ProblemSeriesDto> {
-        if (query.isNullOrBlank() || query.trim().length < 2) return emptyList()
-        return searchLibrary.series(query).map { it.toSeriesDto() }
-    }
 
     @POST
     @Path("/workflows/{id}/movie")
@@ -135,4 +115,11 @@ class ProblemsResource(
     @APIResponseSchema(value = ProblemWorkflowDto::class, responseCode = "200")
     suspend fun abandonWorkflow(@PathParam("id") id: UUID): Response =
         abandonWorkflowUseCase(id, accessor).toResponse()
+
+    @DELETE
+    @Path("/workflows/{id}")
+    @APIResponse(responseCode = "204")
+    suspend fun deleteWorkflow(@PathParam("id") id: UUID): Response =
+        if (deleteWorkflowUseCase(id)) Response.noContent().build()
+        else throw NotFoundException()
 }

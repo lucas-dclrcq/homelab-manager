@@ -4,6 +4,7 @@ import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
+import org.hoohoot.homelab.manager.problems.domain.Accessor
 import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
 import java.time.LocalDateTime
 import java.util.UUID
@@ -17,19 +18,22 @@ class ProblemWorkflowRepository : ProblemWorkflows {
                 .list("username = ?1", Sort.descending("updatedAt"), username)
         }.awaitSuspending()
 
-    override suspend fun findForUser(id: UUID, username: String): ProblemWorkflowEntity? =
+    override suspend fun listAll(): List<ProblemWorkflowEntity> =
         Panache.withSession {
-            ProblemWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
+            ProblemWorkflowEntity.listAll(Sort.descending("updatedAt"))
         }.awaitSuspending()
+
+    override suspend fun find(id: UUID, accessor: Accessor): ProblemWorkflowEntity? =
+        Panache.withSession { findQuery(id, accessor) }.awaitSuspending()
 
     override suspend fun save(entity: ProblemWorkflowEntity): ProblemWorkflowEntity =
         Panache.withTransaction {
             entity.persist<ProblemWorkflowEntity>()
         }.awaitSuspending()
 
-    override suspend fun update(id: UUID, username: String, mutate: (ProblemWorkflowEntity) -> Unit): ProblemWorkflowEntity? =
+    override suspend fun update(id: UUID, accessor: Accessor, mutate: (ProblemWorkflowEntity) -> Unit): ProblemWorkflowEntity? =
         Panache.withTransaction {
-            ProblemWorkflowEntity.find("id = ?1 and username = ?2", id, username).firstResult()
+            findQuery(id, accessor)
                 .invoke { entity ->
                     entity?.let {
                         mutate(it)
@@ -37,6 +41,16 @@ class ProblemWorkflowRepository : ProblemWorkflows {
                     }
                 }
         }.awaitSuspending()
+
+    override suspend fun delete(id: UUID): Boolean =
+        Panache.withTransaction {
+            ProblemWorkflowEntity.deleteById(id)
+        }.awaitSuspending()
+
+    private fun findQuery(id: UUID, accessor: Accessor) = when (accessor) {
+        is Accessor.User -> ProblemWorkflowEntity.find("id = ?1 and username = ?2", id, accessor.username).firstResult()
+        is Accessor.Admin -> ProblemWorkflowEntity.find("id = ?1", id).firstResult()
+    }
 
     // Complète les workflows en attente dont le film vient d'être importé après le grab. Idempotent.
     override suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int {

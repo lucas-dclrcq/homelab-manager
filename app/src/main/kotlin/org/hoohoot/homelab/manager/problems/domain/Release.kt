@@ -19,4 +19,5 @@ data class Release(
 data class AnnotatedRelease(
     val release: Release,
     val isFrench: Boolean,
+    val isRecommended: Boolean,
 )

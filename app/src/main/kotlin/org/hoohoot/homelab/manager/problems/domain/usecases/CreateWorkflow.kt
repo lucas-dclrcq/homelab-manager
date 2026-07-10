@@ -9,14 +9,21 @@ import java.util.UUID
 
 @ApplicationScoped
 class CreateWorkflow(private val workflows: ProblemWorkflows) {
+    companion object {
+        private val MEDIA_TYPES = setOf(
+            ProblemWorkflowEntity.MEDIA_TYPE_MOVIE,
+            ProblemWorkflowEntity.MEDIA_TYPE_TV,
+        )
+    }
+
     suspend operator fun invoke(username: String, mediaType: String?): ProblemResult {
-        if (mediaType != ProblemWorkflowEntity.MEDIA_TYPE_MOVIE) {
-            return ProblemResult.Invalid("mediaType must be '${ProblemWorkflowEntity.MEDIA_TYPE_MOVIE}'")
+        if (mediaType !in MEDIA_TYPES) {
+            return ProblemResult.Invalid("mediaType must be one of ${MEDIA_TYPES.joinToString("', '", "'", "'")}")
         }
         val entity = ProblemWorkflowEntity()
         entity.id = UUID.randomUUID()
         entity.username = username
-        entity.mediaType = ProblemWorkflowEntity.MEDIA_TYPE_MOVIE
+        entity.mediaType = requireNotNull(mediaType)
         entity.status = ProblemWorkflowEntity.STATUS_IN_PROGRESS
         entity.createdAt = LocalDateTime.now()
         entity.updatedAt = LocalDateTime.now()
