@@ -13,6 +13,10 @@
   }, {
     "name" : "Portal"
   }, {
+    "name" : "Admin Cleanup"
+  }, {
+    "name" : "Cleanup"
+  }, {
     "name" : "Finances"
   }, {
     "name" : "Membres"
@@ -92,6 +96,381 @@
           }
         }
       },
+      "CleanupCampaignDetailsDto" : {
+        "type" : "object",
+        "required" : [ "id", "status", "triggerType", "diskPath", "freeBytesAtStart", "targetBytesToFree", "freedBytes", "graceEndsAt", "createdAt", "completedAt", "executionSummary", "candidates" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "triggerType" : {
+            "type" : "string"
+          },
+          "diskPath" : {
+            "type" : "string"
+          },
+          "freeBytesAtStart" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "targetBytesToFree" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "freedBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "graceEndsAt" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "completedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "executionSummary" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/ExecutionSummary"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "candidates" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CleanupCandidateDto"
+            }
+          }
+        }
+      },
+      "CleanupCampaignSummaryDto" : {
+        "type" : "object",
+        "required" : [ "id", "status", "triggerType", "createdAt", "graceEndsAt", "completedAt", "targetBytesToFree", "freedBytes", "candidateCount", "deletedCount", "protectedCount", "skippedCount", "failedCount" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "triggerType" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "graceEndsAt" : {
+            "$ref" : "#/components/schemas/OffsetDateTime"
+          },
+          "completedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "targetBytesToFree" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "freedBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "candidateCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "deletedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "protectedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "skippedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "failedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "CleanupCandidateDto" : {
+        "type" : "object",
+        "required" : [ "id", "mediaKind", "title", "displayTitle", "year", "posterUrl", "seasonNumber", "sizeBytes", "requester", "status", "score", "scoreBreakdown", "protectedBy", "protectedVia", "deletedAt", "freedBytes", "failureReason" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "mediaKind" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "displayTitle" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
+          },
+          "seasonNumber" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "sizeBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "requester" : {
+            "type" : [ "string", "null" ]
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "score" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "scoreBreakdown" : {
+            "$ref" : "#/components/schemas/ScoreBreakdown"
+          },
+          "protectedBy" : {
+            "type" : [ "string", "null" ]
+          },
+          "protectedVia" : {
+            "type" : [ "string", "null" ]
+          },
+          "deletedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "freedBytes" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "failureReason" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "CleanupConfigDto" : {
+        "type" : "object",
+        "required" : [ "diskPath", "thresholdBytes", "targetFreeBytes", "graceDays", "minAgeDays", "recentSeriesWatchDays", "inProgressDays", "maxCandidates", "minScore", "weightLastWatched", "weightDownloadAge", "weightSize", "weightCompletion", "weightRequesterActivity", "knownDiskPaths", "diskFreeBytes" ],
+        "properties" : {
+          "diskPath" : {
+            "type" : "string"
+          },
+          "thresholdBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "targetFreeBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "graceDays" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "minAgeDays" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "recentSeriesWatchDays" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "inProgressDays" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "maxCandidates" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "minScore" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "weightLastWatched" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "weightDownloadAge" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "weightSize" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "weightCompletion" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "weightRequesterActivity" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "knownDiskPaths" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "diskFreeBytes" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          }
+        }
+      },
+      "CleanupMediaDto" : {
+        "type" : "object",
+        "required" : [ "mediaKind", "radarrMovieId", "sonarrSeriesId", "title", "year", "posterUrl", "seasonNumbers" ],
+        "properties" : {
+          "mediaKind" : {
+            "type" : "string"
+          },
+          "radarrMovieId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "sonarrSeriesId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
+          },
+          "seasonNumbers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          }
+        }
+      },
+      "CleanupOverviewDto" : {
+        "type" : "object",
+        "required" : [ "campaign", "diskPath", "diskFreeBytes", "thresholdBytes", "targetFreeBytes" ],
+        "properties" : {
+          "campaign" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/CleanupCampaignDetailsDto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "diskPath" : {
+            "type" : "string"
+          },
+          "diskFreeBytes" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "thresholdBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "targetFreeBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CleanupProtectionDto" : {
+        "type" : "object",
+        "required" : [ "id", "mediaKind", "radarrMovieId", "sonarrSeriesId", "seasonNumber", "title", "year", "posterUrl", "protectedBy", "source", "createdAt" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "mediaKind" : {
+            "type" : "string"
+          },
+          "radarrMovieId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "sonarrSeriesId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "seasonNumber" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "posterUrl" : {
+            "type" : [ "string", "null" ]
+          },
+          "protectedBy" : {
+            "type" : "string"
+          },
+          "source" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          }
+        }
+      },
+      "CreateProtectionRequest" : {
+        "type" : "object",
+        "required" : [ "mediaKind", "radarrMovieId", "sonarrSeriesId", "seasonNumber" ],
+        "properties" : {
+          "mediaKind" : {
+            "type" : [ "string", "null" ]
+          },
+          "radarrMovieId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "sonarrSeriesId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "seasonNumber" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          }
+        }
+      },
       "CreateWorkflowRequest" : {
         "type" : "object",
         "required" : [ "mediaType" ],
@@ -129,6 +508,41 @@
       "EntryType" : {
         "type" : "string",
         "enum" : [ "CONTRIBUTION", "EXPENSE" ]
+      },
+      "ExecutionSummary" : {
+        "type" : "object",
+        "properties" : {
+          "deletedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "protectedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "skippedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "failedCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "freedBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "finishedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "note" : {
+            "type" : [ "string", "null" ]
+          }
+        }
       },
       "FinanceEntriesPageDto" : {
         "type" : "object",
@@ -274,6 +688,16 @@
           },
           "balanceCents" : {
             "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ForceScanRequest" : {
+        "type" : "object",
+        "required" : [ "targetBytes" ],
+        "properties" : {
+          "targetBytes" : {
+            "type" : [ "integer", "null" ],
             "format" : "int64"
           }
         }
@@ -654,6 +1078,11 @@
           }
         }
       },
+      "OffsetDateTime" : {
+        "type" : "string",
+        "format" : "date-time",
+        "examples" : [ "2022-03-10T12:15:50-04:00" ]
+      },
       "PlatformShareDto" : {
         "type" : "object",
         "required" : [ "platform", "plays", "watchTimeSeconds" ],
@@ -708,7 +1137,7 @@
       },
       "ProblemReleaseDto" : {
         "type" : "object",
-        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections", "isFrench", "isRecommended" ],
+        "required" : [ "guid", "indexerId", "indexer", "title", "quality", "size", "age", "seeders", "leechers", "protocol", "rejected", "rejections" ],
         "properties" : {
           "guid" : {
             "type" : "string"
@@ -982,6 +1411,88 @@
             }, {
               "type" : "null"
             } ]
+          }
+        }
+      },
+      "ScanStartedDto" : {
+        "type" : "object",
+        "required" : [ "jobIdentity" ],
+        "properties" : {
+          "jobIdentity" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ScoreBreakdown" : {
+        "type" : "object",
+        "properties" : {
+          "total" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "components" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ScoreComponent"
+            }
+          },
+          "inputs" : {
+            "$ref" : "#/components/schemas/ScoreInputs"
+          }
+        }
+      },
+      "ScoreComponent" : {
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "weight" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "rawValue" : {
+            "type" : "string"
+          },
+          "normalized" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "points" : {
+            "type" : "number",
+            "format" : "double"
+          }
+        }
+      },
+      "ScoreInputs" : {
+        "type" : "object",
+        "properties" : {
+          "lastWatchedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "downloadedAt" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "sizeBytes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "requester" : {
+            "type" : [ "string", "null" ]
+          },
+          "correlation" : {
+            "type" : "string"
           }
         }
       },
@@ -1366,6 +1877,241 @@
     }
   },
   "paths" : {
+    "/api/admin/cleanup/campaigns" : {
+      "get" : {
+        "tags" : [ "Admin Cleanup" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CleanupCampaignSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "List All Campaigns",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/campaigns/scan" : {
+      "post" : {
+        "tags" : [ "Admin Cleanup" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ForceScanRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "202" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ScanStartedDto"
+                }
+              }
+            },
+            "description" : "Accepted"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Force Scan",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/campaigns/{id}" : {
+      "get" : {
+        "tags" : [ "Admin Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupCampaignDetailsDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Get Campaign Details",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/campaigns/{id}/cancel" : {
+      "post" : {
+        "tags" : [ "Admin Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupCampaignDetailsDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Cancel",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/candidates/{id}/retry" : {
+      "post" : {
+        "tags" : [ "Admin Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupCandidateDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Retry",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/config" : {
+      "get" : {
+        "tags" : [ "Admin Cleanup" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupConfigDto"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Get Config",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/admin/cleanup/protections/{id}" : {
+      "delete" : {
+        "tags" : [ "Admin Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Delete Protection",
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
     "/api/admin/finances/entries" : {
       "post" : {
         "tags" : [ "Finances" ],
@@ -2469,6 +3215,182 @@
           }
         },
         "summary" : "Get Logo"
+      }
+    },
+    "/api/cleanup/campaign" : {
+      "get" : {
+        "tags" : [ "Cleanup" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Campaign"
+      }
+    },
+    "/api/cleanup/candidates/{id}/veto" : {
+      "post" : {
+        "tags" : [ "Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupCandidateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Veto"
+      }
+    },
+    "/api/cleanup/protections" : {
+      "post" : {
+        "tags" : [ "Cleanup" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateProtectionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CleanupProtectionDto"
+                }
+              }
+            },
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Protect"
+      },
+      "get" : {
+        "tags" : [ "Cleanup" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CleanupProtectionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "List Protections"
+      }
+    },
+    "/api/cleanup/protections/{id}" : {
+      "delete" : {
+        "tags" : [ "Cleanup" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Unprotect"
+      }
+    },
+    "/api/cleanup/search/movies" : {
+      "get" : {
+        "tags" : [ "Cleanup" ],
+        "parameters" : [ {
+          "name" : "query",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "string", "null" ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CleanupMediaDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Search Movies"
+      }
+    },
+    "/api/cleanup/search/series" : {
+      "get" : {
+        "tags" : [ "Cleanup" ],
+        "parameters" : [ {
+          "name" : "query",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "string", "null" ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CleanupMediaDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Search Series"
       }
     },
     "/api/finances/energy" : {

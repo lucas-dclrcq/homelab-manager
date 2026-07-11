@@ -11,42 +11,63 @@
         "id": 1,
         "title": "Dune: Part Two",
         "year": 2024,
+        "tmdbId": 693134,
+        "imdbId": "tt15239678",
         "overview": "Paul Atreides s'unit à Chani et aux Fremen pour mener la révolte contre ceux qui ont détruit sa famille.",
         "hasFile": true,
+        "sizeOnDisk": 25000000000,
+        "added": "2024-06-01T10:00:00Z",
+        "tags": [1],
         "images": [
           { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/dune2.jpg" }
         ],
         "movieFile": {
           "quality": { "quality": { "name": "WEBDL-1080p" } },
-          "languages": [{ "id": 1, "name": "English" }]
+          "languages": [{ "id": 1, "name": "English" }],
+          "size": 25000000000,
+          "dateAdded": "2024-06-01T10:00:00Z"
         }
       },
       {
         "id": 2,
         "title": "Oppenheimer",
         "year": 2023,
+        "tmdbId": 872585,
+        "imdbId": "tt15398776",
         "overview": "L'histoire de J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.",
         "hasFile": true,
+        "sizeOnDisk": 32000000000,
+        "added": "2023-12-15T10:00:00Z",
+        "tags": [2],
         "images": [
           { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/oppenheimer.jpg" }
         ],
         "movieFile": {
           "quality": { "quality": { "name": "Bluray-1080p" } },
-          "languages": [{ "id": 1, "name": "English" }]
+          "languages": [{ "id": 1, "name": "English" }],
+          "size": 32000000000,
+          "dateAdded": "2023-12-15T10:00:00Z"
         }
       },
       {
         "id": 3,
         "title": "The Substance",
         "year": 2024,
+        "tmdbId": 933260,
+        "imdbId": "tt17526714",
         "overview": "Une célébrité vieillissante essaie une substance qui crée une version plus jeune d'elle-même.",
         "hasFile": true,
+        "sizeOnDisk": 18000000000,
+        "added": "2024-11-20T10:00:00Z",
+        "tags": [],
         "images": [
           { "coverType": "poster", "remoteUrl": "https://image.tmdb.org/t/p/original/substance.jpg" }
         ],
         "movieFile": {
           "quality": { "quality": { "name": "WEBDL-720p" } },
-          "languages": [{ "id": 1, "name": "English" }]
+          "languages": [{ "id": 1, "name": "English" }],
+          "size": 18000000000,
+          "dateAdded": "2024-11-20T10:00:00Z"
         }
       }
     ]

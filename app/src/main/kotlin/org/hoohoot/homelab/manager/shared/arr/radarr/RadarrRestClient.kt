@@ -6,9 +6,11 @@ import org.eclipse.microprofile.faulttolerance.Retry
 import org.eclipse.microprofile.faulttolerance.Timeout
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException
 import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
+import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
@@ -17,6 +19,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
+import org.hoohoot.homelab.manager.shared.arr.ArrTag
 import org.hoohoot.homelab.manager.shared.arr.DiskSpace
 
 @Path("/api/v3")
@@ -51,6 +54,19 @@ interface RadarrRestClient {
     @GET
     @Path("/qualityprofile")
     suspend fun getQualityProfiles(): List<RadarrQualityProfile>?
+
+    @GET
+    @Path("/tag")
+    suspend fun getTags(): List<ArrTag>?
+
+    // Suppression idempotente : un 404 au retry signifie déjà supprimé, le @Retry de classe reste acceptable
+    @DELETE
+    @Path("/movie/{id}")
+    suspend fun deleteMovie(
+        @PathParam("id") id: Int,
+        @QueryParam("deleteFiles") deleteFiles: Boolean,
+        @QueryParam("addImportExclusion") addImportExclusion: Boolean,
+    )
 
     // La recherche interactive interroge tous les indexers : doit dépasser le read-timeout de 120s
     @GET

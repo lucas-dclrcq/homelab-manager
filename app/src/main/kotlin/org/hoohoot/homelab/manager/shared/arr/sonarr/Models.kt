@@ -95,5 +95,23 @@ data class Rating(
 
 data class Season(
     val seasonNumber: Int? = null,
-    val monitored: Boolean? = null
+    val monitored: Boolean? = null,
+    val statistics: SeasonStatistics? = null
+)
+
+data class SeasonStatistics(
+    val episodeFileCount: Int? = null,
+    val episodeCount: Int? = null,
+    val totalEpisodeCount: Int? = null,
+    val sizeOnDisk: Long? = null,
+    val previousAiring: String? = null,
+    val nextAiring: String? = null
+)
+
+data class SonarrEpisodeFile(
+    val id: Int? = null,
+    val seriesId: Int? = null,
+    val seasonNumber: Int? = null,
+    val size: Long? = null,
+    val dateAdded: String? = null
 )

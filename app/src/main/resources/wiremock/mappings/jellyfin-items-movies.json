@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/Items",
+    "queryParameters": {
+      "includeItemTypes": { "equalTo": "Movie" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "Items": [
+        {
+          "Id": "jf-movie-1",
+          "Name": "Dune: Part Two",
+          "ProductionYear": 2024,
+          "Type": "Movie",
+          "ProviderIds": { "Tmdb": "693134", "Imdb": "tt15239678" }
+        },
+        {
+          "Id": "jf-movie-2",
+          "Name": "Oppenheimer",
+          "ProductionYear": 2023,
+          "Type": "Movie",
+          "ProviderIds": { "Tmdb": "872585", "Imdb": "tt15398776" }
+        }
+      ],
+      "TotalRecordCount": 2
+    }
+  }
+}

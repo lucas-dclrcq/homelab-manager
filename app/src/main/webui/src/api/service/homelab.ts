@@ -24,6 +24,14 @@ import type {
   AdminProblemWorkflowDto,
   ApplicationDto,
   BazarrWebhookPayload,
+  CleanupCampaignDetailsDto,
+  CleanupCampaignSummaryDto,
+  CleanupCandidateDto,
+  CleanupConfigDto,
+  CleanupMediaDto,
+  CleanupOverviewDto,
+  CleanupProtectionDto,
+  CreateProtectionRequest,
   CreateWorkflowRequest,
   EnergyStatusDto,
   FinanceEntriesPageDto,
@@ -32,6 +40,9 @@ import type {
   FinanceSettingsDto,
   FinanceSettingsRequest,
   FinanceSummaryDto,
+  ForceScanRequest,
+  GetApiCleanupSearchMoviesParams,
+  GetApiCleanupSearchSeriesParams,
   GetApiFinancesEntriesParams,
   GetApiFinancesMonthlyParams,
   GetApiFinancesSummaryParams,
@@ -67,6 +78,7 @@ import type {
   RadarrWebhookPayload,
   RecurringRuleDto,
   RecurringRuleRequest,
+  ScanStartedDto,
   SeerrWebhookPayload,
   SelectMovieRequest,
   SelectProblemRequest,
@@ -83,6 +95,656 @@ import type {
 import { customInstance } from "../axios-instance";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary List All Campaigns
+ */
+export const getApiAdminCleanupCampaigns = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<CleanupCampaignSummaryDto[]>(
+    { url: `/api/admin/cleanup/campaigns`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminCleanupCampaignsQueryKey = () => {
+  return ["api", "admin", "cleanup", "campaigns"] as const;
+};
+
+export const getGetApiAdminCleanupCampaignsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminCleanupCampaignsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>
+  > = ({ signal }) => getApiAdminCleanupCampaigns(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminCleanupCampaignsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>
+>;
+export type GetApiAdminCleanupCampaignsQueryError = void;
+
+/**
+ * @summary List All Campaigns
+ */
+
+export function useGetApiAdminCleanupCampaigns<
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminCleanupCampaigns>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminCleanupCampaignsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Force Scan
+ */
+export const postApiAdminCleanupCampaignsScan = (
+  forceScanRequest: MaybeRef<ForceScanRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  forceScanRequest = unref(forceScanRequest);
+
+  return customInstance<ScanStartedDto>(
+    {
+      url: `/api/admin/cleanup/campaigns/scan`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: forceScanRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminCleanupCampaignsScanMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>,
+    TError,
+    { data: ForceScanRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>,
+  TError,
+  { data: ForceScanRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminCleanupCampaignsScan"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>,
+    { data: ForceScanRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAdminCleanupCampaignsScan(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminCleanupCampaignsScanMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>
+>;
+export type PostApiAdminCleanupCampaignsScanMutationBody = ForceScanRequest;
+export type PostApiAdminCleanupCampaignsScanMutationError = void;
+
+/**
+ * @summary Force Scan
+ */
+export const usePostApiAdminCleanupCampaignsScan = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>,
+      TError,
+      { data: ForceScanRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsScan>>,
+  TError,
+  { data: ForceScanRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminCleanupCampaignsScanMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get Campaign Details
+ */
+export const getApiAdminCleanupCampaignsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<CleanupCampaignDetailsDto>(
+    { url: `/api/admin/cleanup/campaigns/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminCleanupCampaignsIdQueryKey = (
+  id: MaybeRef<Uuid>,
+) => {
+  return ["api", "admin", "cleanup", "campaigns", id] as const;
+};
+
+export const getGetApiAdminCleanupCampaignsIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminCleanupCampaignsIdQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>
+  > = ({ signal }) => getApiAdminCleanupCampaignsId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(id)),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminCleanupCampaignsIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>
+>;
+export type GetApiAdminCleanupCampaignsIdQueryError = void;
+
+/**
+ * @summary Get Campaign Details
+ */
+
+export function useGetApiAdminCleanupCampaignsId<
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>,
+  TError = void,
+>(
+  id: MaybeRef<Uuid>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminCleanupCampaignsId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminCleanupCampaignsIdQueryOptions(
+    id,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Cancel
+ */
+export const postApiAdminCleanupCampaignsIdCancel = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<CleanupCampaignDetailsDto>(
+    {
+      url: `/api/admin/cleanup/campaigns/${id}/cancel`,
+      method: "POST",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminCleanupCampaignsIdCancelMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminCleanupCampaignsIdCancel"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiAdminCleanupCampaignsIdCancel(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminCleanupCampaignsIdCancelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>
+>;
+
+export type PostApiAdminCleanupCampaignsIdCancelMutationError = void;
+
+/**
+ * @summary Cancel
+ */
+export const usePostApiAdminCleanupCampaignsIdCancel = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminCleanupCampaignsIdCancel>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminCleanupCampaignsIdCancelMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Retry
+ */
+export const postApiAdminCleanupCandidatesIdRetry = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<CleanupCandidateDto>(
+    {
+      url: `/api/admin/cleanup/candidates/${id}/retry`,
+      method: "POST",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAdminCleanupCandidatesIdRetryMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiAdminCleanupCandidatesIdRetry"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiAdminCleanupCandidatesIdRetry(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAdminCleanupCandidatesIdRetryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>
+>;
+
+export type PostApiAdminCleanupCandidatesIdRetryMutationError = void;
+
+/**
+ * @summary Retry
+ */
+export const usePostApiAdminCleanupCandidatesIdRetry = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiAdminCleanupCandidatesIdRetry>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAdminCleanupCandidatesIdRetryMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get Config
+ */
+export const getApiAdminCleanupConfig = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<CleanupConfigDto>(
+    { url: `/api/admin/cleanup/config`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAdminCleanupConfigQueryKey = () => {
+  return ["api", "admin", "cleanup", "config"] as const;
+};
+
+export const getGetApiAdminCleanupConfigQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupConfig>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAdminCleanupConfig>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiAdminCleanupConfigQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAdminCleanupConfig>>
+  > = ({ signal }) => getApiAdminCleanupConfig(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAdminCleanupConfig>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiAdminCleanupConfigQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAdminCleanupConfig>>
+>;
+export type GetApiAdminCleanupConfigQueryError = void;
+
+/**
+ * @summary Get Config
+ */
+
+export function useGetApiAdminCleanupConfig<
+  TData = Awaited<ReturnType<typeof getApiAdminCleanupConfig>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAdminCleanupConfig>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAdminCleanupConfigQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Delete Protection
+ */
+export const deleteApiAdminCleanupProtectionsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<unknown>(
+    { url: `/api/admin/cleanup/protections/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiAdminCleanupProtectionsIdMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiAdminCleanupProtectionsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiAdminCleanupProtectionsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiAdminCleanupProtectionsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>
+>;
+
+export type DeleteApiAdminCleanupProtectionsIdMutationError = void;
+
+/**
+ * @summary Delete Protection
+ */
+export const useDeleteApiAdminCleanupProtectionsId = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiAdminCleanupProtectionsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getDeleteApiAdminCleanupProtectionsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * @summary Create Entry
@@ -2816,6 +3478,672 @@ export function useGetApiApplicationsIdLogo<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiApplicationsIdLogoQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Get Campaign
+ */
+export const getApiCleanupCampaign = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<CleanupOverviewDto>(
+    { url: `/api/cleanup/campaign`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiCleanupCampaignQueryKey = () => {
+  return ["api", "cleanup", "campaign"] as const;
+};
+
+export const getGetApiCleanupCampaignQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiCleanupCampaign>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiCleanupCampaign>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiCleanupCampaignQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiCleanupCampaign>>
+  > = ({ signal }) => getApiCleanupCampaign(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiCleanupCampaign>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiCleanupCampaignQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiCleanupCampaign>>
+>;
+export type GetApiCleanupCampaignQueryError = unknown;
+
+/**
+ * @summary Get Campaign
+ */
+
+export function useGetApiCleanupCampaign<
+  TData = Awaited<ReturnType<typeof getApiCleanupCampaign>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupCampaign>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiCleanupCampaignQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Veto
+ */
+export const postApiCleanupCandidatesIdVeto = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  id = unref(id);
+
+  return customInstance<CleanupCandidateDto>(
+    { url: `/api/cleanup/candidates/${id}/veto`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostApiCleanupCandidatesIdVetoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["postApiCleanupCandidatesIdVeto"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postApiCleanupCandidatesIdVeto(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCleanupCandidatesIdVetoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>
+>;
+
+export type PostApiCleanupCandidatesIdVetoMutationError = unknown;
+
+/**
+ * @summary Veto
+ */
+export const usePostApiCleanupCandidatesIdVeto = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiCleanupCandidatesIdVeto>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiCleanupCandidatesIdVetoMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Protect
+ */
+export const postApiCleanupProtections = (
+  createProtectionRequest: MaybeRef<CreateProtectionRequest>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  createProtectionRequest = unref(createProtectionRequest);
+
+  return customInstance<CleanupProtectionDto>(
+    {
+      url: `/api/cleanup/protections`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createProtectionRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCleanupProtectionsMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCleanupProtections>>,
+    TError,
+    { data: CreateProtectionRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCleanupProtections>>,
+  TError,
+  { data: CreateProtectionRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCleanupProtections"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCleanupProtections>>,
+    { data: CreateProtectionRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCleanupProtections(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCleanupProtectionsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCleanupProtections>>
+>;
+export type PostApiCleanupProtectionsMutationBody = CreateProtectionRequest;
+export type PostApiCleanupProtectionsMutationError = void;
+
+/**
+ * @summary Protect
+ */
+export const usePostApiCleanupProtections = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCleanupProtections>>,
+      TError,
+      { data: CreateProtectionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof postApiCleanupProtections>>,
+  TError,
+  { data: CreateProtectionRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCleanupProtectionsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List Protections
+ */
+export const getApiCleanupProtections = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<CleanupProtectionDto[]>(
+    { url: `/api/cleanup/protections`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiCleanupProtectionsQueryKey = () => {
+  return ["api", "cleanup", "protections"] as const;
+};
+
+export const getGetApiCleanupProtectionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiCleanupProtections>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiCleanupProtections>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiCleanupProtectionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiCleanupProtections>>
+  > = ({ signal }) => getApiCleanupProtections(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiCleanupProtections>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiCleanupProtectionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiCleanupProtections>>
+>;
+export type GetApiCleanupProtectionsQueryError = unknown;
+
+/**
+ * @summary List Protections
+ */
+
+export function useGetApiCleanupProtections<
+  TData = Awaited<ReturnType<typeof getApiCleanupProtections>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupProtections>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiCleanupProtectionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Unprotect
+ */
+export const deleteApiCleanupProtectionsId = (
+  id: MaybeRef<Uuid>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  id = unref(id);
+
+  return customInstance<unknown>(
+    { url: `/api/cleanup/protections/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteApiCleanupProtectionsIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>,
+    TError,
+    { id: Uuid },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationKey = ["deleteApiCleanupProtectionsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>,
+    { id: Uuid }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteApiCleanupProtectionsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiCleanupProtectionsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>
+>;
+
+export type DeleteApiCleanupProtectionsIdMutationError = unknown;
+
+/**
+ * @summary Unprotect
+ */
+export const useDeleteApiCleanupProtectionsId = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>,
+      TError,
+      { id: Uuid },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deleteApiCleanupProtectionsId>>,
+  TError,
+  { id: Uuid },
+  TContext
+> => {
+  const mutationOptions =
+    getDeleteApiCleanupProtectionsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Search Movies
+ */
+export const getApiCleanupSearchMovies = (
+  params: MaybeRef<GetApiCleanupSearchMoviesParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<CleanupMediaDto[]>(
+    {
+      url: `/api/cleanup/search/movies`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiCleanupSearchMoviesQueryKey = (
+  params: MaybeRef<GetApiCleanupSearchMoviesParams>,
+) => {
+  return [
+    "api",
+    "cleanup",
+    "search",
+    "movies",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiCleanupSearchMoviesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiCleanupSearchMovies>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiCleanupSearchMoviesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupSearchMovies>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiCleanupSearchMoviesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiCleanupSearchMovies>>
+  > = ({ signal }) => getApiCleanupSearchMovies(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiCleanupSearchMovies>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiCleanupSearchMoviesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiCleanupSearchMovies>>
+>;
+export type GetApiCleanupSearchMoviesQueryError = unknown;
+
+/**
+ * @summary Search Movies
+ */
+
+export function useGetApiCleanupSearchMovies<
+  TData = Awaited<ReturnType<typeof getApiCleanupSearchMovies>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiCleanupSearchMoviesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupSearchMovies>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiCleanupSearchMoviesQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * @summary Search Series
+ */
+export const getApiCleanupSearchSeries = (
+  params: MaybeRef<GetApiCleanupSearchSeriesParams>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  params = unref(params);
+
+  return customInstance<CleanupMediaDto[]>(
+    {
+      url: `/api/cleanup/search/series`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiCleanupSearchSeriesQueryKey = (
+  params: MaybeRef<GetApiCleanupSearchSeriesParams>,
+) => {
+  return [
+    "api",
+    "cleanup",
+    "search",
+    "series",
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiCleanupSearchSeriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiCleanupSearchSeries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiCleanupSearchSeriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupSearchSeries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = getGetApiCleanupSearchSeriesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiCleanupSearchSeries>>
+  > = ({ signal }) => getApiCleanupSearchSeries(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiCleanupSearchSeries>>,
+    TError,
+    TData
+  >;
+};
+
+export type GetApiCleanupSearchSeriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiCleanupSearchSeries>>
+>;
+export type GetApiCleanupSearchSeriesQueryError = unknown;
+
+/**
+ * @summary Search Series
+ */
+
+export function useGetApiCleanupSearchSeries<
+  TData = Awaited<ReturnType<typeof getApiCleanupSearchSeries>>,
+  TError = unknown,
+>(
+  params: MaybeRef<GetApiCleanupSearchSeriesParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupSearchSeries>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiCleanupSearchSeriesQueryOptions(
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
     TData,

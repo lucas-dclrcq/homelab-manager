@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/series/[0-9]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "id": 11,
+      "title": "Severance",
+      "year": 2022,
+      "tvdbId": 371980,
+      "imdbId": "tt11280740",
+      "status": "ended",
+      "ended": true,
+      "added": "2022-03-01T10:00:00Z",
+      "seasons": [
+        { "seasonNumber": 1, "monitored": true },
+        { "seasonNumber": 2, "monitored": true }
+      ]
+    }
+  }
+}

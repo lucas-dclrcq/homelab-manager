@@ -20,9 +20,13 @@ data class RadarrMovie(
     val inCinemas: String? = null,
     val id: Int? = null,
     val imdbId: String? = null,
+    val tmdbId: Int? = null,
     val overview: String? = null,
     val hasFile: Boolean? = null,
     val qualityProfileId: Int? = null,
+    val sizeOnDisk: Long? = null,
+    val added: String? = null,
+    val tags: List<Int> = emptyList(),
     val images: List<RadarrImage> = emptyList(),
     val movieFile: RadarrMovieFile? = null
 )
@@ -55,7 +59,9 @@ data class RadarrImage(
 
 data class RadarrMovieFile(
     val quality: HistoryQuality? = null,
-    val languages: List<RadarrLanguage> = emptyList()
+    val languages: List<RadarrLanguage> = emptyList(),
+    val size: Long? = null,
+    val dateAdded: String? = null
 )
 
 data class RadarrLanguage(

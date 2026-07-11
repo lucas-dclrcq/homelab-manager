@@ -6,8 +6,12 @@ import org.eclipse.microprofile.faulttolerance.Retry
 import org.eclipse.microprofile.faulttolerance.Timeout
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException
 import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
+import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
+import jakarta.ws.rs.PathParam
+import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import kotlinx.datetime.Instant
@@ -15,6 +19,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
+import org.hoohoot.homelab.manager.shared.arr.ArrTag
 import org.hoohoot.homelab.manager.shared.arr.DiskSpace
 
 @Path("/api/v3")
@@ -47,6 +52,27 @@ interface SonarrRestClient {
     @GET
     @Path("/diskspace")
     suspend fun getDiskSpace(): List<DiskSpace>?
+
+    @GET
+    @Path("/tag")
+    suspend fun getTags(): List<ArrTag>?
+
+    @GET
+    @Path("/series/{id}")
+    suspend fun getSeriesById(@PathParam("id") id: Int): Series?
+
+    @GET
+    @Path("/episodefile")
+    suspend fun getEpisodeFiles(@QueryParam("seriesId") seriesId: Int): List<SonarrEpisodeFile>?
+
+    @DELETE
+    @Path("/episodefile/{id}")
+    suspend fun deleteEpisodeFile(@PathParam("id") id: Int)
+
+    @PUT
+    @Path("/series/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    suspend fun updateSeries(@PathParam("id") id: Int, series: Series): Series?
 }
 
 suspend fun SonarrRestClient.getSeriesCalendar(start: Instant, end: Instant): List<Episode> =

@@ -25,6 +25,6 @@ export interface ProblemReleaseDto {
   protocol: ProblemReleaseDtoProtocol;
   rejected: boolean;
   rejections: string[];
-  isFrench: boolean;
-  isRecommended: boolean;
+  isFrench?: boolean;
+  isRecommended?: boolean;
 }

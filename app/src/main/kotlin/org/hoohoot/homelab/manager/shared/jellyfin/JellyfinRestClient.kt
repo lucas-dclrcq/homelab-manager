@@ -27,6 +27,14 @@ interface JellyfinRestClient {
     @GET
     @Path("/Sessions")
     suspend fun getSessions(): List<JellyfinSessionDto>
+
+    @GET
+    @Path("/Items")
+    suspend fun getItems(
+        @QueryParam("includeItemTypes") includeItemTypes: String,
+        @QueryParam("recursive") recursive: Boolean,
+        @QueryParam("fields") fields: String
+    ): JellyfinItemsResponse
 }
 
 suspend fun JellyfinRestClient.searchSeries(searchTerm: String): List<MediaSearchResult> =

@@ -35,6 +35,11 @@ const router = createRouter({
       component: () => import('../pages/ProblemWorkflowPage.vue'),
     },
     {
+      path: '/cleanup',
+      name: 'cleanup',
+      component: () => import('../pages/CleanupPage.vue'),
+    },
+    {
       path: '/admin',
       redirect: { name: 'admin-applications' },
     },
@@ -78,6 +83,12 @@ const router = createRouter({
       path: '/admin/problems/:id',
       name: 'admin-problem-workflow',
       component: () => import('../pages/ProblemWorkflowPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/cleanup',
+      name: 'admin-cleanup',
+      component: () => import('../pages/AdminCleanupPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

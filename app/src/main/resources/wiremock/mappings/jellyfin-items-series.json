@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/Items",
+    "queryParameters": {
+      "includeItemTypes": { "equalTo": "Series" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": {
+      "Items": [
+        {
+          "Id": "jf-series-10",
+          "Name": "The Bear",
+          "ProductionYear": 2022,
+          "Type": "Series",
+          "ProviderIds": { "Tvdb": "409367", "Imdb": "tt14452776" }
+        },
+        {
+          "Id": "jf-series-11",
+          "Name": "Severance",
+          "ProductionYear": 2022,
+          "Type": "Series",
+          "ProviderIds": { "Tvdb": "371980", "Imdb": "tt11280740" }
+        }
+      ],
+      "TotalRecordCount": 2
+    }
+  }
+}

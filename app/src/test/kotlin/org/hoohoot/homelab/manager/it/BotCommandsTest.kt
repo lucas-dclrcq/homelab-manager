@@ -6,6 +6,8 @@ import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
+import org.hoohoot.homelab.manager.it.config.CleanupSeed
 import org.hoohoot.homelab.manager.it.config.PlaybackSessionSeed
 import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.statistics.domain.MediaType
@@ -147,6 +149,43 @@ internal class BotCommandsTest {
         assertThat(body).contains("Top ten watchers")
         assertThat(body).contains("alice")
         assertThat(body).contains("bob")
+    }
+
+    @Test
+    fun `garde command should protect a matching cleanup candidate`() {
+        CleanupSeed.deleteAll()
+        val campaignId = CleanupSeed.insertCampaign()
+        val candidateId = CleanupSeed.insertCandidate(campaignId, "Inception", radarrMovieId = 101)
+
+        synapseTestClient.sendMessage(roomId, "!$botPrefix garde Inception")
+
+        val response = synapseTestClient.waitForBotMessage(roomId)
+        assertThat(response.get("body").asText()).contains("Inception")
+        assertThat(CleanupSeed.candidateStatus(candidateId))
+            .isEqualTo(CleanupCandidateEntity.STATUS_PROTECTED)
+    }
+
+    @Test
+    fun `garde command without active campaign should say there is nothing to keep`() {
+        CleanupSeed.deleteAll()
+
+        synapseTestClient.sendMessage(roomId, "!$botPrefix garde Inception")
+
+        val response = synapseTestClient.waitForBotMessage(roomId)
+        assertThat(response.get("body").asText()).contains("Aucune campagne")
+    }
+
+    @Test
+    fun `garde command with an ambiguous title should list the matching medias`() {
+        CleanupSeed.deleteAll()
+        val campaignId = CleanupSeed.insertCampaign()
+        CleanupSeed.insertCandidate(campaignId, "Batman Begins", radarrMovieId = 401)
+        CleanupSeed.insertCandidate(campaignId, "Batman Returns", radarrMovieId = 402)
+
+        synapseTestClient.sendMessage(roomId, "!$botPrefix garde Batman")
+
+        val response = synapseTestClient.waitForBotMessage(roomId)
+        assertThat(response.get("body").asText()).contains("Plusieurs médias")
     }
 
     @Test

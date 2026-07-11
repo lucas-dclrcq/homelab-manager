@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/episodefile"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "id": 100, "seriesId": 11, "seasonNumber": 1, "size": 3000000000, "dateAdded": "2022-04-10T10:00:00Z" },
+      { "id": 101, "seriesId": 11, "seasonNumber": 1, "size": 3200000000, "dateAdded": "2022-04-10T10:05:00Z" },
+      { "id": 102, "seriesId": 11, "seasonNumber": 2, "size": 3500000000, "dateAdded": "2025-03-22T10:00:00Z" }
+    ]
+  }
+}

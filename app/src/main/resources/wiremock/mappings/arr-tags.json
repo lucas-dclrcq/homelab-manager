@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v3/tag"
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": [
+      { "id": 1, "label": "1 - alice" },
+      { "id": 2, "label": "2 - bob" }
+    ]
+  }
+}
