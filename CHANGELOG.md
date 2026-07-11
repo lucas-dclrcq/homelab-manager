@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.4...v0.1.5) (2026-07-11)
+
+
+### Features
+
+* add cleanup module ([19c7946](https://github.com/lucas-dclrcq/homelab-manager/commit/19c7946fe998d951c4b23d8fecc17c98bdd32089))
+
 ## [0.1.4](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.3...v0.1.4) (2026-07-10)
 
 

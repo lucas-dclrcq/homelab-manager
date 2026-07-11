@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.hoohoot</groupId>
         <artifactId>synapse-devservice-parent</artifactId>
-        <version>0.1.5-SNAPSHOT</version>
+        <version>0.1.5</version>
     </parent>
     <artifactId>synapse-devservice</artifactId>
 
