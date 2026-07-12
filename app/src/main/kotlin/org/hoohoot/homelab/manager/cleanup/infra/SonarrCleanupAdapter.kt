@@ -9,6 +9,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.CleanupSeries
 import org.hoohoot.homelab.manager.cleanup.domain.DeleteOutcome
 import org.hoohoot.homelab.manager.cleanup.domain.ports.SeasonEraser
 import org.hoohoot.homelab.manager.cleanup.domain.ports.SeriesCatalog
+import org.hoohoot.homelab.manager.cleanup.domain.ports.SeriesEraser
 import org.hoohoot.homelab.manager.notifications.api.requester
 import org.hoohoot.homelab.manager.shared.arr.sonarr.Series
 import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
@@ -17,7 +18,7 @@ import java.time.LocalDateTime
 @ApplicationScoped
 class SonarrCleanupAdapter(
     @param:RestClient private val sonarrRestClient: SonarrRestClient,
-) : SeriesCatalog, SeasonEraser {
+) : SeriesCatalog, SeasonEraser, SeriesEraser {
 
     override suspend fun allSeries(): List<CleanupSeries> {
         val tagLabels = tagLabels()
@@ -69,6 +70,24 @@ class SonarrCleanupAdapter(
             }
         }
         return DeleteOutcome.Deleted(freed)
+    }
+
+    override suspend fun deleteSeries(sonarrSeriesId: Int, sizeBytes: Long): DeleteOutcome {
+        // La taille a pu évoluer depuis la suggestion : mesure au moment de la suppression,
+        // repli sur la taille connue si Sonarr ne répond pas
+        val freed = try {
+            sonarrRestClient.getEpisodeFiles(sonarrSeriesId).orEmpty().sumOf { it.size ?: 0L }
+        } catch (exception: Exception) {
+            sizeBytes
+        }
+
+        return try {
+            sonarrRestClient.deleteSeries(sonarrSeriesId, deleteFiles = true, addImportListExclusion = false)
+            DeleteOutcome.Deleted(freed)
+        } catch (exception: WebApplicationException) {
+            if (exception.response?.status == 404) DeleteOutcome.AlreadyGone
+            else DeleteOutcome.Failed("Sonarr a répondu ${exception.response?.status} : ${exception.message}")
+        }
     }
 
     private suspend fun tagLabels(): Map<Int, String> = try {

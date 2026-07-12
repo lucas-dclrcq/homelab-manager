@@ -9,6 +9,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.ExecutionSummary
 import org.hoohoot.homelab.manager.cleanup.domain.ProtectResult
 import org.hoohoot.homelab.manager.cleanup.domain.RetryResult
 import org.hoohoot.homelab.manager.cleanup.domain.ScoreBreakdown
+import org.hoohoot.homelab.manager.cleanup.domain.SuggestResult
 import org.hoohoot.homelab.manager.cleanup.domain.UnprotectResult
 import org.hoohoot.homelab.manager.cleanup.domain.VetoResult
 import org.hoohoot.homelab.manager.cleanup.domain.usecases.CampaignWithCandidates
@@ -16,6 +17,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.usecases.EffectiveCleanupConfi
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCampaignEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupProtectionEntity
+import org.hoohoot.homelab.manager.cleanup.infra.CleanupSuggestionEntity
 import org.hoohoot.homelab.manager.shared.api.badRequest
 import org.hoohoot.homelab.manager.shared.api.conflict
 import org.hoohoot.homelab.manager.shared.api.notFound
@@ -113,6 +115,7 @@ data class CleanupConfigDto(
     val thresholdBytes: Long,
     val targetFreeBytes: Long,
     val graceDays: Long,
+    val suggestionGraceDays: Long,
     val minAgeDays: Long,
     val recentSeriesWatchDays: Long,
     val inProgressDays: Long,
@@ -128,6 +131,34 @@ data class CleanupConfigDto(
 )
 
 data class CreateProtectionRequest(
+    @field:NotNull val mediaKind: String?,
+    val radarrMovieId: Int?,
+    val sonarrSeriesId: Int?,
+    val seasonNumber: Int?,
+)
+
+data class CleanupSuggestionDto(
+    val id: UUID,
+    val mediaKind: String,
+    val radarrMovieId: Int?,
+    val sonarrSeriesId: Int?,
+    val seasonNumber: Int?,
+    val title: String,
+    val displayTitle: String,
+    val year: Int?,
+    val posterUrl: String?,
+    val sizeBytes: Long,
+    val suggestedBy: String,
+    val status: String,
+    // OffsetDateTime : le front calcule un compte à rebours, l'offset lève l'ambiguïté de fuseau
+    val deleteAfter: OffsetDateTime,
+    val vetoedBy: String?,
+    val freedBytes: Long?,
+    val failureReason: String?,
+    val createdAt: LocalDateTime,
+)
+
+data class CreateSuggestionRequest(
     @field:NotNull val mediaKind: String?,
     val radarrMovieId: Int?,
     val sonarrSeriesId: Int?,
@@ -229,6 +260,7 @@ internal fun EffectiveCleanupConfig.toDto() = CleanupConfigDto(
     thresholdBytes = config.thresholdFreeBytes,
     targetFreeBytes = config.targetFreeBytes,
     graceDays = config.graceDays,
+    suggestionGraceDays = config.suggestionGraceDays,
     minAgeDays = config.minAgeDays,
     recentSeriesWatchDays = config.recentSeriesWatchDays,
     inProgressDays = config.inProgressDays,
@@ -242,6 +274,34 @@ internal fun EffectiveCleanupConfig.toDto() = CleanupConfigDto(
     knownDiskPaths = knownDiskPaths,
     diskFreeBytes = diskFreeBytes,
 )
+
+internal fun CleanupSuggestionEntity.toDto() = CleanupSuggestionDto(
+    id = requireNotNull(id),
+    mediaKind = mediaKind,
+    radarrMovieId = radarrMovieId,
+    sonarrSeriesId = sonarrSeriesId,
+    seasonNumber = seasonNumber,
+    title = title,
+    displayTitle = displayTitle(),
+    year = year,
+    posterUrl = posterUrl,
+    sizeBytes = sizeBytes,
+    suggestedBy = suggestedBy,
+    status = status,
+    deleteAfter = deleteAfter.atZone(ZoneId.systemDefault()).toOffsetDateTime(),
+    vetoedBy = vetoedBy,
+    freedBytes = freedBytes,
+    failureReason = failureReason,
+    createdAt = createdAt,
+)
+
+internal fun SuggestResult.toResponse(): Response = when (this) {
+    is SuggestResult.Ok -> Response.status(Response.Status.CREATED).entity(suggestion.toDto()).build()
+    is SuggestResult.AlreadySuggested -> conflict("« ${suggestion.title} » est déjà proposé à la suppression")
+    is SuggestResult.ProtectedMedia -> conflict("« ${protection.title} » est protégé, impossible de proposer sa suppression")
+    is SuggestResult.Invalid -> badRequest(message)
+    SuggestResult.MediaNotFound -> notFound("média introuvable dans la bibliothèque")
+}
 
 internal fun VetoResult.toResponse(): Response = when (this) {
     is VetoResult.Ok -> Response.ok(candidate.toDto()).build()

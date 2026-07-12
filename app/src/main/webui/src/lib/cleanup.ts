@@ -21,6 +21,14 @@ const campaignStatuses: Record<string, StatusPresentation> = {
   CANCELLED: { label: 'Annulée', color: 'neutral' },
 }
 
+const suggestionStatuses: Record<string, StatusPresentation> = {
+  PENDING: { label: 'En sursis', color: 'amber' },
+  VETOED: { label: 'Veto', color: 'sage' },
+  DELETED: { label: 'Supprimé', color: 'neutral' },
+  FAILED: { label: 'Échec', color: 'berry' },
+  SKIPPED: { label: 'Annulée', color: 'sky' },
+}
+
 const protectionSources: Record<string, StatusPresentation> = {
   VETO: { label: 'Veto', color: 'amber' },
   PROACTIVE: { label: 'Préventive', color: 'dusk' },
@@ -40,6 +48,12 @@ export function protectionSourcePresentation(
   source: string,
 ): StatusPresentation {
   return protectionSources[source] ?? { label: source, color: 'neutral' }
+}
+
+export function suggestionStatusPresentation(
+  status: string,
+): StatusPresentation {
+  return suggestionStatuses[status] ?? { label: status, color: 'neutral' }
 }
 
 /** Jours restants (arrondis au supérieur) avant une échéance ISO locale. */

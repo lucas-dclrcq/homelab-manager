@@ -94,6 +94,35 @@ class SynapseTestClient(
         return objectMapper.readTree(response.body()).get("event_id").asText()
     }
 
+    fun sendReaction(roomId: String, targetEventId: String, key: String): String {
+        val body = objectMapper.writeValueAsString(
+            mapOf(
+                "m.relates_to" to mapOf(
+                    "rel_type" to "m.annotation",
+                    "event_id" to targetEventId,
+                    "key" to key
+                )
+            )
+        )
+
+        val txnId = System.nanoTime().toString()
+        val response = httpClient.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create("$synapseUrl/_matrix/client/r0/rooms/$roomId/send/m.reaction/$txnId"))
+                .header("Authorization", "Bearer $accessToken")
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to send reaction to room $roomId: ${response.body()}")
+        }
+
+        return objectMapper.readTree(response.body()).get("event_id").asText()
+    }
+
     fun inviteUser(roomId: String, userId: String) {
         val body = objectMapper.writeValueAsString(mapOf("user_id" to userId))
 

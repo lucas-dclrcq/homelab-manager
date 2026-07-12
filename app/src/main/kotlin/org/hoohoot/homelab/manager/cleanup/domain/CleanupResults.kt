@@ -3,6 +3,7 @@ package org.hoohoot.homelab.manager.cleanup.domain
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCampaignEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupProtectionEntity
+import org.hoohoot.homelab.manager.cleanup.infra.CleanupSuggestionEntity
 
 sealed interface ScanResult {
     data class Started(val campaign: CleanupCampaignEntity, val candidateCount: Int) : ScanResult
@@ -23,6 +24,14 @@ sealed interface VetoByTitleResult {
     data object NoCampaign : VetoByTitleResult
     data class NoMatch(val proposedTitles: List<String>) : VetoByTitleResult
     data class Ambiguous(val titles: List<String>) : VetoByTitleResult
+}
+
+sealed interface SuggestResult {
+    data class Ok(val suggestion: CleanupSuggestionEntity) : SuggestResult
+    data class AlreadySuggested(val suggestion: CleanupSuggestionEntity) : SuggestResult
+    data class ProtectedMedia(val protection: CleanupProtectionEntity) : SuggestResult
+    data class Invalid(val message: String) : SuggestResult
+    data object MediaNotFound : SuggestResult
 }
 
 sealed interface ProtectResult {

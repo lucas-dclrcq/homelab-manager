@@ -5,6 +5,7 @@ import {
   getGetApiAdminCleanupCampaignsQueryKey,
   getGetApiCleanupCampaignQueryKey,
   getGetApiCleanupProtectionsQueryKey,
+  getGetApiCleanupSuggestionsQueryKey,
   useDeleteApiAdminCleanupProtectionsId,
   useDeleteApiCleanupProtectionsId,
   useGetApiAdminCleanupCampaigns,
@@ -12,11 +13,13 @@ import {
   useGetApiAdminCleanupConfig,
   useGetApiCleanupCampaign,
   useGetApiCleanupProtections,
+  useGetApiCleanupSuggestions,
   usePostApiAdminCleanupCampaignsIdCancel,
   usePostApiAdminCleanupCampaignsScan,
   usePostApiAdminCleanupCandidatesIdRetry,
   usePostApiCleanupCandidatesIdVeto,
   usePostApiCleanupProtections,
+  usePostApiCleanupSuggestions,
 } from '../api/service/homelab'
 
 // Façade TanStack du nettoyage : les composants passent par ici, jamais
@@ -38,6 +41,12 @@ export function invalidateProtections(queryClient: QueryClient) {
   })
 }
 
+export function invalidateSuggestions(queryClient: QueryClient) {
+  queryClient.invalidateQueries({
+    queryKey: getGetApiCleanupSuggestionsQueryKey(),
+  })
+}
+
 interface MutationCallbacks<TResult = unknown> {
   onSuccess?: (result: TResult) => void
   onError?: (error: unknown) => void
@@ -53,6 +62,7 @@ function useCleanupMutationOptions<TResult>(
     onSettled: () => {
       invalidateCampaigns(queryClient)
       invalidateProtections(queryClient)
+      invalidateSuggestions(queryClient)
     },
     onSuccess: (result: TResult) => callbacks.onSuccess?.(result),
     onError: (error: unknown) => callbacks.onError?.(error),
@@ -108,6 +118,19 @@ export function useDeleteProtection(
   return admin
     ? useDeleteApiAdminCleanupProtectionsId({ mutation })
     : useDeleteApiCleanupProtectionsId({ mutation })
+}
+
+export function useSuggestions() {
+  return useGetApiCleanupSuggestions({
+    // Un veto ❌ ou une suggestion d'un autre utilisateur peut arriver à tout moment : veille lente
+    query: { refetchInterval: 60_000 },
+  })
+}
+
+export function useCreateSuggestion(callbacks: MutationCallbacks = {}) {
+  return usePostApiCleanupSuggestions({
+    mutation: useCleanupMutationOptions(callbacks),
+  })
 }
 
 // --- Côté admin ---

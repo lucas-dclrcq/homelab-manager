@@ -67,10 +67,50 @@ class MatrixCleanupNotifier(
         )
     }
 
+    override suspend fun announceSuggestion(suggestion: CleanupSuggestionEntity): String? {
+        val deadline = suggestion.deleteAfter.format(DEADLINE_FORMAT)
+        val icon = if (suggestion.mediaKind == CleanupSuggestionEntity.KIND_MOVIE) "🎬" else "📺"
+        val media = "$icon ${suggestion.displayTitle()}" +
+            (suggestion.year?.let { " ($it)" } ?: "") + " — ${formatGb(suggestion.sizeBytes)}"
+
+        val header = "🗑️ Proposition de suppression"
+        val intro = "${suggestion.suggestedBy} propose de supprimer $media."
+        val howTo = "Sans veto d'ici le $deadline, ce média sera supprimé. " +
+            "Pour s'y opposer : réagissez ❌ à ce message."
+        val link = "Suggestions en cours : $publicUrl/cleanup"
+
+        val body = listOf(header, intro, howTo, link).joinToString("\n")
+        val formattedBody =
+            "<h1>$header</h1><p>${escapeHtml(intro)}</p><p>$howTo</p>" +
+                "<p>Suggestions en cours : <a href=\"$publicUrl/cleanup\">$publicUrl/cleanup</a></p>"
+
+        return sender.send(NotificationRoom.MEDIA, NotificationMessage(body, formattedBody)).value
+    }
+
+    override suspend fun announceSuggestionOutcome(suggestion: CleanupSuggestionEntity) {
+        val title = suggestion.displayTitle()
+        val (header, lines) = when (suggestion.status) {
+            CleanupSuggestionEntity.STATUS_DELETED ->
+                "🗑️ Suppression effectuée" to listOf("$title — ${formatGb(suggestion.freedBytes ?: 0)} libérés")
+            CleanupSuggestionEntity.STATUS_VETOED ->
+                "🛡️ Veto !" to listOf("${suggestion.vetoedBy} s'oppose à la suppression de $title : on le garde.")
+            CleanupSuggestionEntity.STATUS_SKIPPED ->
+                "🗑️ Suppression annulée" to listOf("$title ne sera pas supprimé : ${suggestion.failureReason}.")
+            CleanupSuggestionEntity.STATUS_FAILED ->
+                "⚠️ Échec de la suppression" to listOf("$title : ${suggestion.failureReason}")
+            else -> return
+        }
+        sender.send(NotificationRoom.MEDIA, message(header, lines))
+    }
+
     private fun message(header: String, lines: List<String>) = NotificationMessage(
         body = (listOf(header) + lines).joinToString("\n"),
-        formattedBody = "<h1>$header</h1><p>${lines.joinToString("<br>")}</p>",
+        formattedBody = "<h1>$header</h1><p>${lines.joinToString("<br>") { escapeHtml(it) }}</p>",
     )
+
+    // Les titres viennent de Radarr/Sonarr et peuvent contenir & < > : jamais interprétés comme du HTML
+    private fun escapeHtml(text: String): String =
+        text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
     private fun formatGb(bytes: Long): String = "%.1f Go".format(bytes / 1e9)
 }

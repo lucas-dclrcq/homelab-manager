@@ -5,11 +5,12 @@ import io.quarkus.vertx.VertxContextSupport
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCampaignEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupProtectionEntity
+import org.hoohoot.homelab.manager.cleanup.infra.CleanupSuggestionEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 
-/** Seed des tables cleanup_* pour les tests IT (campagnes, candidats, protections). */
+/** Seed des tables cleanup_* pour les tests IT (campagnes, candidats, protections, suggestions). */
 internal object CleanupSeed {
 
     const val GB = 1_000_000_000L
@@ -100,10 +101,59 @@ internal object CleanupSeed {
         return protectionId
     }
 
+    fun insertSuggestion(
+        title: String,
+        mediaKind: String = CleanupSuggestionEntity.KIND_MOVIE,
+        radarrMovieId: Int? = null,
+        sonarrSeriesId: Int? = null,
+        seasonNumber: Int? = null,
+        sizeBytes: Long = 40 * GB,
+        suggestedBy: String = "alice",
+        announcementEventId: String? = null,
+        status: String = CleanupSuggestionEntity.STATUS_PENDING,
+        deleteAfter: LocalDateTime = LocalDateTime.now().plusDays(2),
+    ): UUID {
+        val suggestionId = UUID.randomUUID()
+        VertxContextSupport.subscribeAndAwait {
+            Panache.withTransaction {
+                CleanupSuggestionEntity().apply {
+                    id = suggestionId
+                    this.mediaKind = mediaKind
+                    this.radarrMovieId = radarrMovieId
+                    this.sonarrSeriesId = sonarrSeriesId
+                    this.seasonNumber = seasonNumber
+                    this.title = title
+                    this.sizeBytes = sizeBytes
+                    this.suggestedBy = suggestedBy
+                    this.announcementEventId = announcementEventId
+                    this.status = status
+                    this.deleteAfter = deleteAfter
+                    createdAt = LocalDateTime.now()
+                    updatedAt = LocalDateTime.now()
+                }.persist<CleanupSuggestionEntity>()
+            }
+        }
+        return suggestionId
+    }
+
+    fun makeSuggestionDue(suggestionId: UUID) {
+        VertxContextSupport.subscribeAndAwait {
+            Panache.withTransaction {
+                CleanupSuggestionEntity.findById(suggestionId)
+                    .invoke { entity -> entity?.deleteAfter = LocalDateTime.now().minusHours(1) }
+            }
+        }
+    }
+
     fun candidateStatus(candidateId: UUID): String? =
         VertxContextSupport.subscribeAndAwait {
             Panache.withSession { CleanupCandidateEntity.findById(candidateId) }
         }?.status
+
+    fun suggestion(suggestionId: UUID): CleanupSuggestionEntity? =
+        VertxContextSupport.subscribeAndAwait {
+            Panache.withSession { CleanupSuggestionEntity.findById(suggestionId) }
+        }
 
     fun deleteAll() {
         VertxContextSupport.subscribeAndAwait {
@@ -111,6 +161,7 @@ internal object CleanupSeed {
                 CleanupCandidateEntity.deleteAll()
                     .chain { _ -> CleanupCampaignEntity.deleteAll() }
                     .chain { _ -> CleanupProtectionEntity.deleteAll() }
+                    .chain { _ -> CleanupSuggestionEntity.deleteAll() }
             }
         }
     }

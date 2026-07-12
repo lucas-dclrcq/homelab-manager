@@ -39,6 +39,7 @@ internal class CandidateScorerTest {
         thresholdFreeBytes = 100_000_000_000,
         targetFreeBytes = 200_000_000_000,
         graceDays = 3,
+        suggestionGraceDays = 2,
         minAgeDays = 60,
         recentSeriesWatchDays = 90,
         inProgressDays = 30,

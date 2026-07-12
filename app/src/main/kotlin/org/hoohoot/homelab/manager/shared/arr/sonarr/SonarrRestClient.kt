@@ -69,6 +69,14 @@ interface SonarrRestClient {
     @Path("/episodefile/{id}")
     suspend fun deleteEpisodeFile(@PathParam("id") id: Int)
 
+    @DELETE
+    @Path("/series/{id}")
+    suspend fun deleteSeries(
+        @PathParam("id") id: Int,
+        @QueryParam("deleteFiles") deleteFiles: Boolean,
+        @QueryParam("addImportListExclusion") addImportListExclusion: Boolean,
+    )
+
     @PUT
     @Path("/series/{id}")
     @Produces(MediaType.APPLICATION_JSON)
