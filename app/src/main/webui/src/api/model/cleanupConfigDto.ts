@@ -11,6 +11,7 @@ export interface CleanupConfigDto {
   thresholdBytes: number;
   targetFreeBytes: number;
   graceDays: number;
+  suggestionGraceDays: number;
   minAgeDays: number;
   recentSeriesWatchDays: number;
   inProgressDays: number;

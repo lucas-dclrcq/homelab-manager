@@ -273,6 +273,7 @@ components:
       - thresholdBytes
       - targetFreeBytes
       - graceDays
+      - suggestionGraceDays
       - minAgeDays
       - recentSeriesWatchDays
       - inProgressDays
@@ -295,6 +296,9 @@ components:
           type: integer
           format: int64
         graceDays:
+          type: integer
+          format: int64
+        suggestionGraceDays:
           type: integer
           format: int64
         minAgeDays:
@@ -452,7 +456,111 @@ components:
           type: string
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
+    CleanupSuggestionDto:
+      type: object
+      required:
+      - id
+      - mediaKind
+      - radarrMovieId
+      - sonarrSeriesId
+      - seasonNumber
+      - title
+      - displayTitle
+      - year
+      - posterUrl
+      - sizeBytes
+      - suggestedBy
+      - status
+      - deleteAfter
+      - vetoedBy
+      - freedBytes
+      - failureReason
+      - createdAt
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        mediaKind:
+          type: string
+        radarrMovieId:
+          type:
+          - integer
+          - "null"
+          format: int32
+        sonarrSeriesId:
+          type:
+          - integer
+          - "null"
+          format: int32
+        seasonNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+        title:
+          type: string
+        displayTitle:
+          type: string
+        year:
+          type:
+          - integer
+          - "null"
+          format: int32
+        posterUrl:
+          type:
+          - string
+          - "null"
+        sizeBytes:
+          type: integer
+          format: int64
+        suggestedBy:
+          type: string
+        status:
+          type: string
+        deleteAfter:
+          $ref: "#/components/schemas/OffsetDateTime"
+        vetoedBy:
+          type:
+          - string
+          - "null"
+        freedBytes:
+          type:
+          - integer
+          - "null"
+          format: int64
+        failureReason:
+          type:
+          - string
+          - "null"
+        createdAt:
+          $ref: "#/components/schemas/LocalDateTime"
     CreateProtectionRequest:
+      type: object
+      required:
+      - mediaKind
+      - radarrMovieId
+      - sonarrSeriesId
+      - seasonNumber
+      properties:
+        mediaKind:
+          type:
+          - string
+          - "null"
+        radarrMovieId:
+          type:
+          - integer
+          - "null"
+          format: int32
+        sonarrSeriesId:
+          type:
+          - integer
+          - "null"
+          format: int32
+        seasonNumber:
+          type:
+          - integer
+          - "null"
+          format: int32
+    CreateSuggestionRequest:
       type: object
       required:
       - mediaKind
@@ -2959,6 +3067,39 @@ paths:
                 items:
                   $ref: "#/components/schemas/CleanupMediaDto"
       summary: Search Series
+  /api/cleanup/suggestions:
+    post:
+      tags:
+      - Cleanup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSuggestionRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CleanupSuggestionDto"
+          description: Created
+        "400":
+          description: Bad Request
+      summary: Suggest
+    get:
+      tags:
+      - Cleanup
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CleanupSuggestionDto"
+      summary: List Suggestions
   /api/finances/energy:
     get:
       tags:

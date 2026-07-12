@@ -11,16 +11,19 @@ import kotlinx.coroutines.ThreadContextElement
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import de.connect2x.trixnity.core.model.events.*
+import de.connect2x.trixnity.core.model.events.m.ReactionEventContent
 import de.connect2x.trixnity.core.model.events.m.room.MemberEventContent
 import de.connect2x.trixnity.core.model.events.m.room.Membership
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.core.subscribeContent
+import org.hoohoot.homelab.manager.shared.matrix.bot.reactions.ReactionBotHandlers
 import kotlin.coroutines.CoroutineContext
 
 @ApplicationScoped
 class MatrixBotLifecycle(
     private val session: MatrixBotSession,
     private val dispatcher: MatrixBotCommandDispatcher,
+    private val reactionHandlers: ReactionBotHandlers,
     private val config: MatrixBotConfiguration
 ) {
 
@@ -51,6 +54,14 @@ class MatrixBotLifecycle(
                         withQuarkusClassLoader {
                             if (isValidEventFromUser(event)) {
                                 dispatcher.dispatch(event)
+                            }
+                        }
+                    }
+
+                    session.client.api.sync.subscribeContent<ReactionEventContent> { event ->
+                        withQuarkusClassLoader {
+                            if (isValidEventFromUser(event)) {
+                                dispatchReaction(event)
                             }
                         }
                     }
@@ -98,6 +109,22 @@ class MatrixBotLifecycle(
         session.roomApi
             .joinRoom(roomId)
             .onFailure { Log.error("Could not join room $roomId: ${it.message}", it) }
+    }
+
+    private suspend fun dispatchReaction(event: ClientEvent<ReactionEventContent>) {
+        val roomId = event.roomIdOrNull ?: return
+        val sender = event.senderOrNull ?: return
+        val relatesTo = event.content.relatesTo ?: return
+        val key = relatesTo.key ?: return
+
+        // Un handler qui échoue ne doit pas empêcher les autres de traiter la réaction
+        for (handler in reactionHandlers.all()) {
+            try {
+                handler.handle(session, sender, roomId, relatesTo.eventId, key)
+            } catch (e: Exception) {
+                Log.error("Reaction handler ${handler.javaClass.simpleName} failed", e)
+            }
+        }
     }
 
     private fun isValidEventFromUser(event: ClientEvent<*>): Boolean {

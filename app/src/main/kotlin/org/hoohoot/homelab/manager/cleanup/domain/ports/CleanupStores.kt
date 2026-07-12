@@ -5,6 +5,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.CleanupConfig
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCampaignEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupProtectionEntity
+import org.hoohoot.homelab.manager.cleanup.infra.CleanupSuggestionEntity
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -22,6 +23,18 @@ interface Candidates {
     suspend fun listByCampaign(campaignId: UUID): List<CleanupCandidateEntity>
     suspend fun find(id: UUID): CleanupCandidateEntity?
     suspend fun update(id: UUID, mutate: (CleanupCandidateEntity) -> Unit): CleanupCandidateEntity?
+}
+
+interface Suggestions {
+    suspend fun listPending(): List<CleanupSuggestionEntity>
+
+    // Suggestions en attente + issues récentes, pour l'affichage
+    suspend fun listRecent(resolvedSince: LocalDateTime): List<CleanupSuggestionEntity>
+    suspend fun listDue(now: LocalDateTime): List<CleanupSuggestionEntity>
+    suspend fun find(id: UUID): CleanupSuggestionEntity?
+    suspend fun findPendingByAnnouncementEvent(eventId: String): CleanupSuggestionEntity?
+    suspend fun save(entity: CleanupSuggestionEntity): CleanupSuggestionEntity
+    suspend fun update(id: UUID, mutate: (CleanupSuggestionEntity) -> Unit): CleanupSuggestionEntity?
 }
 
 interface Protections {

@@ -8,6 +8,7 @@ data class CleanupConfig(
     val thresholdFreeBytes: Long,
     val targetFreeBytes: Long,
     val graceDays: Long,
+    val suggestionGraceDays: Long,
     val minAgeDays: Long,
     val recentSeriesWatchDays: Long,
     val inProgressDays: Long,

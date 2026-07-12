@@ -62,4 +62,9 @@ class CleanupProtectionEntity : PanacheEntityBase {
             this.seasonNumber == seasonNumber
         else -> false
     }
+
+    // Supprimer une série entière emporterait ses saisons : la protection d'une seule saison suffit à bloquer
+    fun blocksDeletionOf(mediaKind: String, radarrMovieId: Int?, sonarrSeriesId: Int?, seasonNumber: Int?): Boolean =
+        covers(radarrMovieId, sonarrSeriesId, seasonNumber) ||
+            (mediaKind == KIND_SERIES && sonarrSeriesId != null && this.sonarrSeriesId == sonarrSeriesId)
 }

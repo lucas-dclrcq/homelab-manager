@@ -27,6 +27,11 @@ interface SeasonEraser {
     suspend fun deleteSeason(sonarrSeriesId: Int, seasonNumber: Int): DeleteOutcome
 }
 
+interface SeriesEraser {
+    // sizeBytes : taille connue au moment de la suggestion (le DELETE Sonarr ne renvoie rien)
+    suspend fun deleteSeries(sonarrSeriesId: Int, sizeBytes: Long): DeleteOutcome
+}
+
 interface JellyfinCatalog {
     suspend fun libraryEntries(): List<JellyfinLibraryEntry>
 }

@@ -13,6 +13,7 @@ import UiIcon from '../components/ui/UiIcon.vue'
 import CampaignProgress from '../components/cleanup/CampaignProgress.vue'
 import CandidateCard from '../components/cleanup/CandidateCard.vue'
 import ProtectionsPanel from '../components/cleanup/ProtectionsPanel.vue'
+import SuggestionsPanel from '../components/cleanup/SuggestionsPanel.vue'
 import { formatBytes } from '../lib/format'
 
 const { data: overview, isPending, isError } = useCleanupOverview()
@@ -111,7 +112,8 @@ function confirmVeto() {
       </template>
     </template>
 
-    <!-- Les protections ne dépendent pas de la campagne : elles restent utilisables même si le GET campagne échoue -->
+    <!-- Suggestions et protections ne dépendent pas de la campagne : utilisables même si le GET campagne échoue -->
+    <SuggestionsPanel v-if="!isPending" />
     <ProtectionsPanel v-if="!isPending" />
 
     <BaseModal
