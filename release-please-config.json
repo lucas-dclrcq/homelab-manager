@@ -2,8 +2,35 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "release-type": "maven",
   "include-component-in-tag": false,
-  "bump-minor-pre-major": true,
-  "bump-patch-for-minor-pre-major": true,
+  "changelog-sections": [
+    {"type": "feat", "scope": "synapse-devservice", "section": "Synapse DevService - Features"},
+    {"type": "feat", "scope": "app", "section": "App - Features"},
+    {"type": "feat", "scope": "operator", "section": "Operator - Features"},
+    {"type": "feat", "section": "Features"},
+
+    {"type": "fix", "scope": "synapse-devservice", "section": "Synapse DevService - Bug Fixes"},
+    {"type": "fix", "scope": "app", "section": "App - Bug Fixes"},
+    {"type": "fix", "scope": "operator", "section": "Operator - Bug Fixes"},
+    {"type": "fix", "section": "Bug Fixes"},
+
+    {"type": "perf", "scope": "synapse-devservice", "section": "Synapse DevService - Performance"},
+    {"type": "perf", "scope": "app", "section": "App - Performance"},
+    {"type": "perf", "scope": "operator", "section": "Operator - Performance"},
+    {"type": "perf", "section": "Performance Improvements"},
+
+    {"type": "docs", "scope": "synapse-devservice", "section": "Synapse DevService - Documentation"},
+    {"type": "docs", "scope": "app", "section": "App - Documentation"},
+    {"type": "docs", "scope": "operator", "section": "Operator - Documentation"},
+    {"type": "docs", "section": "Documentation"},
+
+    {"type": "refactor", "section": "Refactoring"},
+    {"type": "style", "section": "Styles"},
+    {"type": "test", "section": "Tests"},
+    {"type": "ci", "section": "CI/CD"},
+    {"type": "build", "section": "Build System"},
+    {"type": "chore", "section": "Chores"},
+    {"type": "revert", "section": "Reverts"}
+  ],
   "packages": {
     ".": {
       "package-name": "homelab-manager",

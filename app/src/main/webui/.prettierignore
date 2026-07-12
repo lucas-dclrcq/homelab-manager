@@ -1,0 +1,7 @@
+dist
+node_modules
+# Contrats OpenAPI exportés par le backend (style Jackson, régénérés — pas de Prettier).
+# Ancrés à la racine pour ne pas viser le code généré par Orval sous src/api/.
+/api
+/src/api/catalog.json
+/src/api/catalog.yaml

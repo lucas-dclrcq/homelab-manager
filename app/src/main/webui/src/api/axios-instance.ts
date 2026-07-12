@@ -21,7 +21,10 @@ AXIOS_INSTANCE.interceptors.response.use(
   },
 )
 
-export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosRequestConfig): Promise<T> =>
+export const customInstance = <T>(
+  config: AxiosRequestConfig,
+  options?: AxiosRequestConfig,
+): Promise<T> =>
   AXIOS_INSTANCE({ ...config, ...options }).then(({ data }) => data)
 
 export default customInstance

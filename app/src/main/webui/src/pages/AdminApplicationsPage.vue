@@ -74,8 +74,7 @@ const { mutate: deleteApplication, isPending: isDeleting } =
       @close="deleting = null"
     >
       <p class="mb-5 text-sm text-ink-soft">
-        Elle disparaîtra du catalogue. Pas de retour en
-        arrière possible.
+        Elle disparaîtra du catalogue. Pas de retour en arrière possible.
       </p>
       <div class="flex gap-3">
         <BaseButton

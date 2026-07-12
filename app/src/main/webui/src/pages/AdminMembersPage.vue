@@ -44,8 +44,8 @@ const syncResult = computed(
           Membres
         </h1>
         <p class="mt-2 text-ink-soft">
-          La liste des membres de Hoohoot, synchronisée depuis Authentik
-          toutes les 6 heures.
+          La liste des membres de Hoohoot, synchronisée depuis Authentik toutes
+          les 6 heures.
         </p>
       </div>
       <BaseButton

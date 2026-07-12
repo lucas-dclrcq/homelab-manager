@@ -1,4 +1,4 @@
-import { defineConfig } from 'orval';
+import { defineConfig } from 'orval'
 
 export default defineConfig({
   homelab: {
@@ -26,4 +26,4 @@ export default defineConfig({
       afterAllFilesWrite: 'prettier --write',
     },
   },
-});
+})

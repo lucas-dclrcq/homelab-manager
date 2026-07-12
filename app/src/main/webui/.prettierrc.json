@@ -1,0 +1,10 @@
+{
+  "singleQuote": true,
+  "semi": false,
+  "overrides": [
+    {
+      "files": ["src/api/model/**", "src/api/service/**"],
+      "options": { "singleQuote": false, "semi": true }
+    }
+  ]
+}
