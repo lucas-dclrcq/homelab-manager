@@ -62,7 +62,7 @@ jobs:
       version: ${{ steps.release.outputs.version }}
     steps:
       - id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           # GITHUB_TOKEN would not trigger CI on the release PRs
           token: ${{ secrets.GH_PAT }}
