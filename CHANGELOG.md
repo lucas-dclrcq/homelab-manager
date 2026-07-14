@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.2.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.5...v0.2.0) (2026-07-14)
+
+
+### Features
+
+* media deletion suggestions by users ([1c0a072](https://github.com/lucas-dclrcq/homelab-manager/commit/1c0a072c3058ad741fa731d68ee9b1a44a0e5306))
+
+
+### Bug Fixes
+
+* adapt TimeService for kotlinx-datetime 0.8.0 / Kotlin 2.4.0 compatibility ([e3135ff](https://github.com/lucas-dclrcq/homelab-manager/commit/e3135ff43569a6ca905ce40b526d6e0ba716e8a0))
+* **deps:** update dependency io.ktor:ktor-client-java-jvm to v3.5.1 ([2554f3b](https://github.com/lucas-dclrcq/homelab-manager/commit/2554f3b2984c3321ffde4b831f10bc42fe33de94))
+* **deps:** update dependency io.quarkiverse.quinoa:quarkus-quinoa to v2.8.3 ([5dae712](https://github.com/lucas-dclrcq/homelab-manager/commit/5dae712f12bffb870fd8b1222b3583e472c95084))
+* **deps:** update dependency io.quarkiverse.wiremock:quarkus-wiremock to v1.6.3 ([a9be90f](https://github.com/lucas-dclrcq/homelab-manager/commit/a9be90f8a7d930427ed6429567bede39e62ed673))
+* **deps:** update dependency org.commonmark:commonmark to v0.29.0 ([447d60e](https://github.com/lucas-dclrcq/homelab-manager/commit/447d60efa9cc560393e738ce34b3e8ae8ce8b618))
+* **deps:** update dependency org.jetbrains.kotlinx:kotlinx-datetime-jvm to v0.8.0-0.6.x-compat ([20a9e4c](https://github.com/lucas-dclrcq/homelab-manager/commit/20a9e4c65362fb5685ffd1cbd5b6699857001e1b))
+* **deps:** update quarkus.platform.version to v3.37.2 ([41d8a88](https://github.com/lucas-dclrcq/homelab-manager/commit/41d8a8884fa529874fbd5ba4d0b7548448f14a7b))
+* **deps:** update trixnity.version to v5.6.0 ([504736f](https://github.com/lucas-dclrcq/homelab-manager/commit/504736f99d584592a2664671bc740c90f5bbc334))
+* resolve merge conflict in package.json ([f5517d9](https://github.com/lucas-dclrcq/homelab-manager/commit/f5517d944bcadf9ad484c52cfb36a9e8de3dce77))
+
+
+### Tests
+
+* add frontend test strategy ([8fc73cc](https://github.com/lucas-dclrcq/homelab-manager/commit/8fc73cc01bd366ca00481fce5505aa3bed1453c4))
+
+
+### Chores
+
+* **deps:** update actions/checkout action to v7 ([af64d72](https://github.com/lucas-dclrcq/homelab-manager/commit/af64d7241999d78e50190a090487266809b51349))
+* **deps:** update actions/setup-java action to v5 ([6a12929](https://github.com/lucas-dclrcq/homelab-manager/commit/6a129292436eccfe0e95dcfc987f81f447527fb7))
+* **deps:** update dependency @vitejs/plugin-vue to v5.2.4 ([153b7e4](https://github.com/lucas-dclrcq/homelab-manager/commit/153b7e4007fcb8802b2c7bd4a95d793c88857eeb))
+* **deps:** update dependency @vue/tsconfig to ^0.9.0 ([6a1eca1](https://github.com/lucas-dclrcq/homelab-manager/commit/6a1eca11dc98012a2d87da6dbbdcf3dceb34771d))
+* **deps:** update dependency io.smallrye:jandex-maven-plugin to v3.6.0 ([44bba1a](https://github.com/lucas-dclrcq/homelab-manager/commit/44bba1a7c13051fef51439847c242632c75776c9))
+* **deps:** update dependency maven-wrapper to v3.3.4 ([6959552](https://github.com/lucas-dclrcq/homelab-manager/commit/6959552e74ec112962a87562a104e773454ff6cc))
+* **deps:** update dependency org.apache.maven.plugins:maven-compiler-plugin to v3.15.0 ([cddda0f](https://github.com/lucas-dclrcq/homelab-manager/commit/cddda0f67ee479b54323031f16ba11a82d7bc0b2))
+* **deps:** update dependency org.apache.maven.plugins:maven-surefire-report-plugin to v3.5.6 ([36ee2ca](https://github.com/lucas-dclrcq/homelab-manager/commit/36ee2ca6fb85728ffeac76dd0d66cfaeccd32a3f))
+* **deps:** update dependency org.assertj:assertj-core to v3.27.7 ([f37916e](https://github.com/lucas-dclrcq/homelab-manager/commit/f37916ee45f861b6001e21a63a2a14c810a52812))
+* **deps:** update dependency org.wiremock:wiremock to v3.13.2 ([4052cd8](https://github.com/lucas-dclrcq/homelab-manager/commit/4052cd87ed71942f969d56f8095a4b02241b9dc6))
+* **deps:** update dependency orval to v7.21.0 ([55283ef](https://github.com/lucas-dclrcq/homelab-manager/commit/55283effd95330ab6208bca03309e06afb2433cb))
+* **deps:** update dependency vite to v6.4.3 ([e9a81c4](https://github.com/lucas-dclrcq/homelab-manager/commit/e9a81c492adbead5dcfc782280c7f17381bf5fd2))
+* **deps:** update dependency vue to v3.5.39 ([0465236](https://github.com/lucas-dclrcq/homelab-manager/commit/04652360287b2e8825e31e1ff4073efa6df7f70d))
+* **deps:** update dependency vue-tsc to v2.2.12 ([c979040](https://github.com/lucas-dclrcq/homelab-manager/commit/c979040d994c80b5a23c8408a49c6c3ddb261a39))
+* **deps:** update docker/build-push-action action to v7 ([2ff5874](https://github.com/lucas-dclrcq/homelab-manager/commit/2ff58740bf20c84eb686e9c9aa4069147440d60e))
+* **deps:** update docker/login-action action to v4 ([7c32f31](https://github.com/lucas-dclrcq/homelab-manager/commit/7c32f311a3543a0f487387e69c4e594bf0fc2a30))
+* **deps:** update docker/setup-buildx-action action to v4 ([8363328](https://github.com/lucas-dclrcq/homelab-manager/commit/8363328c9561e2dd303892f15b7c958f95bd774f))
+* **deps:** update docker/setup-qemu-action action to v4 ([bfad519](https://github.com/lucas-dclrcq/homelab-manager/commit/bfad5195a38f966eacc289cfecdbdb5389f1da04))
+* **deps:** update googleapis/release-please-action action to v5 ([350ce4d](https://github.com/lucas-dclrcq/homelab-manager/commit/350ce4d7189d0a22fdd4f1df3b7a9dc74b75cdb6))
+* **deps:** update kotlin monorepo to v2.4.0 ([08152de](https://github.com/lucas-dclrcq/homelab-manager/commit/08152deab5b7647b09e7010d6198c3567c45eda5))
+* **deps:** update surefire-plugin.version to v3.5.6 ([cf082ab](https://github.com/lucas-dclrcq/homelab-manager/commit/cf082abf21ac64ce3a4f2ce585ebfb132107543c))
+* **main:** release 0.1.6-SNAPSHOT ([fdf6f0d](https://github.com/lucas-dclrcq/homelab-manager/commit/fdf6f0d62e03d2e6317af91d764634e8ea5336cd))
+
 ## [0.1.5](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.4...v0.1.5) (2026-07-11)
 
 
