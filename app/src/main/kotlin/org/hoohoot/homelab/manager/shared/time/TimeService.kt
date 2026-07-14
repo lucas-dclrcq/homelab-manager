@@ -2,13 +2,15 @@ package org.hoohoot.homelab.manager.shared.time
 
 import jakarta.enterprise.context.ApplicationScoped
 import kotlinx.datetime.*
-import kotlin.time.Duration
 
 data class Week(val start: Instant, val end: Instant)
 
 class FixedClock(private val fixedInstant: Instant): Clock {
     override fun now(): Instant  = fixedInstant
 }
+
+private fun kotlin.time.Instant.toKotlinxInstant(): Instant =
+    Instant.fromEpochMilliseconds(this.toEpochMilliseconds())
 
 @ApplicationScoped
 class TimeService {
@@ -19,10 +21,9 @@ class TimeService {
             .date
             .let { it.minus(it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
             .atStartOfDayIn(TimeZone.UTC)
+            .toKotlinxInstant()
 
-        val end = now.plus(Duration.parse("P6D"))
-            .plus(23, DateTimeUnit.HOUR)
-            .plus(59, DateTimeUnit.MINUTE)
+        val end = now.plus(DateTimePeriod(days = 6, hours = 23, minutes = 59), TimeZone.UTC)
 
         return Week(now, end)
     }
@@ -32,10 +33,9 @@ class TimeService {
             .date
             .let { it.plus(7 - it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
             .atStartOfDayIn(TimeZone.UTC)
+            .toKotlinxInstant()
 
-        val end = nextMonday.plus(Duration.parse("P6D"))
-            .plus(23, DateTimeUnit.HOUR)
-            .plus(59, DateTimeUnit.MINUTE)
+        val end = nextMonday.plus(DateTimePeriod(days = 6, hours = 23, minutes = 59), TimeZone.UTC)
 
         return Week(nextMonday, end)
     }

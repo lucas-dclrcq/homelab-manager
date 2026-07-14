@@ -3812,7 +3812,7 @@ paths:
                 $ref: "#/components/schemas/TimelinePageDto"
       summary: Get Timeline
 servers:
-- url: http://localhost:8088
+- url: http://localhost:8080
   description: Auto generated value
-- url: http://0.0.0.0:8088
+- url: http://0.0.0.0:8080
   description: Auto generated value
