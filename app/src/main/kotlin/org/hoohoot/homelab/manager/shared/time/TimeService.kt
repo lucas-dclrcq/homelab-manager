@@ -5,6 +5,7 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import kotlin.time.Instant
 import kotlin.time.Clock
 
@@ -52,7 +53,7 @@ class TimeService {
     fun getDaysSince(date: LocalDate): Int {
         val currentDate = java.time.Instant.ofEpochMilli(clock.now().toEpochMilliseconds())
             .atZone(ZoneOffset.UTC).toLocalDate()
-        return date.daysUntil(currentDate)
+        return ChronoUnit.DAYS.between(date, currentDate).toInt()
     }
 
     fun setFixedClock(fixedInstant: Instant) {
