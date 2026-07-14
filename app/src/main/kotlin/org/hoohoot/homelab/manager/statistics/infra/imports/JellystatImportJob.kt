@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @ApplicationScoped
 class JellystatImportJob(
     private val importJellystatBackup: ImportJellystatBackup,
-    @param:ConfigProperty(name = "statistics.import.staging-path") stagingPath: String,
+    @ConfigProperty(name = "statistics.import.staging-path") stagingPath: String,
 ) : ManagedJob {
     override val identity = IDENTITY
     override val displayName = "Import backup Jellystat"

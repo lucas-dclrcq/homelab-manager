@@ -2,7 +2,7 @@ package org.hoohoot.homelab.manager.notifications.bot
 
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import de.connect2x.trixnity.client.room.message.text
 import de.connect2x.trixnity.core.model.EventId
 import de.connect2x.trixnity.core.model.RoomId

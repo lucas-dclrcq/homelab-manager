@@ -22,11 +22,14 @@ class ArrReleaseCalendar(
 ) : ReleaseCalendar {
 
     override suspend fun upcomingMovies(week: Week): List<RadarrMovie> =
-        radarrRestClient.getMovieCalendar(week.start, week.end)
+        radarrRestClient.getMovieCalendar(week.start.toJavaInstant(), week.end.toJavaInstant())
 
     override suspend fun upcomingEpisodes(week: Week): List<Episode> =
-        sonarrRestClient.getSeriesCalendar(week.start, week.end)
+        sonarrRestClient.getSeriesCalendar(week.start.toJavaInstant(), week.end.toJavaInstant())
 
     override suspend fun upcomingAlbums(week: Week): List<LidarrAlbum> =
-        lidarrRestClient.getAlbumCalendar(week.start, week.end)
+        lidarrRestClient.getAlbumCalendar(week.start.toJavaInstant(), week.end.toJavaInstant())
 }
+
+private fun kotlin.time.Instant.toJavaInstant(): java.time.Instant =
+    java.time.Instant.ofEpochMilli(toEpochMilliseconds())

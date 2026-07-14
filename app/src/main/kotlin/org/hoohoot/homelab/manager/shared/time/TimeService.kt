@@ -1,47 +1,57 @@
 package org.hoohoot.homelab.manager.shared.time
 
 import jakarta.enterprise.context.ApplicationScoped
-import kotlinx.datetime.*
+import java.time.DayOfWeek
+import java.time.Duration
+import java.time.LocalDate
+import java.time.ZoneOffset
+import kotlin.time.Instant
+import kotlin.time.Clock
 
 data class Week(val start: Instant, val end: Instant)
 
-class FixedClock(private val fixedInstant: Instant): Clock {
-    override fun now(): Instant  = fixedInstant
+class FixedClock(private val fixedInstant: Instant) : Clock {
+    override fun now(): Instant = fixedInstant
 }
-
-private fun kotlin.time.Instant.toKotlinxInstant(): Instant =
-    Instant.fromEpochMilliseconds(this.toEpochMilliseconds())
 
 @ApplicationScoped
 class TimeService {
     private var clock: Clock = Clock.System
 
     fun getCurrentWeek(): Week {
-        val now = clock.now().toLocalDateTime(TimeZone.UTC)
-            .date
-            .let { it.minus(it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
-            .atStartOfDayIn(TimeZone.UTC)
-            .toKotlinxInstant()
+        val now = clock.now()
+        val utcNow = java.time.Instant.ofEpochMilli(now.toEpochMilliseconds())
+        val monday = utcNow.atZone(ZoneOffset.UTC).toLocalDate()
+            .with(DayOfWeek.MONDAY)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+        val end = monday.plus(Duration.ofDays(7)).minusMillis(1)
 
-        val end = now.plus(DateTimePeriod(days = 6, hours = 23, minutes = 59), TimeZone.UTC)
-
-        return Week(now, end)
+        return Week(
+            Instant.fromEpochMilliseconds(monday.toEpochMilli()),
+            Instant.fromEpochMilliseconds(end.toEpochMilli()),
+        )
     }
 
     fun getNextWeek(): Week {
-        val nextMonday = clock.now().toLocalDateTime(TimeZone.UTC)
-            .date
-            .let { it.plus(7 - it.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY) }
-            .atStartOfDayIn(TimeZone.UTC)
-            .toKotlinxInstant()
+        val now = clock.now()
+        val utcNow = java.time.Instant.ofEpochMilli(now.toEpochMilliseconds())
+        val nextMonday = utcNow.atZone(ZoneOffset.UTC).toLocalDate()
+            .with(DayOfWeek.MONDAY)
+            .plusWeeks(1)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+        val end = nextMonday.plus(Duration.ofDays(7)).minusMillis(1)
 
-        val end = nextMonday.plus(DateTimePeriod(days = 6, hours = 23, minutes = 59), TimeZone.UTC)
-
-        return Week(nextMonday, end)
+        return Week(
+            Instant.fromEpochMilliseconds(nextMonday.toEpochMilli()),
+            Instant.fromEpochMilliseconds(end.toEpochMilli()),
+        )
     }
 
     fun getDaysSince(date: LocalDate): Int {
-        val currentDate = clock.now().toLocalDateTime(TimeZone.UTC).date
+        val currentDate = java.time.Instant.ofEpochMilli(clock.now().toEpochMilliseconds())
+            .atZone(ZoneOffset.UTC).toLocalDate()
         return date.daysUntil(currentDate)
     }
 

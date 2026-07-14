@@ -1,7 +1,8 @@
 package org.hoohoot.homelab.manager.notifications.domain
 
 
-import kotlinx.datetime.*
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrAlbum
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.shared.arr.sonarr.Episode
@@ -37,7 +38,7 @@ class WeeklyReportNotificationBuilder(
             val undated = grouped[null]
 
             dated.forEach { (date, items) ->
-                val header = "${date!!.dayOfWeek.toFullName()} ${date.dayOfMonth}"
+                val header = "${date!!.dayOfWeek.toFullName()} ${date.day}"
                 textLines.add("")
                 textLines.add(header)
                 htmlLines.add("<br><b>$header</b><br>")
@@ -140,8 +141,8 @@ class WeeklyReportNotificationBuilder(
     private fun parseTime(dateTimeStr: String?): String? {
         if (dateTimeStr == null) return null
         return try {
-            val instant = Instant.parse(dateTimeStr)
-            val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            val instant = java.time.Instant.parse(dateTimeStr)
+            val local = instant.atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
             if (local.hour == 0 && local.minute == 0) null
             else "%02d:%02d".format(local.hour, local.minute)
         } catch (_: Exception) {

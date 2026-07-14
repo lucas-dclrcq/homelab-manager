@@ -14,9 +14,9 @@ import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
-import kotlinx.datetime.Instant
-import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 import org.hoohoot.homelab.manager.shared.arr.ArrTag
@@ -84,6 +84,6 @@ interface RadarrRestClient {
 
 suspend fun RadarrRestClient.getMovieCalendar(start: Instant, end: Instant): List<RadarrMovie> =
     getCalendar(
-        start.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET),
-        end.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET),
+        start.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        end.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
     ) ?: emptyList()

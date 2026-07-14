@@ -25,9 +25,9 @@ import java.time.Instant
 class JellyfinSessionPoller(
     @param:RestClient private val jellyfin: JellyfinRestClient,
     private val playbackSessions: PlaybackSessions,
-    @param:ConfigProperty(name = "statistics.min-play-seconds") minPlaySeconds: Long,
-    @param:ConfigProperty(name = "statistics.stale-after-seconds") staleAfterSeconds: Long,
-    @param:ConfigProperty(name = "statistics.completed-threshold") completedThreshold: Double,
+    @ConfigProperty(name = "statistics.min-play-seconds") minPlaySeconds: Long,
+    @ConfigProperty(name = "statistics.stale-after-seconds") staleAfterSeconds: Long,
+    @ConfigProperty(name = "statistics.completed-threshold") completedThreshold: Double,
 ) : NowPlayingSource {
     private val tracker = SessionTracker(minPlaySeconds, staleAfterSeconds, completedThreshold)
     private var lastErrorLogAt: Instant = Instant.EPOCH

@@ -189,7 +189,7 @@ class AdminFinancesResource(
         request.dayOfMonth == null || request.dayOfMonth !in 1..28 -> "le jour du mois doit être entre 1 et 28"
         request.startDate == null -> "la date de début est requise"
         request.type == EntryType.CONTRIBUTION && request.memberId == null -> "une cotisation récurrente doit référencer un membre"
-        request.endDate != null && request.startDate != null && request.endDate.isBefore(request.startDate) ->
+        request.endDate != null && request.endDate.isBefore(request.startDate) ->
             "la date de fin doit être postérieure à la date de début"
         else -> "requête invalide"
     }

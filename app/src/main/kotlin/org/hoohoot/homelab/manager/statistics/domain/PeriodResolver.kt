@@ -23,7 +23,7 @@ data class StatsRange(
 )
 
 @ApplicationScoped
-class PeriodResolver(@param:ConfigProperty(name = "statistics.timezone") timezoneId: String) {
+class PeriodResolver(@ConfigProperty(name = "statistics.timezone") timezoneId: String) {
     val zone: ZoneId = ZoneId.of(timezoneId)
 
     fun resolve(period: StatsPeriod, now: Instant = Instant.now()): StatsRange {

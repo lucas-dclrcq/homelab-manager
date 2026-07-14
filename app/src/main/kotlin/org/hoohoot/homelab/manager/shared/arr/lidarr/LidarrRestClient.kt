@@ -10,9 +10,9 @@ import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
-import kotlinx.datetime.Instant
-import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 
@@ -42,7 +42,7 @@ interface LidarrRestClient {
 
 suspend fun LidarrRestClient.getAlbumCalendar(start: Instant, end: Instant): List<LidarrAlbum> =
     getCalendar(
-        start.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET),
-        end.format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET),
+        start.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        end.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
         true
     ) ?: emptyList()

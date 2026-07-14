@@ -53,7 +53,7 @@ class FinanceEntryRepository : FinanceEntries {
             Panache.getSession().flatMap { session ->
                 val query = session.createQuery(
                     "select count(e) from FinanceEntryEntity e where extract(year from e.entryDate) = :year$typeFilter",
-                    java.lang.Long::class.java
+                    Long::class.java
                 )
                 query.setParameter("year", year)
                 type?.let { query.setParameter("type", it) }
