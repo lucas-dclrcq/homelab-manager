@@ -10,7 +10,7 @@
 
     <properties>
         <skipITs>true</skipITs>
-        <trixnity.version>5.3.1</trixnity.version>
+        <trixnity.version>5.6.0</trixnity.version>
     </properties>
 
     <dependencies>
