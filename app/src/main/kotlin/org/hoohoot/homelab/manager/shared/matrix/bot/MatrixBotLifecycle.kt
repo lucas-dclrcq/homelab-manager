@@ -3,13 +3,28 @@ package org.hoohoot.homelab.manager.shared.matrix.bot
 import io.quarkus.logging.Log
 import io.quarkus.runtime.ShutdownEvent
 import io.quarkus.runtime.StartupEvent
+import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.ThreadContextElement
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
+import de.connect2x.trixnity.clientserverapi.client.SyncState
 import de.connect2x.trixnity.core.model.events.*
 import de.connect2x.trixnity.core.model.events.m.ReactionEventContent
 import de.connect2x.trixnity.core.model.events.m.room.MemberEventContent
@@ -17,67 +32,69 @@ import de.connect2x.trixnity.core.model.events.m.room.Membership
 import de.connect2x.trixnity.core.model.events.m.room.RoomMessageEventContent
 import de.connect2x.trixnity.core.subscribeContent
 import org.hoohoot.homelab.manager.shared.matrix.bot.reactions.ReactionBotHandlers
-import kotlin.coroutines.CoroutineContext
+import org.hoohoot.homelab.manager.shared.vertx.QuarkusClassLoaderElement
+import org.hoohoot.homelab.manager.shared.vertx.newSafeVertxDispatcher
+
+enum class MatrixBotStatus { DISABLED, CONNECTING, RUNNING, STOPPED }
 
 @ApplicationScoped
 class MatrixBotLifecycle(
     private val session: MatrixBotSession,
     private val dispatcher: MatrixBotCommandDispatcher,
     private val reactionHandlers: ReactionBotHandlers,
-    private val config: MatrixBotConfiguration
+    private val config: MatrixBotConfiguration,
+    private val vertx: Vertx,
 ) {
 
     private val runningTimestamp = Clock.System.now()
     private lateinit var quarkusClassLoader: ClassLoader
+    private val botScope = CoroutineScope(SupervisorJob() + CoroutineName("matrix-bot"))
+    private var startupJob: Job? = null
+
+    @Volatile
+    private var state = MatrixBotStatus.STOPPED
+
+    val status: MatrixBotStatus get() = state
 
     @Volatile
     private var syncRunning = false
     private var initialized = false
 
     fun onStart(@Observes event: StartupEvent) {
-        if (!config.enabled() || syncRunning) return
+        if (!config.enabled()) {
+            state = MatrixBotStatus.DISABLED
+            return
+        }
+        if (syncRunning) return
 
         quarkusClassLoader = Thread.currentThread().contextClassLoader
+        state = MatrixBotStatus.CONNECTING
 
-        runBlocking {
-            if (!initialized) {
+        // Init en arrière-plan avec retry : un Matrix indisponible ne bloque pas le démarrage
+        // de l'app. Dispatchers.IO car MatrixClient.create fait du JDBC bloquant (schéma Exposed).
+        startupJob = botScope.launch(Dispatchers.IO + QuarkusClassLoaderElement(quarkusClassLoader)) {
+            var retryDelay = INITIAL_RETRY_DELAY
+            while (isActive) {
                 try {
-                    session.initialize()
-
-                    session.client.api.sync.subscribeContent<MemberEventContent> { event ->
-                        withQuarkusClassLoader {
-                            handleJoinEvent(event)
-                        }
+                    if (!initialized) {
+                        session.initialize()
+                        subscribeSyncEvents()
+                        initialized = true
+                        Log.info("Matrix bot initialized.")
                     }
-
-                    session.client.api.sync.subscribeContent<RoomMessageEventContent> { event ->
-                        withQuarkusClassLoader {
-                            if (isValidEventFromUser(event)) {
-                                dispatcher.dispatch(event)
-                            }
-                        }
-                    }
-
-                    session.client.api.sync.subscribeContent<ReactionEventContent> { event ->
-                        withQuarkusClassLoader {
-                            if (isValidEventFromUser(event)) {
-                                dispatchReaction(event)
-                            }
-                        }
-                    }
-
-                    initialized = true
-                    Log.info("Matrix bot initialized.")
+                    session.client.startSync()
+                    syncRunning = true
+                    state = MatrixBotStatus.RUNNING
+                    Log.info("Matrix bot sync started.")
+                    return@launch
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
-                    Log.error("Failed to initialize Matrix bot.", e)
-                    return@runBlocking
+                    Log.error("Failed to initialize Matrix bot, retrying in $retryDelay", e)
+                    delay(retryDelay)
+                    retryDelay = (retryDelay * 2).coerceAtMost(MAX_RETRY_DELAY)
                 }
             }
-
-            Log.info("Starting Sync!")
-            session.client.startSync()
-            syncRunning = true
-            Log.info("Matrix bot sync started.")
         }
     }
 
@@ -85,11 +102,56 @@ class MatrixBotLifecycle(
         if (!config.enabled()) return
 
         runBlocking {
+            startupJob?.cancelAndJoin()
             if (syncRunning) {
                 Log.info("Stopping Matrix bot sync...")
                 session.client.stopSync()
                 syncRunning = false
                 Log.info("Matrix bot stopped.")
+            }
+            withTimeoutOrNull(5.seconds) {
+                botScope.coroutineContext.job.children.toList().joinAll()
+            }
+            botScope.cancel()
+        }
+        state = MatrixBotStatus.STOPPED
+    }
+
+    fun currentSyncState(): SyncState? =
+        if (syncRunning) session.client.syncState.value else null
+
+    private fun subscribeSyncEvents() {
+        session.client.api.sync.subscribeContent<MemberEventContent> { event ->
+            launchEventHandler("join handling") {
+                handleJoinEvent(event)
+            }
+        }
+
+        session.client.api.sync.subscribeContent<RoomMessageEventContent> { event ->
+            launchEventHandler("message handling") {
+                if (isValidEventFromUser(event)) {
+                    dispatcher.dispatch(event)
+                }
+            }
+        }
+
+        session.client.api.sync.subscribeContent<ReactionEventContent> { event ->
+            launchEventHandler("reaction handling") {
+                if (isValidEventFromUser(event)) {
+                    dispatchReaction(event)
+                }
+            }
+        }
+    }
+
+    private fun launchEventHandler(what: String, block: suspend () -> Unit) {
+        botScope.launch(newSafeVertxDispatcher(vertx) + QuarkusClassLoaderElement(quarkusClassLoader)) {
+            try {
+                block()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.error("Matrix bot: $what failed", e)
             }
         }
     }
@@ -134,23 +196,8 @@ class MatrixBotLifecycle(
         return !(timeOfOrigin == null || Instant.fromEpochMilliseconds(timeOfOrigin) < runningTimestamp)
     }
 
-    private suspend fun <T> withQuarkusClassLoader(block: suspend () -> T): T =
-        withContext(ClassLoaderContextElement(quarkusClassLoader)) { block() }
-
-    private class ClassLoaderContextElement(
-        private val classLoader: ClassLoader
-    ) : ThreadContextElement<ClassLoader> {
-        companion object Key : CoroutineContext.Key<ClassLoaderContextElement>
-        override val key: CoroutineContext.Key<ClassLoaderContextElement> = Key
-
-        override fun updateThreadContext(context: CoroutineContext): ClassLoader {
-            val old = Thread.currentThread().contextClassLoader
-            Thread.currentThread().contextClassLoader = classLoader
-            return old
-        }
-
-        override fun restoreThreadContext(context: CoroutineContext, oldState: ClassLoader) {
-            Thread.currentThread().contextClassLoader = oldState
-        }
+    companion object {
+        private val INITIAL_RETRY_DELAY = 5.seconds
+        private val MAX_RETRY_DELAY = 60.seconds
     }
 }

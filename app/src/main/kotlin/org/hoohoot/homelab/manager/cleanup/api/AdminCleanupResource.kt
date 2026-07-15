@@ -1,9 +1,6 @@
 package org.hoohoot.homelab.manager.cleanup.api
 
 import io.quarkus.logging.Log
-import io.quarkus.vertx.core.runtime.context.VertxContextSafetyToggle
-import io.smallrye.common.vertx.VertxContext
-import io.vertx.core.Vertx
 import jakarta.annotation.security.RolesAllowed
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -14,9 +11,6 @@ import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.hoohoot.homelab.manager.cleanup.domain.Accessor
@@ -33,7 +27,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.usecases.ScanAndStartCampaign
 import org.hoohoot.homelab.manager.cleanup.domain.usecases.UnprotectMedia
 import org.hoohoot.homelab.manager.jobs.CleanupScanJob
 import org.hoohoot.homelab.manager.shared.api.conflict
-import org.hoohoot.homelab.manager.shared.vertx.VertxContextDispatcher
+import org.hoohoot.homelab.manager.shared.vertx.BackgroundTasks
 import java.util.UUID
 
 @Path("/api/admin/cleanup")
@@ -50,7 +44,7 @@ class AdminCleanupResource(
     private val scanAndStartCampaign: ScanAndStartCampaign,
     private val campaigns: Campaigns,
     private val candidates: Candidates,
-    private val vertx: Vertx,
+    private val backgroundTasks: BackgroundTasks,
 ) {
 
     @GET
@@ -79,7 +73,8 @@ class AdminCleanupResource(
         if (campaigns.findActive() != null) {
             return conflict("une campagne est déjà en cours")
         }
-        launchInBackground {
+        // Le scan survit à la requête : coroutine sur un contexte Vertx duplé neuf et safe (cf. BackgroundTasks)
+        backgroundTasks.launch("Cleanup: manual scan failed") {
             when (val result = scanAndStartCampaign(CampaignTrigger.MANUAL, request?.targetBytes)) {
                 is ScanResult.Started ->
                     Log.info("Cleanup: manual campaign ${result.campaign.id} started with ${result.candidateCount} candidates")
@@ -105,18 +100,4 @@ class AdminCleanupResource(
     @Path("/protections/{id}")
     suspend fun deleteProtection(@PathParam("id") id: UUID): Response =
         unprotectMedia(id, Accessor.Admin).toResponse()
-
-    // Le scan survit à la requête : coroutine sur un contexte Vertx duplé et marqué safe,
-    // condition pour que Hibernate Reactive accepte d'y ouvrir des sessions
-    private fun launchInBackground(block: suspend () -> Unit) {
-        val context = VertxContext.getOrCreateDuplicatedContext(vertx)
-        VertxContextSafetyToggle.setContextSafe(context, true)
-        CoroutineScope(SupervisorJob() + VertxContextDispatcher(context)).launch {
-            try {
-                block()
-            } catch (e: Exception) {
-                Log.error("Cleanup: manual scan failed", e)
-            }
-        }
-    }
 }

@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import org.hoohoot.homelab.manager.it.config.CleanupSeed
@@ -13,6 +14,7 @@ import org.hoohoot.homelab.manager.it.config.SynapseTestClient
 import org.hoohoot.homelab.manager.statistics.domain.MediaType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.Duration
 
 @QuarkusTest
 internal class BotCommandsTest {
@@ -149,6 +151,21 @@ internal class BotCommandsTest {
         assertThat(body).contains("Top ten watchers")
         assertThat(body).contains("alice")
         assertThat(body).contains("bob")
+    }
+
+    @Test
+    fun `concurrent commands should both be answered`() {
+        PlaybackSessionSeed.insertSession(userName = "carol", userId = "bot-carol", itemName = "Marathon Movie", mediaType = MediaType.MOVIE, durationSeconds = 120000)
+        synapseTestClient.sendMessage(roomId, "!$botPrefix top-watchers")
+        synapseTestClient.sendMessage(roomId, "!$botPrefix top-watched last-week")
+
+        await().atMost(Duration.ofSeconds(15)).pollInterval(Duration.ofMillis(500)).untilAsserted {
+            val botBodies = synapseTestClient.getMessages(roomId)
+                .filter { it.get("sender").asText() == "@johnnybot:localhost" }
+                .map { it.get("content").get("body").asText() }
+            assertThat(botBodies).anyMatch { it.contains("Top ten watchers") }
+            assertThat(botBodies).anyMatch { it.contains("Top watch") && !it.contains("Top ten watchers") }
+        }
     }
 
     @Test

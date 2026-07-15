@@ -1,6 +1,5 @@
 package org.hoohoot.homelab.manager.notifications.infra.stats
 
-import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.notifications.domain.MostPopularMedia
 import org.hoohoot.homelab.manager.notifications.domain.MostViewedMedia
@@ -10,7 +9,6 @@ import org.hoohoot.homelab.manager.notifications.domain.UserStatistics
 import org.hoohoot.homelab.manager.notifications.domain.WatcherInfo
 import org.hoohoot.homelab.manager.notifications.domain.WhoWatchedInfos
 import org.hoohoot.homelab.manager.notifications.domain.ports.ViewingStats
-import org.hoohoot.homelab.manager.shared.vertx.runOnSafeVertxContext
 import org.hoohoot.homelab.manager.statistics.domain.MediaKind
 import org.hoohoot.homelab.manager.statistics.domain.PeriodResolver
 import org.hoohoot.homelab.manager.statistics.domain.StatsPeriod
@@ -24,25 +22,24 @@ import kotlin.time.DurationUnit
 
 /**
  * Implémentation de ViewingStats sur l'historique local playback_session (module statistics),
- * en remplacement de l'API Jellystat. Chaque appel bascule sur un contexte Vertx safe :
- * les consommateurs (commandes du bot Matrix) tournent hors des dispatchers Quarkus.
+ * en remplacement de l'API Jellystat. Tous les appelants (commandes bot, REST, scheduler)
+ * arrivent déjà sur un contexte Vertx safe : les requêtes Panache s'exécutent directement.
  */
 @ApplicationScoped
 class LocalViewingStats(
     private val statisticsQueries: StatisticsQueries,
     private val periodResolver: PeriodResolver,
-    private val vertx: Vertx,
 ) : ViewingStats {
 
     override suspend fun topMovies(lastDays: Int, limit: Int): List<MostPopularMedia> =
-        runOnSafeVertxContext(vertx) { mostPopular(lastDays, MediaKind.MOVIE, limit) }
+        mostPopular(lastDays, MediaKind.MOVIE, limit)
 
     override suspend fun topSeries(lastDays: Int, limit: Int): List<MostPopularMedia> =
-        runOnSafeVertxContext(vertx) { mostPopular(lastDays, MediaKind.SERIES, limit) }
+        mostPopular(lastDays, MediaKind.SERIES, limit)
 
-    override suspend fun getTopWatched(period: TopWatchedPeriod): TopWatched = runOnSafeVertxContext(vertx) {
+    override suspend fun getTopWatched(period: TopWatchedPeriod): TopWatched {
         val (from, to) = lastDaysRange(period.days)
-        TopWatched(
+        return TopWatched(
             period = period,
             mostPopularSeries = mostPopular(period.days, MediaKind.SERIES, TOP_LIMIT),
             mostPopularMovies = mostPopular(period.days, MediaKind.MOVIE, TOP_LIMIT),
@@ -55,27 +52,25 @@ class LocalViewingStats(
         )
     }
 
-    override suspend fun getTopWatchers(limit: Int): List<UserStatistics> = runOnSafeVertxContext(vertx) {
+    override suspend fun getTopWatchers(limit: Int): List<UserStatistics> =
         statisticsQueries.topUsers(periodResolver.resolve(StatsPeriod.ALL_TIME))
             .take(limit)
             .map { UserStatistics(it.userName, it.playCount.toInt(), it.watchTimeSeconds.toHours()) }
-    }
 
-    override suspend fun getWatchersInfo(seriesId: String, seriesName: String): WhoWatchedInfos =
-        runOnSafeVertxContext(vertx) {
-            val watchers = statisticsQueries.seriesWatchers(seriesId)
-                .map {
-                    WatcherInfo(
-                        username = it.userName,
-                        episodeWatchedCount = it.episodesWatched.toInt(),
-                        lastEpisodeWatched = it.lastEpisodeName,
-                        seasonNumber = it.lastSeasonNumber ?: 0,
-                        episodeNumber = it.lastEpisodeNumber ?: 0,
-                    )
-                }
-                .sortedWith(compareByDescending<WatcherInfo> { it.seasonNumber }.thenByDescending { it.episodeNumber })
-            WhoWatchedInfos(seriesName, watchers.size, watchers)
-        }
+    override suspend fun getWatchersInfo(seriesId: String, seriesName: String): WhoWatchedInfos {
+        val watchers = statisticsQueries.seriesWatchers(seriesId)
+            .map {
+                WatcherInfo(
+                    username = it.userName,
+                    episodeWatchedCount = it.episodesWatched.toInt(),
+                    lastEpisodeWatched = it.lastEpisodeName,
+                    seasonNumber = it.lastSeasonNumber ?: 0,
+                    episodeNumber = it.lastEpisodeNumber ?: 0,
+                )
+            }
+            .sortedWith(compareByDescending<WatcherInfo> { it.seasonNumber }.thenByDescending { it.episodeNumber })
+        return WhoWatchedInfos(seriesName, watchers.size, watchers)
+    }
 
     private suspend fun mostPopular(lastDays: Int, kind: MediaKind, limit: Int): List<MostPopularMedia> {
         val (from, to) = lastDaysRange(lastDays)
