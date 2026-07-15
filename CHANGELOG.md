@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.3.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.2.0...v0.3.0) (2026-07-15)
+
+
+### Features
+
+* send notification on problem workflow events ([5ea851e](https://github.com/lucas-dclrcq/homelab-manager/commit/5ea851e64c42796372574f739f3ab654c6ae6cd6))
+* split cleanup page into Campagnes/Propositions/Protection tabs ([#123](https://github.com/lucas-dclrcq/homelab-manager/issues/123)) ([55fb34c](https://github.com/lucas-dclrcq/homelab-manager/commit/55fb34c2fdc4103e91872eeb519be1ebc73f10cd))
+
+
+### Documentation
+
+* add AGENTS.md context file for AI coding agents ([#121](https://github.com/lucas-dclrcq/homelab-manager/issues/121)) ([6acc5f2](https://github.com/lucas-dclrcq/homelab-manager/commit/6acc5f23b07c1bb295144494b28089854c75d3fe))
+
+
+### Refactoring
+
+* fix compilation warnings ([dd869c8](https://github.com/lucas-dclrcq/homelab-manager/commit/dd869c8393e94e8f905125e4979f36cb4bc75234))
+* improve vertx context use by matrix bot ([4190dd1](https://github.com/lucas-dclrcq/homelab-manager/commit/4190dd1be848811db67dbd6b3b780ec904936494))
+
+
+### CI/CD
+
+* add code coverage ([#118](https://github.com/lucas-dclrcq/homelab-manager/issues/118)) ([b1ade2f](https://github.com/lucas-dclrcq/homelab-manager/commit/b1ade2f66a2e1c54df457f098098fedb08e84986))
+
+
+### Chores
+
+* **main:** release 0.2.1-SNAPSHOT ([d055910](https://github.com/lucas-dclrcq/homelab-manager/commit/d0559102eca4da41bdd1f8e30430d259ab899c7e))
+
 ## [0.2.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.1.5...v0.2.0) (2026-07-14)
 
 
