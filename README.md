@@ -9,7 +9,7 @@
 - A **Matrix bot** for interacting with the setup from chat.
 - A **downloads timeline and library stats**, built by periodically syncing the *arr apps, Jellyfin and Jellystat.
 
-The web UI is served by the backend (Quarkus + Kotlin, React frontend), with OIDC login and PostgreSQL storage.
+The web UI is served by the backend (Quarkus + Kotlin, Vue 3 frontend), with OIDC login and PostgreSQL storage.
 
 This app is quite specific to my needs, and since I also use it to experiment and keep current on the latest tech, it is
 quite overkill :D
