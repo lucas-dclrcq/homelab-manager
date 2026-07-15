@@ -20,6 +20,15 @@ const { data: overview, isPending, isError } = useCleanupOverview()
 
 const campaign = computed(() => overview.value?.campaign ?? null)
 
+type Tab = 'campaigns' | 'suggestions' | 'protections'
+
+const tab = ref<Tab>('campaigns')
+const tabs: { value: Tab; label: string }[] = [
+  { value: 'campaigns', label: 'Campagnes' },
+  { value: 'suggestions', label: 'Propositions' },
+  { value: 'protections', label: 'Protection' },
+]
+
 const vetoTarget = ref<CleanupCandidateDto | null>(null)
 const vetoError = ref('')
 
@@ -57,64 +66,83 @@ function confirmVeto() {
       </p>
     </header>
 
-    <BaseSpinner v-if="isPending" />
-
-    <div
-      v-else-if="isError"
-      class="rounded-tile border-[1.5px] border-line bg-paper p-8 text-center"
-    >
-      <p class="font-display text-lg font-bold">
-        Impossible de charger la campagne
-      </p>
-      <p class="mt-1 text-sm text-ink-soft">
-        Le serveur n'a pas répondu. Réessaie dans un instant.
-      </p>
+    <div class="flex flex-wrap gap-1.5">
+      <button
+        v-for="item in tabs"
+        :key="item.value"
+        type="button"
+        class="rounded-full px-4 py-2 text-sm font-bold transition-colors"
+        :class="
+          tab === item.value
+            ? 'bg-ink text-cream'
+            : 'bg-line/60 text-ink-soft hover:bg-line'
+        "
+        @click="tab = item.value"
+      >
+        {{ item.label }}
+      </button>
     </div>
 
-    <template v-else-if="overview">
+    <template v-if="tab === 'campaigns'">
+      <BaseSpinner v-if="isPending" />
+
       <div
-        v-if="!campaign"
-        class="rounded-tile border-[1.5px] border-dashed border-line bg-paper p-10 text-center"
+        v-else-if="isError"
+        class="rounded-tile border-[1.5px] border-line bg-paper p-8 text-center"
       >
         <p class="font-display text-lg font-bold">
-          Aucune campagne en cours 🎉
+          Impossible de charger la campagne
         </p>
         <p class="mt-1 text-sm text-ink-soft">
-          Le disque respire<template v-if="overview.diskFreeBytes != null">
-            : il reste {{ formatBytes(overview.diskFreeBytes) }} de libre sur
-            {{ overview.diskPath }}</template
-          >. Si ça se resserre, une campagne s'ouvrira et tout le monde pourra
-          voter pour garder ses favoris.
+          Le serveur n'a pas répondu. Réessaie dans un instant.
         </p>
       </div>
 
-      <template v-else>
-        <CampaignProgress
-          :campaign="campaign"
-          :disk-free-bytes="overview.diskFreeBytes"
-        />
-
-        <section class="flex flex-col gap-3">
-          <h2 class="font-display text-xl font-bold">Les médias en sursis</h2>
-          <p class="-mt-2 text-sm text-ink-soft">
-            Sans veto d'ici la fin de la période de grâce, ils seront supprimés
-            pour faire de la place.
+      <template v-else-if="overview">
+        <div
+          v-if="!campaign"
+          class="rounded-tile border-[1.5px] border-dashed border-line bg-paper p-10 text-center"
+        >
+          <p class="font-display text-lg font-bold">
+            Aucune campagne en cours 🎉
           </p>
-          <div class="grid gap-4 md:grid-cols-2">
-            <CandidateCard
-              v-for="candidate in campaign.candidates"
-              :key="candidate.id"
-              :candidate="candidate"
-              @veto="openVeto($event)"
-            />
-          </div>
-        </section>
+          <p class="mt-1 text-sm text-ink-soft">
+            Le disque respire<template v-if="overview.diskFreeBytes != null">
+              : il reste {{ formatBytes(overview.diskFreeBytes) }} de libre sur
+              {{ overview.diskPath }}</template
+            >. Si ça se resserre, une campagne s'ouvrira et tout le monde pourra
+            voter pour garder ses favoris.
+          </p>
+        </div>
+
+        <template v-else>
+          <CampaignProgress
+            :campaign="campaign"
+            :disk-free-bytes="overview.diskFreeBytes"
+          />
+
+          <section class="flex flex-col gap-3">
+            <h2 class="font-display text-xl font-bold">Les médias en sursis</h2>
+            <p class="-mt-2 text-sm text-ink-soft">
+              Sans veto d'ici la fin de la période de grâce, ils seront
+              supprimés pour faire de la place.
+            </p>
+            <div class="grid gap-4 md:grid-cols-2">
+              <CandidateCard
+                v-for="candidate in campaign.candidates"
+                :key="candidate.id"
+                :candidate="candidate"
+                @veto="openVeto($event)"
+              />
+            </div>
+          </section>
+        </template>
       </template>
     </template>
 
-    <!-- Suggestions et protections ne dépendent pas de la campagne : utilisables même si le GET campagne échoue -->
-    <SuggestionsPanel v-if="!isPending" />
-    <ProtectionsPanel v-if="!isPending" />
+    <SuggestionsPanel v-else-if="tab === 'suggestions'" />
+
+    <ProtectionsPanel v-else-if="tab === 'protections'" />
 
     <BaseModal
       v-if="vetoTarget"
