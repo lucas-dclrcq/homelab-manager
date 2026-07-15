@@ -59,7 +59,6 @@ interface RadarrRestClient {
     @Path("/tag")
     suspend fun getTags(): List<ArrTag>?
 
-    // Suppression idempotente : un 404 au retry signifie déjà supprimé, le @Retry de classe reste acceptable
     @DELETE
     @Path("/movie/{id}")
     suspend fun deleteMovie(

@@ -31,12 +31,6 @@ data class OperatorApplicationRequest(
     val logoUrl: String? = null,
 )
 
-/**
- * Duplication des endpoints applications pour l'opérateur k8s : auth par clé partagée
- * (voir OperatorApiKeyFilter) au lieu d'OIDC, JSON au lieu de multipart (le logo est déclaré
- * par URL et téléchargé côté serveur, pas uploadé).
- * Exclu du contrat OpenAPI consommé par Orval (mp.openapi.scan.exclude.classes).
- */
 @Path("/api/operator/applications")
 @OperatorApiKeyProtected
 @Consumes(MediaType.APPLICATION_JSON)
@@ -80,8 +74,6 @@ class OperatorApplicationsResource(
             Response.status(Response.Status.NOT_FOUND).build()
         }
 
-    // Contrat déclaratif : logoUrl absent = pas de logo désiré, le use case supprime alors
-    // un logo précédemment téléchargé (mais préserve un upload manuel)
     private fun OperatorApplicationRequest.toInput() =
         ApplicationInput(
             name, category, description, url, requiresVpn, managedBy, externalId,

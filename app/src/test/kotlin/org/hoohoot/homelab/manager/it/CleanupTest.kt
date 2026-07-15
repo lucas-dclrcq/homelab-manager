@@ -47,7 +47,6 @@ internal class CleanupTest {
     @Inject
     lateinit var wireMock: WireMock
 
-    // Série terminée dont la saison 1 (30 Go, jamais visionnée) est candidate au nettoyage
     private val wireSeriesJson = """
         {
           "id": 201, "title": "The Wire", "year": 2002, "tvdbId": 79126, "ended": true,
@@ -104,7 +103,6 @@ internal class CleanupTest {
                 )
             )
         )
-        // Un seul WireMock : ce stub sert les tags Radarr et Sonarr
         wireMock.register(
             get(urlPathEqualTo("/api/v3/tag")).willReturn(okJson("""[{"id": 1, "label": "1 - john"}]"""))
         )
@@ -203,7 +201,6 @@ internal class CleanupTest {
     @Test
     @TestSecurity(user = "alice", roles = ["admin", "user"])
     fun `le job cleanup-scan démarre une campagne avec les candidats triés par score décroissant`() {
-        // « Le Voyage » a été vu en entier récemment : il doit scorer moins qu'« Inception » jamais visionné
         PlaybackSessionSeed.insertSession(
             userName = "cleanup-watcher",
             itemId = "jf-voyage",
@@ -231,7 +228,6 @@ internal class CleanupTest {
         val recentlyCompleted = (byTitle["Le Voyage"]!!["score"] as Number).toDouble()
         assertThat(neverWatched).isGreaterThan(recentlyCompleted)
 
-        // Le breakdown persisté est explicable : composantes présentes et total cohérent
         assertThat(overview.getList<Any>("campaign.candidates[0].scoreBreakdown.components")).isNotEmpty()
         assertThat(overview.getDouble("campaign.candidates[0].scoreBreakdown.total")).isGreaterThan(0.0)
 
@@ -338,7 +334,6 @@ internal class CleanupTest {
                 .withQueryParam("deleteFiles", equalTo("true"))
                 .withQueryParam("addImportExclusion", equalTo("false"))
         )
-        // La saison est d'abord dé-monitorée puis ses fichiers d'épisodes supprimés un à un
         wireMock.verifyThat(
             putRequestedFor(urlPathEqualTo("/api/v3/series/201"))
                 .withRequestBody(matchingJsonPath("$.seasons[0].monitored", equalTo("false")))
@@ -394,7 +389,6 @@ internal class CleanupTest {
         assertThat(byTitle["Inception"]!!["failureReason"].toString()).isNotBlank()
         assertThat(byTitle["Le Voyage"]!!["status"]).isEqualTo("DELETED")
 
-        // Radarr est réparé : le retry admin rejoue la suppression et crédite la campagne
         wireMock.register(delete(urlPathEqualTo("/api/v3/movie/101")).willReturn(aResponse().withStatus(200)))
 
         val retried = RestAssured.given()
@@ -413,7 +407,6 @@ internal class CleanupTest {
         val campaignId = CleanupSeed.insertCampaign(graceEndsAt = LocalDateTime.now().minusHours(1))
         CleanupSeed.insertCandidate(campaignId, "Inception", radarrMovieId = 101, score = 90.0)
         CleanupSeed.insertCandidate(campaignId, "Le Voyage", radarrMovieId = 102, score = 60.0)
-        // Re-check en direct : 400 Go libres, au-dessus de la cible (50 Go au départ + 250 Go à libérer)
         wireMock.register(
             get(urlPathEqualTo("/api/v3/diskspace")).willReturn(
                 okJson("""[{"path": "/data", "label": "data", "freeSpace": 400000000000, "totalSpace": 1000000000000}]""")
@@ -447,7 +440,6 @@ internal class CleanupTest {
         assertThat(cancelled.getList<Map<String, Any>>("candidates").map { it["status"] })
             .containsOnly("CANCELLED")
 
-        // Plus de campagne active côté user
         assertThat(getOverview().getString("campaign")).isNull()
     }
 

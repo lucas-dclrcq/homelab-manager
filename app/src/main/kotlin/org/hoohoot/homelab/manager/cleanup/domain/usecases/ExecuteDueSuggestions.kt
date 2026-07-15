@@ -32,15 +32,12 @@ class ExecuteDueSuggestions(
     private suspend fun execute(suggestion: CleanupSuggestionEntity): CleanupSuggestionEntity? {
         val suggestionId = requireNotNull(suggestion.id)
 
-        // Sans annonce, personne n'a pu poser de veto : on ne supprime pas
         val announcementEventId = suggestion.announcementEventId
             ?: return finish(suggestionId) {
                 it.status = CleanupSuggestionEntity.STATUS_SKIPPED
                 it.failureReason = "l'annonce Matrix n'a jamais été envoyée, suppression annulée par prudence"
             }
 
-        // Le veto s'exprime en réaction ❌ sur l'annonce : lu à l'échéance, il survit aux redémarrages.
-        // Si Matrix est injoignable, on reporte plutôt que de supprimer sans avoir lu les vetos.
         val vetoer = try {
             vetoes.vetoers(announcementEventId).firstOrNull()
         } catch (exception: Exception) {
@@ -55,7 +52,6 @@ class ExecuteDueSuggestions(
             }
         }
 
-        // Re-check juste avant suppression : une protection ou un problème a pu apparaître
         if (protections.all().any {
                 it.blocksDeletionOf(suggestion.mediaKind, suggestion.radarrMovieId, suggestion.sonarrSeriesId, suggestion.seasonNumber)
             }
@@ -94,7 +90,6 @@ class ExecuteDueSuggestions(
         }
     }
 
-    // Une erreur sur une suggestion ne doit pas interrompre les suivantes
     private suspend fun delete(suggestion: CleanupSuggestionEntity): DeleteOutcome = try {
         when (suggestion.mediaKind) {
             CleanupSuggestionEntity.KIND_MOVIE ->

@@ -5,7 +5,6 @@ import io.smallrye.config.WithDefault
 
 @ConfigMapping(prefix = "homelab-operator")
 interface OperatorConfig {
-    /** Noms des gateways dont les routes nécessitent le VPN */
     @WithDefault("internal")
     fun vpnGateways(): Set<String>
 
@@ -15,7 +14,6 @@ interface OperatorConfig {
     @WithDefault("Uncategorized")
     fun defaultCategory(): String
 
-    /** Intervalle du sweep complet (consommé par @Scheduled) */
     @WithDefault("5m")
     fun syncInterval(): String
 

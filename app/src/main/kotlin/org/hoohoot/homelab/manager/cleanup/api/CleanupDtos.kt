@@ -42,7 +42,6 @@ data class CleanupCampaignDetailsDto(
     val freeBytesAtStart: Long,
     val targetBytesToFree: Long,
     val freedBytes: Long,
-    // OffsetDateTime : le front calcule un compte à rebours, l'offset lève l'ambiguïté de fuseau
     val graceEndsAt: OffsetDateTime,
     val createdAt: LocalDateTime,
     val completedAt: LocalDateTime?,
@@ -150,7 +149,6 @@ data class CleanupSuggestionDto(
     val sizeBytes: Long,
     val suggestedBy: String,
     val status: String,
-    // OffsetDateTime : le front calcule un compte à rebours, l'offset lève l'ambiguïté de fuseau
     val deleteAfter: OffsetDateTime,
     val vetoedBy: String?,
     val freedBytes: Long?,

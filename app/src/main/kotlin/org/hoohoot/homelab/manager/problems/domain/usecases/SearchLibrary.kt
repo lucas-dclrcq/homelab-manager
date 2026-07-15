@@ -16,7 +16,6 @@ class SearchLibrary(
         private const val MAX_SEARCH_RESULTS = 10
     }
 
-    // Les APIs *arr ne supportent pas de recherche : on filtre la bibliothèque côté backend
     suspend fun movies(query: String): List<LibraryMovie> =
         search(query, { movieLibrary.allMovies() }, { it.title })
 

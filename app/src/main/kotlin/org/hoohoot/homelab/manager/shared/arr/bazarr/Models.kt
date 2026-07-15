@@ -2,7 +2,6 @@ package org.hoohoot.homelab.manager.shared.arr.bazarr
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-// Actions Bazarr considérées comme un téléchargement de sous-titres
 object BazarrActions {
     const val DOWNLOADED = 1
     const val UPGRADED = 3

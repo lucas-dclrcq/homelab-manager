@@ -112,7 +112,6 @@ internal fun ProblemWorkflowEntity.toAdminDto() = AdminProblemWorkflowDto(
     workflow = toDto(),
 )
 
-// L'étape courante est dérivée de l'état : reprendre un workflow = recharger son DTO
 private fun ProblemWorkflowEntity.currentStep(): String = when {
     status == ProblemWorkflowEntity.STATUS_ABANDONED -> "ABANDONED"
     status == ProblemWorkflowEntity.STATUS_COMPLETED -> "COMPLETED"

@@ -7,7 +7,6 @@ import org.hoohoot.homelab.manager.cleanup.domain.ActiveProblemIds
 import org.hoohoot.homelab.manager.cleanup.domain.ports.ActiveProblems
 import org.hoohoot.homelab.manager.problems.infra.ProblemWorkflowEntity
 
-// Un média avec un problème en cours de traitement ne doit jamais être supprimé
 @ApplicationScoped
 class ProblemWorkflowGuardAdapter : ActiveProblems {
     companion object {

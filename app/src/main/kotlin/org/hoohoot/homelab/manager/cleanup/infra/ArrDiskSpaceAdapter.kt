@@ -19,7 +19,6 @@ class ArrDiskSpaceAdapter(
             .sortedByDescending { it.collectedAt }
             .firstNotNullOfOrNull { it.disks[path]?.freeBytes }
 
-    // Best-effort : en cas d'échec on retombera sur le snapshot
     override suspend fun liveFree(path: String): Long? = try {
         radarrRestClient.getDiskSpace().orEmpty().firstOrNull { it.path == path }?.freeSpace
     } catch (exception: Exception) {

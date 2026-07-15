@@ -17,8 +17,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-// Année dédiée à ce test : les totaux ne sont pas pollués par les écritures
-// créées par les autres classes de test (base partagée)
 private const val YEAR = 2031
 
 @QuarkusTest

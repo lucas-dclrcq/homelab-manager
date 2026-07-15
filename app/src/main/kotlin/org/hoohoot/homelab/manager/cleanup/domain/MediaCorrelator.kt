@@ -2,12 +2,6 @@ package org.hoohoot.homelab.manager.cleanup.domain
 
 import java.time.LocalDateTime
 
-/**
- * Corrèle les médias Radarr/Sonarr avec la bibliothèque et l'historique de visionnage Jellyfin.
- * Priorité aux provider ids (TMDB/IMDB/TVDB), fallback sur le titre normalisé ; en cas
- * d'ambiguïté le média est traité comme non corrélé (le scoring plafonne alors sa composante
- * « jamais visionné » par prudence).
- */
 class MediaCorrelator(
     jellyfinEntries: List<JellyfinLibraryEntry>,
     movieWatches: List<MovieWatchAggregate>,
@@ -46,7 +40,6 @@ class MediaCorrelator(
             return movieWatchesByItemId[titleEntry.itemId].toCorrelated(Correlation.TITLE)
         }
 
-        // Le film n'est plus (ou pas) dans Jellyfin : on tente encore l'historique par nom d'item
         val watchesByName = movieWatchesByTitle[Titles.normalize(movie.title)].orEmpty()
         if (watchesByName.map { it.itemId }.distinct().size == 1) {
             return watchesByName.first().toCorrelated(Correlation.TITLE)
@@ -69,7 +62,6 @@ class MediaCorrelator(
         )
     }
 
-    // Dernier visionnage toutes saisons confondues — garde-fou « rewatch en cours »
     fun seriesLastWatchedAt(series: CleanupSeries): LocalDateTime? =
         seasonWatchesOf(series).second.maxOfOrNull { it.lastWatchedAt }
 
@@ -93,7 +85,6 @@ class MediaCorrelator(
         return Correlation.NONE to emptyList()
     }
 
-    // Match par titre normalisé, départagé par l'année (±1) ; plusieurs homonymes -> non corrélé
     private fun uniqueEntryByTitle(
         entriesByTitle: Map<String, List<JellyfinLibraryEntry>>,
         title: String,

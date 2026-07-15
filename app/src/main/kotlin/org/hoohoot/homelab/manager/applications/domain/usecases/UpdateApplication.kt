@@ -15,8 +15,6 @@ class UpdateApplication(
     private val logoFetcher: LogoFetcher,
 ) {
     suspend operator fun invoke(id: UUID, input: ApplicationInput): ApplicationEntity? {
-        // Le fetch est suspend, la mutation transactionnelle ne l'est pas : on télécharge avant,
-        // et seulement si la source a changé (un drift sur un autre champ ne re-télécharge pas)
         val change = input.logo
         val fetched = if (change is LogoChange.FromUrl && change.url != applications.findById(id)?.logoSourceUrl) {
             logoFetcher.fetch(change.url)
@@ -35,8 +33,6 @@ class UpdateApplication(
                     entity.logoSourceUrl = null
                 }
 
-                // Échec de téléchargement (fetched null alors que la source a changé) : on garde
-                // l'ancien logo et l'ancienne source, le prochain sweep de l'opérateur retentera
                 is LogoChange.FromUrl -> fetched?.let {
                     entity.logo = it.bytes
                     entity.logoContentType = it.contentType

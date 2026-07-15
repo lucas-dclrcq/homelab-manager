@@ -73,8 +73,6 @@ class SonarrCleanupAdapter(
     }
 
     override suspend fun deleteSeries(sonarrSeriesId: Int, sizeBytes: Long): DeleteOutcome {
-        // La taille a pu évoluer depuis la suggestion : mesure au moment de la suppression,
-        // repli sur la taille connue si Sonarr ne répond pas
         val freed = try {
             sonarrRestClient.getEpisodeFiles(sonarrSeriesId).orEmpty().sumOf { it.size ?: 0L }
         } catch (exception: Exception) {

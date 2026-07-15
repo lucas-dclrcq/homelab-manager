@@ -13,8 +13,6 @@ import org.hoohoot.homelab.manager.cleanup.infra.CleanupCandidateEntity
 import java.time.LocalDateTime
 import java.util.UUID
 
-// Rejoue la suppression d'un candidat FAILED (admin). La suppression *arr est idempotente :
-// ce qui a déjà été supprimé lors de la tentative précédente le reste.
 @ApplicationScoped
 class RetryCandidate(
     private val candidates: Candidates,

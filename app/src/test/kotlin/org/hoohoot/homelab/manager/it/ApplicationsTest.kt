@@ -314,7 +314,6 @@ internal class ApplicationsTest {
             .then().statusCode(Response.Status.CREATED.statusCode)
             .extract().jsonPath().getString("id")
 
-        // Simule une édition depuis l'admin UI, qui n'envoie pas les champs managed
         RestAssured.given()
             .multiPart("name", "Radarr Films")
             .multiPart(utf8Part("category", "Médias"))

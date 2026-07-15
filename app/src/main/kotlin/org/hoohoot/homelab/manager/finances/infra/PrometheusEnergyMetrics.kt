@@ -7,8 +7,6 @@ import org.hoohoot.homelab.manager.shared.prometheus.PrometheusRestClient
 import java.time.Duration
 import java.time.Instant
 
-// Le max() agrège les séries dupliquées par le churn des pods snmp-exporter :
-// increase(upsHighPrecOutputEnergyUsage) serait cassé à chaque restart du pod
 private const val POWER_QUERY = "max(upsAdvOutputActivePower)"
 
 @ApplicationScoped

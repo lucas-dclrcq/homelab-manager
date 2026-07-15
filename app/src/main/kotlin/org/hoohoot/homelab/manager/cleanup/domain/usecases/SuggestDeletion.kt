@@ -20,7 +20,6 @@ data class SuggestionRequest(
     val seasonNumber: Int?,
 )
 
-// Suggestion de suppression : annoncée sur Matrix, supprimée à l'échéance sauf veto ❌ en réaction
 @ApplicationScoped
 class SuggestDeletion(
     private val configStore: CleanupConfigStore,
@@ -59,7 +58,6 @@ class SuggestDeletion(
         suggestion.updatedAt = now
         val saved = suggestions.save(suggestion)
 
-        // Annonce best-effort : sans event id, l'exécution n'osera pas supprimer (aucun veto possible)
         try {
             val eventId = notifier.announceSuggestion(saved)
             if (eventId != null) suggestions.update(requireNotNull(saved.id)) { it.announcementEventId = eventId }

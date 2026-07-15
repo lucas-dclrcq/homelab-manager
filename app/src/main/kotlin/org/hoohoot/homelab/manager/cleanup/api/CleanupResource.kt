@@ -44,7 +44,6 @@ class CleanupResource(
     private val suggestDeletion: SuggestDeletion,
 ) {
     companion object {
-        // Les issues récentes (veto, suppression…) restent visibles quelques jours dans l'UI
         private const val RECENT_SUGGESTIONS_DAYS = 7L
     }
 

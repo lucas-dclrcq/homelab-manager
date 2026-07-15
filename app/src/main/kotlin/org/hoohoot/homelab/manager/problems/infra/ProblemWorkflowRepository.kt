@@ -52,7 +52,6 @@ class ProblemWorkflowRepository : ProblemWorkflows {
         is Accessor.Admin -> ProblemWorkflowEntity.find("id = ?1", id).firstResult()
     }
 
-    // Complète les workflows en attente dont le film vient d'être importé après le grab. Idempotent.
     override suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int {
         if (movieIdToImportedAt.isEmpty()) return 0
         return Panache.withTransaction {

@@ -30,8 +30,6 @@ import org.hoohoot.homelab.manager.problems.domain.usecases.SelectSeries
 import org.hoohoot.homelab.manager.shared.api.conflict
 import java.util.UUID
 
-// Reprise d'un problème par un admin : mêmes use cases que la resource user,
-// mais avec Accessor.Admin (accès à tous les workflows, sans réassignation)
 @Path("/api/admin/problems")
 @Produces(MediaType.APPLICATION_JSON)
 @RolesAllowed("admin")

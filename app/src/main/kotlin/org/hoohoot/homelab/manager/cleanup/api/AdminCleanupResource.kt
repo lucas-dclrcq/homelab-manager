@@ -68,10 +68,6 @@ class AdminCleanupResource(
         getCampaign(id)?.let { it.campaign.toDetailsDto(it.candidates) }
             ?: throw NotFoundException()
 
-    /**
-     * Le scan charge les bibliothèques Radarr/Sonarr/Jellyfin : trop long pour la requête,
-     * il part en arrière-plan (202). Le front suit l'apparition de la campagne via GET /campaign.
-     */
     @POST
     @Path("/campaigns/scan")
     @APIResponseSchema(value = ScanStartedDto::class, responseCode = "202")
@@ -106,8 +102,6 @@ class AdminCleanupResource(
     suspend fun deleteProtection(@PathParam("id") id: UUID): Response =
         unprotectMedia(id, Accessor.Admin).toResponse()
 
-    // Le scan survit à la requête : coroutine sur un contexte Vertx duplé et marqué safe,
-    // condition pour que Hibernate Reactive accepte d'y ouvrir des sessions
     private fun launchInBackground(block: suspend () -> Unit) {
         val context = VertxContext.getOrCreateDuplicatedContext(vertx)
         VertxContextSafetyToggle.setContextSafe(context, true)

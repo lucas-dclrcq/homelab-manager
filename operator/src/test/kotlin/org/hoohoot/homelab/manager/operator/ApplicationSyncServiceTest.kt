@@ -171,7 +171,6 @@ internal class ApplicationSyncServiceTest {
 
     @Test
     fun `does not consider a manually uploaded logo as drift`() {
-        // hasLogo true mais logoSourceUrl null : logo posé à la main, la route ne déclare pas de logo-url
         stubList(managedJellyfin.replace("\"hasLogo\": false", "\"hasLogo\": true"))
 
         syncService.syncAll(listOf(desiredJellyfin))

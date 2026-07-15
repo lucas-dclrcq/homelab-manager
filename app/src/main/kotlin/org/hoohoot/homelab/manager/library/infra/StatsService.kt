@@ -64,7 +64,6 @@ class StatsService(
     }
 
     fun merge(sources: List<SourceStats>): LibraryStats {
-        // Radarr and Sonarr usually report the same mounts: dedupe by path before summing
         val disks = sources.flatMap { it.disks }.distinctBy { it.path }
         val diskTotal = disks.sumOf { it.totalBytes }
         val diskFree = disks.sumOf { it.freeBytes }

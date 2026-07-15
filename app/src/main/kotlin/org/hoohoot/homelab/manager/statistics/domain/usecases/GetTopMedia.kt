@@ -30,7 +30,6 @@ class GetTopMedia(
         limit: Int = 10,
     ): List<TopMediaItem> {
         val range = periodResolver.resolve(period)
-        // Le binge score n'existe pas pour les films : retomber sur le tri par défaut
         val effectiveSort = if (kind == MediaKind.MOVIE && sort == TopMediaSort.BINGE_SCORE) TopMediaSort.PLAYS else sort
         return when (kind) {
             MediaKind.SERIES -> queries.topSeries(range, limit, effectiveSort, direction).map {

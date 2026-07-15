@@ -10,7 +10,6 @@ import org.hoohoot.homelab.manager.cleanup.domain.ports.PlaybackHistory
 import org.hoohoot.homelab.manager.members.infra.MemberEntity
 import java.time.LocalDateTime
 
-// Agrégations SQL natives sur playback_session (timestamps UTC)
 @ApplicationScoped
 class PlaybackHistoryAdapter : PlaybackHistory, MemberStatuses {
 

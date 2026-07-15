@@ -28,7 +28,6 @@ class DownloadsSyncService(
     companion object {
         private const val DOWNLOAD_IMPORTED_EVENT_TYPE = "downloadFolderImported"
 
-        // Lidarr : un event par téléchargement d'album complet (vs trackFileImported, un par piste)
         private const val LIDARR_DOWNLOAD_IMPORTED_EVENT_TYPE = "downloadImported"
     }
 
@@ -137,7 +136,6 @@ class DownloadsSyncService(
     }
 
     private suspend fun sinceFor(source: String): LocalDateTime =
-        // Overlap d'1h sur le watermark : la dédup rend le refetch inoffensif
         mediaDownloadRepository.latestDownloadedAt(source)?.minusHours(1)
             ?: LocalDateTime.now().minusDays(backfillDays)
 

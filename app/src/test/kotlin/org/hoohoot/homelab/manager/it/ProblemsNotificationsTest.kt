@@ -39,7 +39,6 @@ internal class ProblemsNotificationsTest {
         wireMock.resetMappings()
         wireMock.resetRequests()
 
-        // Stub Radarr movies
         wireMock.register(
             get(urlPathEqualTo("/api/v3/movie")).willReturn(
                 okJson(
@@ -59,7 +58,6 @@ internal class ProblemsNotificationsTest {
             )
         )
 
-        // Stub quality profiles
         wireMock.register(
             get(urlPathEqualTo("/api/v3/qualityprofile")).willReturn(
                 okJson(
@@ -76,12 +74,10 @@ internal class ProblemsNotificationsTest {
             )
         )
 
-        // Stub release grab
         wireMock.register(
             post(urlPathEqualTo("/api/v3/release")).willReturn(okJson("""{"guid": "release-1", "indexerId": 1}"""))
         )
 
-        // Stub Sonarr series
         wireMock.register(
             get(urlPathEqualTo("/api/v3/series")).willReturn(
                 okJson(
@@ -133,7 +129,6 @@ internal class ProblemsNotificationsTest {
     fun `le signalement d'un probleme envoie une notification en thread du message de creation`() {
         val id = createWorkflow()
 
-        // Récupère l'event_id du message de création (racine du thread)
         val createEventId = synapseTestClient.getLastMessageEvent(supportRoomId).get("event_id").asText()
 
         selectMovie(id)
@@ -144,7 +139,6 @@ internal class ProblemsNotificationsTest {
         assertThat(lastMessage.get("body").asText()).contains("@alice")
         assertThat(lastMessage.get("body").asText()).contains("Le fichier est corrompu")
 
-        // Vérifie que le message est en thread du message de création
         val lastEvent = synapseTestClient.getLastMessageEvent(supportRoomId)
         val relatesTo = lastEvent.get("content").get("m.relates_to")
         assertThat(relatesTo).isNotNull()
@@ -161,18 +155,15 @@ internal class ProblemsNotificationsTest {
 
         resolveWorkflow(id)
 
-        // Vérifie le message de résolution
         val lastMessage = synapseTestClient.getLastMessage(supportRoomId)
         assertThat(lastMessage.get("body").asText()).contains("🙄 Problème résolu")
         assertThat(lastMessage.get("body").asText()).contains("@alice")
         assertThat(lastMessage.get("body").asText()).contains("fallait juste chercher un peu")
 
-        // Vérifie que le message est en thread
         val lastEvent = synapseTestClient.getLastMessageEvent(supportRoomId)
         val resolutionRelatesTo = lastEvent.get("content").get("m.relates_to")
         assertThat(resolutionRelatesTo.get("rel_type").asText()).isEqualTo("m.thread")
 
-        // Vérifie la réaction ✅ sur le message racine du thread
         val reactions = synapseTestClient.getReactions(supportRoomId)
         assertThat(reactions).isNotEmpty()
 
@@ -189,7 +180,6 @@ internal class ProblemsNotificationsTest {
         selectMovie(id)
         selectProblem(id, problemType = "other", description = "Problème test")
 
-        // Résolution par admin via l'endpoint admin
         RestAssured.given()
             .`when`().post("/api/admin/problems/workflows/$id/resolve")
             .then().statusCode(Response.Status.OK.statusCode)

@@ -27,7 +27,6 @@ internal class StatsTest {
 
     @BeforeEach
     fun setUp() {
-        // Other tests may have persisted snapshots: remove them so stats are computed live from the stubs
         VertxContextSupport.subscribeAndAwait {
             Panache.withTransaction { StatsSnapshotEntity.deleteAll() }
         }
@@ -48,8 +47,6 @@ internal class StatsTest {
                 )
             )
         )
-        // Radarr and Sonarr share the same WireMock: both clients see the same mounts,
-        // which the dedupe-by-path aggregation must collapse to a single disk
         wireMock.register(
             get(urlPathEqualTo("/api/v3/diskspace")).willReturn(
                 okJson("""[{"path": "/data", "label": "data", "freeSpace": 500, "totalSpace": 2000}]""")

@@ -28,7 +28,6 @@ interface Candidates {
 interface Suggestions {
     suspend fun listPending(): List<CleanupSuggestionEntity>
 
-    // Suggestions en attente + issues récentes, pour l'affichage
     suspend fun listRecent(resolvedSince: LocalDateTime): List<CleanupSuggestionEntity>
     suspend fun listDue(now: LocalDateTime): List<CleanupSuggestionEntity>
     suspend fun find(id: UUID): CleanupSuggestionEntity?
@@ -45,7 +44,6 @@ interface Protections {
 }
 
 interface ActiveProblems {
-    // Médias avec un problem_workflow non terminal : jamais candidats à la suppression
     suspend fun activeMediaIds(): ActiveProblemIds
 }
 

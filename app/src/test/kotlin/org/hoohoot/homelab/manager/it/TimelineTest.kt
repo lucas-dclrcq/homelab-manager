@@ -39,7 +39,6 @@ internal class TimelineTest {
 
         wireMock.resetMappings()
         wireMock.resetRequests()
-        // Radarr and Sonarr share the same WireMock: disambiguate /history/since by query param
         wireMock.register(
             get(urlPathEqualTo("/api/v3/history/since"))
                 .withQueryParam("includeMovie", equalTo("true"))
@@ -85,7 +84,6 @@ internal class TimelineTest {
                     )
                 )
         )
-        // Lidarr est sur /api/v1 : pas de collision avec les stubs /api/v3 de Radarr/Sonarr
         wireMock.register(
             get(urlPathEqualTo("/api/v1/history/since")).willReturn(
                 okJson(
@@ -207,7 +205,6 @@ internal class TimelineTest {
         runJob("bazarr-downloads-sync")
 
         val items = getTimeline().getList<Map<String, Any>>("items")
-        // The action=0 episode item must be filtered out
         assertThat(items).hasSize(2)
         assertThat(items.map { it["eventType"] }).containsOnly("subtitles_downloaded")
         assertThat(items.map { it["title"] }).containsExactlyInAnyOrder("The Bear", "Dune")
@@ -263,7 +260,6 @@ internal class TimelineTest {
         assertThat(firstPage.getLong("totalCount")).isEqualTo(3)
         assertThat(firstPage.getInt("totalPages")).isEqualTo(3)
 
-        // Movie and first episode are from yesterday, second episode is older and must come last
         val lastPage = getTimeline(page = 2, pageSize = 1)
         val lastItem = lastPage.getList<Map<String, Any>>("items").first()
         assertThat(lastItem["title"]).isEqualTo("The Bear")

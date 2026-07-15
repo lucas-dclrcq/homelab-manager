@@ -14,7 +14,6 @@ import org.hoohoot.homelab.manager.cleanup.infra.CleanupProtectionEntity
 import java.time.LocalDateTime
 import java.util.UUID
 
-// Veto par titre depuis le bot Matrix : `!johnny garde <titre>`
 @ApplicationScoped
 class VetoByTitle(
     private val campaigns: Campaigns,
@@ -61,7 +60,6 @@ class VetoByTitle(
             }
         }
 
-        // Un veto bot sur une série protège la série entière, pas seulement les saisons candidates
         val sample = entities.first()
         saveProtectionIfMissing(sample, username)
 

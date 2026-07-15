@@ -8,7 +8,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @ApplicationScoped
 class ApplicationSyncService(@param:RestClient private val api: ManagerApiClient) {
 
-    /** Réconciliation complète : upsert de toutes les routes désirées, suppression des apps managées orphelines */
     fun syncAll(desired: List<DesiredApplication>) {
         val managed = listManaged()
         val desiredByExternalId = desired.associateBy { it.externalId }
@@ -23,12 +22,10 @@ class ApplicationSyncService(@param:RestClient private val api: ManagerApiClient
             }
     }
 
-    /** Upsert d'une seule route (chemin reconciler) */
     fun upsert(desired: DesiredApplication) {
         upsert(desired, listManaged()[desired.externalId])
     }
 
-    /** Supprime l'app correspondant à la route si (et seulement si) elle est managée par l'opérateur */
     fun deleteIfManaged(externalId: String) {
         val existing = listManaged()[externalId] ?: return
         Log.info("Deleting managed application '${existing.name}' ($externalId)")
@@ -57,9 +54,6 @@ class ApplicationSyncService(@param:RestClient private val api: ManagerApiClient
     private fun DesiredApplication.toRequest() =
         ApplicationRequest(name, category, description, url, requiresVpn, MANAGED_BY, externalId, logoUrl)
 
-    // logoSourceUrl : un logo uploadé à la main a une source nulle, donc pas de drift tant que
-    // le CRD ne déclare pas de logo-url ; un téléchargement échoué garde l'ancienne source et
-    // sera retenté au prochain sweep
     private fun ApplicationDto.hasDriftedFrom(desired: DesiredApplication): Boolean =
         name != desired.name ||
             category != desired.category ||

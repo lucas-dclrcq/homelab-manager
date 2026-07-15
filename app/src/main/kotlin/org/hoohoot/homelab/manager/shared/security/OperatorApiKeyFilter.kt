@@ -16,10 +16,6 @@ private const val API_KEY_HEADER = "X-Api-Key"
 @Retention(AnnotationRetention.RUNTIME)
 annotation class OperatorApiKeyProtected
 
-/**
- * Auth simple par clé partagée pour les endpoints appelés par l'opérateur k8s.
- * Le chemin est en policy "permit" côté HTTP : ce filtre est la seule garde, fail-closed si la clé n'est pas configurée.
- */
 @Provider
 @OperatorApiKeyProtected
 class OperatorApiKeyFilter(

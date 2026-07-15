@@ -22,7 +22,6 @@ class SelectProblem(
                 ProblemWorkflowEntity.PROBLEM_VO_SHOULD_BE_FRENCH,
                 ProblemWorkflowEntity.PROBLEM_OTHER,
             ),
-            // Pas de recherche de releases côté Sonarr : les séries passent par la déclaration libre
             ProblemWorkflowEntity.MEDIA_TYPE_TV to setOf(ProblemWorkflowEntity.PROBLEM_OTHER),
         )
     }
@@ -60,7 +59,6 @@ class SelectProblem(
             }
         } ?: return ProblemResult.NotFound
 
-        // Notifie le channel support quand le problème passe en REPORTED
         if (updated.status == ProblemWorkflowEntity.STATUS_REPORTED) {
             notifier.problemReported(
                 mediaTitle = updated.mediaTitle,

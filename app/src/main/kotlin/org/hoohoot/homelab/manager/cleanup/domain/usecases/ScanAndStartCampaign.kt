@@ -124,7 +124,6 @@ class ScanAndStartCampaign(
         val entities = selected.map { it.toEntity(campaign.id!!, now) }
         candidates.saveAll(entities)
 
-        // Annonce best-effort : un échec Matrix ne doit pas annuler la campagne
         try {
             val eventId = notifier.announceCampaign(campaign, entities)
             if (eventId != null) campaigns.update(campaign.id!!) { it.announcementEventId = eventId }
@@ -149,7 +148,6 @@ class ScanAndStartCampaign(
             if (series.sonarrSeriesId in problemIds) continue
             if (allProtections.any { it.covers(null, series.sonarrSeriesId, null) && it.mediaKind == CleanupProtectionEntity.KIND_SERIES }) continue
 
-            // Une série regardée récemment (toutes saisons confondues) est un rewatch potentiel
             val seriesLastWatched = correlator.seriesLastWatchedAt(series)
             if (seriesLastWatched != null &&
                 Duration.between(seriesLastWatched, now).toDays() < config.recentSeriesWatchDays
@@ -164,7 +162,6 @@ class ScanAndStartCampaign(
             }
             if (eligibleSeasons.isEmpty()) continue
 
-            // Un appel Sonarr par série, seulement pour celles qui ont passé les filtres
             val downloadDates = seriesCatalog.seasonDownloadDates(series.sonarrSeriesId)
 
             for (season in eligibleSeasons) {
@@ -178,8 +175,6 @@ class ScanAndStartCampaign(
         return proposals
     }
 
-    // Meilleurs scores d'abord, jusqu'à couvrir l'objectif d'espace (le candidat qui franchit
-    // l'objectif est inclus) dans la limite du plafond
     private fun selectProposals(
         proposals: List<Proposal>,
         targetToFree: Long,

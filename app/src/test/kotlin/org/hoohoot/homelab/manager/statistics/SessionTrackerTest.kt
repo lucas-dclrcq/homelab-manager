@@ -26,7 +26,7 @@ internal class SessionTrackerTest {
         mediaType: MediaType = MediaType.MOVIE,
         isPaused: Boolean = false,
         positionTicks: Long? = null,
-        runTimeTicks: Long? = 36_000_000_000L, // 1h
+        runTimeTicks: Long? = 36_000_000_000L,
     ) = ActiveSession(
         userId = userId,
         userName = userName,
@@ -69,7 +69,6 @@ internal class SessionTrackerTest {
     fun `le temps de pause est deduit de la duree visionnee`() {
         tracker.onSnapshot(listOf(session()), t0)
         tracker.onSnapshot(listOf(session()), t0.plusSeconds(120))
-        // 2 ticks en pause : 120 s de pause accumulée
         tracker.onSnapshot(listOf(session(isPaused = true)), t0.plusSeconds(180))
         tracker.onSnapshot(listOf(session(isPaused = true)), t0.plusSeconds(240))
         tracker.onSnapshot(listOf(session()), t0.plusSeconds(300))
@@ -80,7 +79,7 @@ internal class SessionTrackerTest {
 
     @Test
     fun `la progression et la completion sont calculees depuis les ticks`() {
-        val almostDone = session(positionTicks = 33_000_000_000L) // 55 min sur 1h
+        val almostDone = session(positionTicks = 33_000_000_000L)
         tracker.onSnapshot(listOf(almostDone), t0)
         tracker.onSnapshot(listOf(almostDone), t0.plusSeconds(300))
         val finished = tracker.onSnapshot(emptyList(), t0.plusSeconds(315))
@@ -105,13 +104,11 @@ internal class SessionTrackerTest {
     fun `un trou de polling superieur au timeout cloture l'ancienne session et en demarre une nouvelle`() {
         tracker.onSnapshot(listOf(session()), t0)
         tracker.onSnapshot(listOf(session()), t0.plusSeconds(300))
-        // Jellyfin injoignable pendant 20 min, la même lecture est toujours en cours au retour
         val finished = tracker.onSnapshot(listOf(session()), t0.plusSeconds(1500))
 
         assertThat(finished).hasSize(1)
         assertThat(finished.single().playDurationSeconds).isEqualTo(300)
 
-        // La nouvelle session démarre au retour du polling
         tracker.onSnapshot(listOf(session()), t0.plusSeconds(1800))
         val second = tracker.onSnapshot(emptyList(), t0.plusSeconds(1815))
         assertThat(second.single().playDurationSeconds).isEqualTo(300)

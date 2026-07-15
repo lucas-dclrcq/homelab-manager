@@ -26,8 +26,6 @@ class CreateApplication(
                 entity.logoContentType = change.logo.contentType
             }
 
-            // Échec de téléchargement : l'app est créée sans logo ni source, le prochain sweep
-            // de l'opérateur verra le drift et retentera
             is LogoChange.FromUrl -> logoFetcher.fetch(change.url)?.let {
                 entity.logo = it.bytes
                 entity.logoContentType = it.contentType

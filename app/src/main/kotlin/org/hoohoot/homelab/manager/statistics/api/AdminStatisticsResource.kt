@@ -36,11 +36,6 @@ class AdminStatisticsResource(
     private val vertx: Vertx,
 ) {
 
-    /**
-     * Stage le fichier de backup uploadé et déclenche l'import en arrière-plan (202) :
-     * le fichier fait des centaines de Mo, l'import est trop long pour la requête.
-     * Suivi via l'API admin jobs (identité "jellystat-import").
-     */
     @POST
     @Path("/import")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -59,8 +54,6 @@ class AdminStatisticsResource(
         return Response.accepted(ImportStartedDto(JellystatImportJob.IDENTITY)).build()
     }
 
-    // L'import survit à la requête : coroutine sur un contexte Vertx duplé et marqué safe,
-    // condition pour que Hibernate Reactive accepte d'y ouvrir des sessions
     private fun launchInBackground(block: suspend () -> Unit) {
         val context = VertxContext.getOrCreateDuplicatedContext(vertx)
         VertxContextSafetyToggle.setContextSafe(context, true)

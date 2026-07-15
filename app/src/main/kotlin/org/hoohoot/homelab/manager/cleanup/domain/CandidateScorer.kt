@@ -4,16 +4,11 @@ import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
-/**
- * Scoring pur d'un candidat au nettoyage : plus le score est haut, plus le média est supprimable.
- * Le breakdown complet est retourné pour rester explicable dans l'UI et dans l'annonce Matrix.
- */
 class CandidateScorer(
     private val config: CleanupConfig,
     private val now: LocalDateTime,
 ) {
     companion object {
-        // Un média non corrélé à Jellyfin n'est peut-être juste pas reconnu : prudence
         const val UNCORRELATED_CAP = 0.7
         const val REQUESTER_ACTIVITY_REF_DAYS = 180L
     }

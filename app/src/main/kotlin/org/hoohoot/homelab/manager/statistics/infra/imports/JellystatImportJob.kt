@@ -10,13 +10,6 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Import du backup Jellystat, découplé de l'upload HTTP : l'endpoint admin stage le fichier
- * puis déclenche ce job en arrière-plan (le fichier fait des centaines de Mo, le parsing et
- * les insertions dépassent le budget d'une requête). Pas de @Scheduled : déclenchement
- * uniquement via runNow — relançable depuis l'UI admin jobs tant que le fichier stagé existe
- * (il n'est supprimé qu'en fin d'import réussi).
- */
 @ApplicationScoped
 class JellystatImportJob(
     private val importJellystatBackup: ImportJellystatBackup,

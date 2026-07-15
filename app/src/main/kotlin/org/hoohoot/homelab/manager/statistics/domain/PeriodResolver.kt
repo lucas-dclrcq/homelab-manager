@@ -10,10 +10,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 
-/**
- * Bornes d'une période de stats : `[fromUtc, toUtc)` pour filtrer la base (stockée en UTC),
- * `[fromLocal, toLocal)` en heure locale d'affichage pour combler les buckets vides des graphes.
- */
 data class StatsRange(
     val fromUtc: LocalDateTime,
     val toUtc: LocalDateTime,

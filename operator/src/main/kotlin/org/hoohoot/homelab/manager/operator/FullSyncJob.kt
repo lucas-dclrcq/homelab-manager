@@ -8,10 +8,6 @@ import io.quarkus.scheduler.Scheduled
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 
-/**
- * Sweep périodique : source de vérité pour les routes supprimées, que le reconciler
- * ne voit pas (pas de finalizer sur des ressources non possédées).
- */
 @ApplicationScoped
 class FullSyncJob(
     private val client: KubernetesClient,

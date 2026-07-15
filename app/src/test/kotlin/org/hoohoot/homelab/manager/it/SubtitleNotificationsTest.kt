@@ -68,7 +68,6 @@ internal class SubtitleNotificationsTest {
 
     @Test
     fun `should thread movie subtitle notification under movie download notification`() {
-        // 1. Radarr notifies movie downloaded
         RestAssured.given().contentType(ContentType.JSON)
             .body(radarrNotification(movieId = 900, title = "Interstellar", year = 2014))
             .header("X-Api-Key", "secureapikey")
@@ -77,7 +76,6 @@ internal class SubtitleNotificationsTest {
 
         val movieEventId = synapseTestClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
-        // 2. Bazarr notifies subtitle downloaded for same movie
         RestAssured.given().contentType(ContentType.JSON)
             .body(bazarrNotification("Interstellar (2014) : French subtitles downloaded from opensubtitles with a score of 95%."))
             .header("X-Api-Key", "secureapikey")
@@ -93,7 +91,6 @@ internal class SubtitleNotificationsTest {
 
     @Test
     fun `should thread series subtitle notification under episode download notification`() {
-        // 1. Sonarr notifies episode downloaded
         RestAssured.given().contentType(ContentType.JSON)
             .body(sonarrNotification(seriesId = 901, title = "Breaking Bad", year = 2008, episodeNumber = 1))
             .header("X-Api-Key", "secureapikey")
@@ -102,7 +99,6 @@ internal class SubtitleNotificationsTest {
 
         val seriesEventId = synapseTestClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
 
-        // 2. Bazarr notifies subtitle downloaded for same series
         RestAssured.given().contentType(ContentType.JSON)
             .body(bazarrNotification("Breaking Bad (2008) - S01E01 - Pilot : French subtitles downloaded from opensubtitles with a score of 90%."))
             .header("X-Api-Key", "secureapikey")

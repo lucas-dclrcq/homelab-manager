@@ -20,7 +20,6 @@ data class ProtectionRequest(
     val seasonNumber: Int?,
 )
 
-// Protection proactive (liste blanche) : un média protégé ne sera jamais candidat au nettoyage
 @ApplicationScoped
 class ProtectMedia(
     private val protections: Protections,
@@ -82,7 +81,6 @@ class ProtectMedia(
         }
     }
 
-    // Cohérence : protéger un média couvert par la campagne active vaut veto immédiat
     private suspend fun protectMatchingCandidates(protection: CleanupProtectionEntity, username: String) {
         val campaign = campaigns.findActive() ?: return
         candidates.listByCampaign(requireNotNull(campaign.id))

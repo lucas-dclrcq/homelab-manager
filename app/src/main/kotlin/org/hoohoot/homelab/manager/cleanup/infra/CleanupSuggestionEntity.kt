@@ -74,8 +74,6 @@ class CleanupSuggestionEntity : PanacheEntityBase {
 
     fun displayTitle(): String = if (seasonNumber != null) "$title — Saison $seasonNumber" else title
 
-    // Deux suggestions se chevauchent si l'une supprimerait (tout ou partie de) l'autre :
-    // une série entière chevauche chacune de ses saisons
     fun overlaps(mediaKind: String, radarrMovieId: Int?, sonarrSeriesId: Int?, seasonNumber: Int?): Boolean =
         when (this.mediaKind) {
             KIND_MOVIE -> mediaKind == KIND_MOVIE && radarrMovieId != null && this.radarrMovieId == radarrMovieId

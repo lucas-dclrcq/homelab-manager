@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-// Format Bazarr : "1x02"
 private val BAZARR_EPISODE_NUMBER_REGEX = Regex("""(\d+)x(\d+)""")
 private val BAZARR_TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
@@ -19,7 +18,6 @@ internal fun BazarrHistoryItem.toMediaDownload(isEpisode: Boolean): MediaDownloa
     if (action !in BazarrActions.DOWNLOAD_ACTIONS) return null
     val itemTitle = if (isEpisode) seriesTitle else title
     val downloadedAt = parseBazarrTimestamp()
-    // Sans id de record côté Bazarr, la clé de dédup est synthétique
     val mediaId = if (isEpisode) sonarrEpisodeId else radarrId
     if (itemTitle.isNullOrBlank() || downloadedAt == null || mediaId == null) {
         Log.warn("Skipping Bazarr history item '$itemTitle': missing title, media id or unparseable timestamp")

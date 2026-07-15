@@ -17,7 +17,6 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.util.UUID
 
-// Rattrapage limité : au-delà, la rétention Prometheus ne couvre plus les mesures
 private const val CATCH_UP_MONTHS = 3
 
 @ApplicationScoped
@@ -41,8 +40,6 @@ class CreateMonthlyEnergyExpense(
             val to = month.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant()
             val averageWatts = energyMetrics.averagePowerWatts(from, to)
             if (averageWatts == null) {
-                // Seul le mois écoulé est bloquant : les mois plus anciens peuvent être
-                // sortis de la rétention Prometheus, inutile d'échouer indéfiniment dessus
                 if (offset == 1) {
                     throw IllegalStateException("Prometheus n'a renvoyé aucune mesure de puissance pour $period")
                 }

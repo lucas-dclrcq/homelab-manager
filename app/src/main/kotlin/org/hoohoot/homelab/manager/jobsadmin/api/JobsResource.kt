@@ -63,7 +63,6 @@ class JobsResource(
                     lastExecution = lastExecutions[trigger.id]?.toDto(),
                 )
             }
-        // Jobs à déclenchement manuel uniquement (ex : import Jellystat), inconnus du scheduler
         val manualOnly = jobRunner.all()
             .filter { job -> !isScheduled(job.identity) }
             .sortedBy { it.identity }

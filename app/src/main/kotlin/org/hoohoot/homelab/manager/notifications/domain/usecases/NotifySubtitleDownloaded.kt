@@ -32,7 +32,6 @@ class NotifySubtitleDownloaded(
             ),
         )
 
-        // Rattaché au thread du média correspondant quand il existe encore
         val existingThread = threads.getThreadByMediaKey(mediaKey(subtitle.mediaTitle, subtitle.year))
         sender.send(NotificationRoom.MEDIA, message, existingThread)
     }

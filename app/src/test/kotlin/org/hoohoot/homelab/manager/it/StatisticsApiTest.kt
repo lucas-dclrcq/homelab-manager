@@ -12,21 +12,12 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.time.LocalDateTime
 
-/**
- * Dataset volontairement daté en juin 2020 (aucune autre classe de test ne seede cette période)
- * et purgé à chaque test : les assertions en ALL_TIME sont exactes.
- *
- * marie : 6 épisodes de "Stats Show" (3 par jour sur 2 jours, complétés, 30 min chacun, à 14h Paris)
- *         + le film "Stats Movie" complété (2 h, 20h Paris).
- * jean : le même film, non complété (1 h, 21h Paris).
- */
 @QuarkusTest
 internal class StatisticsApiTest {
 
     @BeforeEach
     fun setUp() {
         PlaybackSessionSeed.deleteAll()
-        // 2020-06-10 (mercredi) et 2020-06-11 (jeudi) : 3 épisodes par jour à 12h UTC = 14h Paris (été)
         listOf("2020-06-10", "2020-06-11").forEachIndexed { day, date ->
             repeat(3) { index ->
                 val episode = day * 3 + index + 1
@@ -46,7 +37,6 @@ internal class StatisticsApiTest {
                 )
             }
         }
-        // 2020-06-12 (vendredi) : le film, vu par marie (complété) et jean (non complété)
         PlaybackSessionSeed.insertSession(
             userName = "stats-marie",
             itemId = "stats-movie",
@@ -112,7 +102,6 @@ internal class StatisticsApiTest {
         assertThat(series.getLong("[0].watchTimeSeconds")).isEqualTo(10800L)
         assertThat(series.getLong("[0].uniqueViewers")).isEqualTo(1L)
         assertThat(series.getDouble("[0].completionRate")).isEqualTo(100.0)
-        // 3 épisodes par jour actif en moyenne, cap à 6 par jour => score 50
         assertThat(series.getInt("[0].bingeScore")).isEqualTo(50)
     }
 
@@ -128,7 +117,6 @@ internal class StatisticsApiTest {
         assertThat(movies.getLong("[0].plays")).isEqualTo(2L)
         assertThat(movies.getLong("[0].watchTimeSeconds")).isEqualTo(10800L)
         assertThat(movies.getLong("[0].uniqueViewers")).isEqualTo(2L)
-        // marie a complété, jean non => 50 % des visionneurs
         assertThat(movies.getDouble("[0].completionRate")).isEqualTo(50.0)
         assertThat(movies.getString("[0].bingeScore")).isNull()
     }
@@ -136,7 +124,6 @@ internal class StatisticsApiTest {
     @Test
     @TestSecurity(user = "bob", roles = ["user"])
     fun `top media is sorted by plays by default and honors the sort parameters`() {
-        // Second film : moins de visionnages mais 100 % de complétion
         PlaybackSessionSeed.insertSession(
             userName = "stats-luc",
             itemId = "stats-movie-b",
@@ -171,10 +158,10 @@ internal class StatisticsApiTest {
             .extract().jsonPath()
 
         assertThat(weekdays.getList<Any>("$")).hasSize(7)
-        assertThat(weekdays.getLong("[2].plays")).isEqualTo(3L) // mercredi (ISO 3)
-        assertThat(weekdays.getLong("[3].plays")).isEqualTo(3L) // jeudi
-        assertThat(weekdays.getLong("[4].plays")).isEqualTo(2L) // vendredi
-        assertThat(weekdays.getLong("[0].plays")).isEqualTo(0L) // lundi comblé à zéro
+        assertThat(weekdays.getLong("[2].plays")).isEqualTo(3L)
+        assertThat(weekdays.getLong("[3].plays")).isEqualTo(3L)
+        assertThat(weekdays.getLong("[4].plays")).isEqualTo(2L)
+        assertThat(weekdays.getLong("[0].plays")).isEqualTo(0L)
     }
 
     @Test
@@ -186,7 +173,7 @@ internal class StatisticsApiTest {
             .extract().jsonPath()
 
         assertThat(hours.getList<Any>("$")).hasSize(24)
-        assertThat(hours.getLong("[14].plays")).isEqualTo(6L) // 12h UTC = 14h Paris en été
+        assertThat(hours.getLong("[14].plays")).isEqualTo(6L)
         assertThat(hours.getLong("[20].plays")).isEqualTo(1L)
         assertThat(hours.getLong("[21].plays")).isEqualTo(1L)
         assertThat(hours.getLong("[0].plays")).isEqualTo(0L)
@@ -218,7 +205,7 @@ internal class StatisticsApiTest {
         assertThat(overTime.getString("granularity")).isEqualTo("MONTH")
         assertThat(overTime.getString("points[0].bucketStart")).startsWith("2020-06-01T00:00")
         assertThat(overTime.getLong("points[0].plays")).isEqualTo(8L)
-        assertThat(overTime.getLong("points[1].plays")).isEqualTo(0L) // mois vide comblé
+        assertThat(overTime.getLong("points[1].plays")).isEqualTo(0L)
     }
 
     @Test
@@ -236,7 +223,6 @@ internal class StatisticsApiTest {
     @Test
     @TestSecurity(user = "bob", roles = ["user"])
     fun `now playing returns the in-memory sessions`() {
-        // Poller désactivé en test : la liste est vide mais l'endpoint répond
         RestAssured.given()
             .`when`().get("/api/statistics/now-playing")
             .then().statusCode(Response.Status.OK.statusCode)

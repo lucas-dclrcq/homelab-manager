@@ -36,8 +36,6 @@ internal class WeeklyReportNotificationsTest {
         mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
         wireMock.resetMappings()
-        // Le rapport agrège playback_session sur 7 jours glissants : purge pour que
-        // les sessions seedées par les autres classes de test ne polluent pas les tops
         PlaybackSessionSeed.deleteAll()
     }
 

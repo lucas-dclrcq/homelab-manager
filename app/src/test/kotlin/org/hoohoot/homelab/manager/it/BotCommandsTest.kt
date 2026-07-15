@@ -137,8 +137,6 @@ internal class BotCommandsTest {
 
     @Test
     fun `top-watchers should return top watchers list`() {
-        // Grosses durées : alice et bob doivent rester dans le top 10 all-time malgré
-        // les sessions seedées par les autres classes de test (base partagée)
         PlaybackSessionSeed.insertSession(userName = "alice", userId = "bot-alice", itemName = "Marathon Movie", mediaType = MediaType.MOVIE, durationSeconds = 180000)
         PlaybackSessionSeed.insertSession(userName = "bob", userId = "bot-bob", itemName = "Marathon Movie", mediaType = MediaType.MOVIE, durationSeconds = 90000)
 
@@ -194,11 +192,8 @@ internal class BotCommandsTest {
 
         val response = synapseTestClient.waitForBotMessage(roomId)
         val body = response.get("body").asText()
-        // The response is a random deado variant, just check it's not empty
         assertThat(body).isNotBlank()
     }
-
-    // WireMock stub helpers
 
     private fun stubJellyfinSearch() {
         wireMock.register(

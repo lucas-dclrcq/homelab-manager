@@ -49,7 +49,6 @@ internal class CleanupSuggestionsTest {
 
     private lateinit var mediaRoomId: String
 
-    // Série terminée à deux saisons (30 + 20 Go) : suggestible saison par saison ou en entier
     private val wireSeriesJson = """
         {
           "id": 201, "title": "The Wire", "year": 2002, "tvdbId": 79126, "ended": true,
@@ -82,7 +81,6 @@ internal class CleanupSuggestionsTest {
         wireMock.resetRequests()
         registerDefaultStubs()
 
-        // Chaque test poste dans une room fraîche : les assertions sur les messages restent isolées
         mediaRoomId = synapseTestClient.createRoom("media-${System.nanoTime()}")
         roomProvider.media = mediaRoomId
     }
@@ -177,7 +175,6 @@ internal class CleanupSuggestionsTest {
             .contains("Inception")
             .contains("❌")
 
-        // L'event id de l'annonce est persisté : c'est lui que l'exécution interrogera pour les vetos
         val stored = CleanupSeed.suggestion(UUID.fromString(suggestion.getString("id")))
         assertThat(stored?.announcementEventId).isEqualTo(announcement.get("event_id").asText())
 
@@ -215,7 +212,6 @@ internal class CleanupSuggestionsTest {
     fun `sans veto le film est supprimé via radarr à l'échéance et l'issue est annoncée`() {
         val suggestionId = UUID.fromString(suggest("MOVIE", radarrMovieId = 101).getString("id"))
 
-        // Une réaction qui n'est pas ❌ est un simple vote, pas un veto
         val announcementEventId = synapseTestClient.getLastMessageEvent(mediaRoomId).get("event_id").asText()
         synapseTestClient.sendReaction(mediaRoomId, announcementEventId, "👍")
 
@@ -236,7 +232,6 @@ internal class CleanupSuggestionsTest {
             .contains("Suppression effectuée")
             .contains("Inception")
 
-        // L'issue reste visible quelques jours dans l'UI
         val recent = listSuggestions()
         assertThat(recent).hasSize(1)
         assertThat(recent.first()["status"]).isEqualTo("DELETED")
@@ -267,7 +262,6 @@ internal class CleanupSuggestionsTest {
     @Test
     @TestSecurity(user = "bob", roles = ["user"])
     fun `une réaction ❌ est acquittée immédiatement sans attendre l'échéance`() {
-        // Le bot est dans la room : son sync voit la réaction arriver en direct
         synapseTestClient.inviteUser(mediaRoomId, "@johnnybot:localhost")
 
         val suggestionId = UUID.fromString(suggest("MOVIE", radarrMovieId = 101).getString("id"))
@@ -283,7 +277,6 @@ internal class CleanupSuggestionsTest {
         val vetoed = CleanupSeed.suggestion(suggestionId)
         assertThat(vetoed?.vetoedBy).isEqualTo("admin")
 
-        // L'issue est annoncée dans le chat sans attendre le job d'échéance
         await().atMost(Duration.ofSeconds(10)).pollInterval(Duration.ofMillis(500)).untilAsserted {
             assertThat(synapseTestClient.getLastMessage(mediaRoomId).get("body").asText())
                 .contains("Veto")
@@ -291,7 +284,6 @@ internal class CleanupSuggestionsTest {
         }
         wireMock.verifyThat(0, deleteRequestedFor(urlPathMatching("/api/v3/movie/\\d+")))
 
-        // Et l'UI reflète le veto
         val recent = listSuggestions()
         assertThat(recent).hasSize(1)
         assertThat(recent.first()["status"]).isEqualTo("VETOED")
@@ -315,7 +307,6 @@ internal class CleanupSuggestionsTest {
         )
         val deleted = CleanupSeed.suggestion(suggestionId)
         assertThat(deleted?.status).isEqualTo(CleanupSuggestionEntity.STATUS_DELETED)
-        // Les octets libérés sont mesurés sur les fichiers d'épisodes au moment de la suppression
         assertThat(deleted?.freedBytes).isEqualTo(50 * GB)
     }
 
@@ -330,7 +321,6 @@ internal class CleanupSuggestionsTest {
         CleanupSeed.makeSuggestionDue(suggestionId)
         runJob("cleanup-suggestions")
 
-        // La saison est dé-monitorée puis ses fichiers supprimés un à un : la série reste en place
         wireMock.verifyThat(
             putRequestedFor(urlPathEqualTo("/api/v3/series/201"))
                 .withRequestBody(matchingJsonPath("$.seasons[0].monitored", equalTo("false")))
@@ -359,7 +349,6 @@ internal class CleanupSuggestionsTest {
             .`when`().post("/api/cleanup/suggestions")
             .then().statusCode(Response.Status.CONFLICT.statusCode)
 
-        // La saison protégée est intouchable, mais l'autre saison reste suggérable
         suggest("SEASON", sonarrSeriesId = 201, seasonNumber = 1)
         RestAssured.given()
             .contentType(ContentType.JSON)
@@ -373,7 +362,6 @@ internal class CleanupSuggestionsTest {
     fun `une suggestion de saison et une suggestion de la même série entière s'excluent mutuellement`() {
         suggest("SEASON", sonarrSeriesId = 201, seasonNumber = 1)
 
-        // La série entière emporterait la saison déjà en attente de veto
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(mapOf("mediaKind" to "SERIES", "sonarrSeriesId" to 201))
@@ -383,7 +371,6 @@ internal class CleanupSuggestionsTest {
         CleanupSeed.deleteAll()
         suggest("SERIES", sonarrSeriesId = 201)
 
-        // Inversement, une saison couverte par une série en attente ne peut pas être re-suggérée
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(mapOf("mediaKind" to "SEASON", "sonarrSeriesId" to 201, "seasonNumber" to 2))

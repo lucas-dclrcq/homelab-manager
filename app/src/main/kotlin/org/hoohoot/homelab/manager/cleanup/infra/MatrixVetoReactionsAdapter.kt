@@ -9,8 +9,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.cleanup.domain.ports.SuggestionVetoes
 import org.hoohoot.homelab.manager.shared.matrix.MatrixRoomProvider
 
-// Lit les réactions ❌ posées sur l'annonce via l'API relations : contrairement à une écoute
-// du sync du bot, rien n'est perdu si l'app redémarre pendant le délai de grâce
 @ApplicationScoped
 class MatrixVetoReactionsAdapter(
     private val matrixClient: MatrixClientServerApiClient,

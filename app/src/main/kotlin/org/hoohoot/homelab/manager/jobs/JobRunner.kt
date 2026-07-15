@@ -12,12 +12,6 @@ data class JobRunResult(
     val error: String?,
 )
 
-/**
- * Runs a [ManagedJob] and records the execution in job_execution.
- * Both scheduled fires and manual runs go through here: the scheduler's
- * SuccessfulExecution/FailedExecution CDI events are not fired reliably
- * for suspend methods in dev mode, so recording is done in-line instead.
- */
 @ApplicationScoped
 class JobRunner(
     private val managedJobs: Instance<ManagedJob>,

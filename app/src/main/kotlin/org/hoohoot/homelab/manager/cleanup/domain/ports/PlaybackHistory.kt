@@ -9,11 +9,9 @@ interface PlaybackHistory {
 
     suspend fun seasonWatchAggregates(): List<SeasonWatchAggregate>
 
-    // Dernière session de chaque utilisateur, clé user_name en minuscules
     suspend fun userLastActivity(): Map<String, LocalDateTime>
 }
 
 interface MemberStatuses {
-    // username (minuscules) -> membre actif
     suspend fun memberStatuses(): Map<String, Boolean>
 }

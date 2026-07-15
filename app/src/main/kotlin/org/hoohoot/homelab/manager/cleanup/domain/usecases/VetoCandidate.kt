@@ -28,7 +28,6 @@ class VetoCandidate(
             it.protectedAt = LocalDateTime.now()
         } ?: return VetoResult.NotFound
 
-        // Le veto vaut protection durable : le média ne sera plus jamais candidat
         saveProtectionIfMissing(updated, username)
 
         return VetoResult.Ok(updated)

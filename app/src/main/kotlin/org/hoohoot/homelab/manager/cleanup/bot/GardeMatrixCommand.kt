@@ -41,7 +41,6 @@ class GardeMatrixCommand(
 
         Log.info("Cleanup: veto requested by ${sender.localpart} for '$parameters'")
 
-        // Les commandes bot tournent sur les dispatchers trixnity : Panache exige un contexte Vertx safe
         val result = runOnSafeVertxContext(vertx) { vetoByTitle(parameters, sender.localpart) }
 
         when (result) {

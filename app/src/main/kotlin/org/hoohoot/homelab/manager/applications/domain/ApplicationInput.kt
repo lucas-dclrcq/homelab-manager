@@ -6,16 +6,12 @@ const val MAX_LOGO_SIZE_BYTES = 1024L * 1024L
 data class LogoUpload(val bytes: ByteArray, val contentType: String?)
 
 sealed interface LogoChange {
-    /** Formulaire admin sans fichier : le logo existant est conservé tel quel */
     data object Keep : LogoChange
 
-    /** Upload manuel : remplace le logo et efface la source URL (le déclaratif reprendra la main au prochain drift) */
     data class Upload(val logo: LogoUpload) : LogoChange
 
-    /** Source déclarée par l'opérateur : téléchargée seulement si l'URL diffère de celle déjà stockée */
     data class FromUrl(val url: String) : LogoChange
 
-    /** Plus de source déclarée : supprime le logo seulement s'il provenait d'une URL (un upload manuel survit) */
     data object Remove : LogoChange
 }
 

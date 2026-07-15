@@ -37,7 +37,6 @@ class ExecuteDueCampaigns(
         val proposed = all.filter { it.status == CleanupCandidateEntity.STATUS_PROPOSED }
             .sortedByDescending { it.score }
 
-        // Re-check en direct : l'espace a pu se libérer pendant la période de grâce
         val liveFree = diskSpaceGauge.liveFree(campaign.diskPath) ?: diskSpaceGauge.snapshotFree(campaign.diskPath)
         val targetFreeBytes = campaign.freeBytesAtStart + campaign.targetBytesToFree
         val stillToFree = liveFree?.let { targetFreeBytes - it } ?: campaign.targetBytesToFree
@@ -56,7 +55,6 @@ class ExecuteDueCampaigns(
             }
 
             val candidateId = requireNotNull(candidate.id)
-            // Re-check juste avant suppression : un veto ou un problème a pu apparaître
             val fresh = candidates.find(candidateId) ?: continue
             if (fresh.status != CleanupCandidateEntity.STATUS_PROPOSED) continue
             if (protections.all().any { it.covers(fresh.radarrMovieId, fresh.sonarrSeriesId, fresh.seasonNumber) }) {
@@ -95,7 +93,6 @@ class ExecuteDueCampaigns(
         return complete(campaign, freedNow = freed, note = null)
     }
 
-    // Une erreur sur un candidat ne doit pas interrompre les suivants
     private suspend fun delete(candidate: CleanupCandidateEntity): DeleteOutcome = try {
         when (candidate.mediaKind) {
             CleanupCandidateEntity.KIND_MOVIE ->

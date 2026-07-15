@@ -111,7 +111,6 @@ internal class ProblemsTest {
                 )
             )
         )
-        // Oppenheimer n'a pas de fichier : la contrainte de résolution est levée
         wireMock.register(
             get(urlPathEqualTo("/api/v3/release")).withQueryParam("movieId", equalTo("2")).willReturn(
                 okJson(
@@ -130,7 +129,6 @@ internal class ProblemsTest {
         wireMock.register(
             post(urlPathEqualTo("/api/v3/release")).willReturn(okJson("""{"guid": "release-multi", "indexerId": 1}"""))
         )
-        // Profil « HD-1080p » : cutoff = groupe « WEB 1080p » (cas réel du profil Radarr par défaut)
         wireMock.register(
             get(urlPathEqualTo("/api/v3/qualityprofile")).willReturn(
                 okJson(
@@ -155,7 +153,6 @@ internal class ProblemsTest {
                 )
             )
         )
-        // Blade Runner 2049 : releases FR pour le film au profil 4K (movieId 5)
         wireMock.register(
             get(urlPathEqualTo("/api/v3/release")).withQueryParam("movieId", equalTo("5")).willReturn(
                 okJson(
@@ -363,7 +360,6 @@ internal class ProblemsTest {
         assertThat(workflow.getString("media.posterUrl")).isEqualTo("https://img/dune2.jpg")
         assertThat(workflow.getString("media.currentQuality")).isEqualTo("Bluray-720p")
         assertThat(workflow.getList<String>("media.currentLanguages")).containsExactly("English")
-        // Résolution voulue issue du profil Radarr (cutoff), pas celle du fichier 720p actuel
         assertThat(workflow.getString("media.desiredResolution")).isEqualTo("1080")
     }
 
@@ -518,13 +514,11 @@ internal class ProblemsTest {
 
         assertThat(releases).hasSize(5)
         val byGuid = releases.associateBy { it["guid"] }
-        // MULTI dans le titre = FR, même si Radarr ne parse pas de langue French
         assertThat(byGuid["release-multi"]!!["isFrench"]).isEqualTo(true)
         assertThat(byGuid["release-truefrench"]!!["isFrench"]).isEqualTo(true)
         assertThat(byGuid["release-french-language"]!!["isFrench"]).isEqualTo(true)
         assertThat(byGuid["release-vostfr"]!!["isFrench"]).isEqualTo(false)
         assertThat(byGuid["release-vo"]!!["isFrench"]).isEqualTo(false)
-        // Tri : françaises d'abord, puis par seeders
         assertThat(releases.map { it["guid"] })
             .containsExactly("release-multi", "release-truefrench", "release-french-language", "release-vo", "release-vostfr")
     }
@@ -566,7 +560,6 @@ internal class ProblemsTest {
     @TestSecurity(user = "alice", roles = ["admin", "user"])
     fun `radarr sync ignores imports that happened before the grab`() {
         val id = runToAwaitingImport()
-        // L'import VO d'origine réapparaît dans l'historique à cause de l'overlap du watermark
         registerRadarrImportHistory(movieId = 1, importedAt = Instant.now().minus(2, ChronoUnit.HOURS))
 
         runJob("radarr-downloads-sync")
@@ -643,17 +636,12 @@ internal class ProblemsTest {
             .extract().jsonPath().getList<Map<String, Any>>("")
 
         val byGuid = releases.associateBy { it["guid"] }
-        // Le fichier actuel est en 720p mais le profil demande du 1080p : on recommande l'upgrade
-        // MULTI 1080p, même s'il est rejeté par les règles Radarr (taille/format).
         assertThat(byGuid["release-multi"]!!["isRecommended"]).isEqualTo(true)
         assertThat(byGuid["release-multi"]!!["rejected"]).isEqualTo(true)
-        // 720p alors que la qualité demandée est 1080p
         assertThat(byGuid["release-truefrench"]!!["isRecommended"]).isEqualTo(false)
-        // usenet, et pas de tag VF dans le titre
         assertThat(byGuid["release-french-language"]!!["isRecommended"]).isEqualTo(false)
         assertThat(byGuid["release-vo"]!!["isRecommended"]).isEqualTo(false)
         assertThat(byGuid["release-vostfr"]!!["isRecommended"]).isEqualTo(false)
-        // Tri : recommandées d'abord
         assertThat(releases.first()["guid"]).isEqualTo("release-multi")
     }
 
@@ -670,7 +658,6 @@ internal class ProblemsTest {
             .extract().jsonPath().getList<Map<String, Any>>("")
 
         val byGuid = releases.associateBy { it["guid"] }
-        // Profil 1080p : on recommande la 1080p MULTI, pas la 2160p (qualité au-dessus de la demandée)
         assertThat(byGuid["br-multi-1080"]!!["isRecommended"]).isEqualTo(true)
         assertThat(byGuid["br-multi-2160"]!!["isRecommended"]).isEqualTo(false)
     }
@@ -678,7 +665,6 @@ internal class ProblemsTest {
     @Test
     @TestSecurity(user = "alice", roles = ["admin", "user"])
     fun `the resolution constraint is lifted when the desired resolution is unknown`() {
-        // Oppenheimer n'a pas de qualityProfileId : on ne connaît pas la résolution voulue → permissif
         val id = createWorkflow().getString("id")
         selectMovie(id, radarrMovieId = 2)
         selectProblem(id)
@@ -719,12 +705,10 @@ internal class ProblemsTest {
     fun `an admin can take over another user's workflow without reassigning it`() {
         val bobWorkflowId = insertWorkflowFor("bob")
 
-        // Le endpoint user ne voit pas le workflow de bob
         RestAssured.given().contentType(ContentType.JSON).body("""{"radarrMovieId": 1}""")
             .`when`().post("/api/problems/workflows/$bobWorkflowId/movie")
             .then().statusCode(Response.Status.NOT_FOUND.statusCode)
 
-        // Le endpoint admin déroule les mêmes étapes
         val afterMovie = RestAssured.given().contentType(ContentType.JSON).body("""{"radarrMovieId": 1}""")
             .`when`().post("/api/admin/problems/workflows/$bobWorkflowId/movie")
             .then().statusCode(Response.Status.OK.statusCode)
@@ -735,7 +719,6 @@ internal class ProblemsTest {
             .`when`().post("/api/admin/problems/workflows/$bobWorkflowId/problem")
             .then().statusCode(Response.Status.OK.statusCode)
 
-        // Le workflow reste celui de bob
         val adminView = RestAssured.given()
             .`when`().get("/api/admin/problems/workflows/$bobWorkflowId")
             .then().statusCode(Response.Status.OK.statusCode)

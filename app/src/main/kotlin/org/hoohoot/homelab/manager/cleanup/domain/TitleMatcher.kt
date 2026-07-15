@@ -12,17 +12,11 @@ data class MatchableCandidate(
 )
 
 sealed interface TitleMatch {
-    // Tous les candidats d'un même média : un film, ou les saisons candidates d'une même série
     data class Matched(val candidates: List<MatchableCandidate>) : TitleMatch
     data class Ambiguous(val titles: List<String>) : TitleMatch
     data object NoMatch : TitleMatch
 }
 
-/**
- * Matching du titre donné au bot (`!johnny garde <titre>`) contre les candidats de la campagne
- * active : égalité exacte > préfixe > contient, sur titres normalisés. Plusieurs médias distincts
- * dans le meilleur palier -> ambigu, l'utilisateur doit préciser.
- */
 class TitleMatcher {
     fun match(query: String, candidates: List<MatchableCandidate>): TitleMatch {
         val normalizedQuery = Titles.normalize(query)

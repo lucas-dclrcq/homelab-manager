@@ -16,18 +16,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-/**
- * Parse un fichier de backup Jellystat : tableau racine d'objets à clé unique, une par table
- * (`jf_library_items`, `jf_library_episodes`, `jf_playback_activity`, ...).
- *
- * Le fichier peut peser des centaines de Mo (l'essentiel vient des MediaStreams de chaque session) :
- * parsing en streaming Jackson, ligne à ligne, sans jamais matérialiser l'arbre complet.
- * Deux passes pour ne pas dépendre de l'ordre des tables : la première construit les lookups
- * épisodes/items (runtime, saison/épisode, nom de série propre), la seconde mappe les sessions.
- *
- * La progression/complétion est estimée par `durée visionnée / runtime` (suppose un visionnage
- * linéaire, sans skip) — le backup ne contient pas la position de lecture finale.
- */
 @ApplicationScoped
 class JellystatBackupParser(
     private val objectMapper: ObjectMapper,

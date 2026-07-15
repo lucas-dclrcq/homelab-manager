@@ -117,7 +117,6 @@ class MatrixBotLifecycle(
         val relatesTo = event.content.relatesTo ?: return
         val key = relatesTo.key ?: return
 
-        // Un handler qui échoue ne doit pas empêcher les autres de traiter la réaction
         for (handler in reactionHandlers.all()) {
             try {
                 handler.handle(session, sender, roomId, relatesTo.eventId, key)

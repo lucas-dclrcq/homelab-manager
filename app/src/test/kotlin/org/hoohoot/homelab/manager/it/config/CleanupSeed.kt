@@ -10,7 +10,6 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 
-/** Seed des tables cleanup_* pour les tests IT (campagnes, candidats, protections, suggestions). */
 internal object CleanupSeed {
 
     const val GB = 1_000_000_000L

@@ -13,13 +13,10 @@ interface MovieCatalog {
 interface SeriesCatalog {
     suspend fun allSeries(): List<CleanupSeries>
 
-    // Date du dernier episodefile importé par saison — un appel Sonarr par série, à réserver
-    // aux séries déjà pré-filtrées
     suspend fun seasonDownloadDates(sonarrSeriesId: Int): Map<Int, LocalDateTime>
 }
 
 interface MovieEraser {
-    // sizeBytes : taille connue au scan, reprise dans Deleted (le DELETE Radarr ne renvoie rien)
     suspend fun deleteMovie(radarrMovieId: Int, sizeBytes: Long): DeleteOutcome
 }
 
@@ -28,7 +25,6 @@ interface SeasonEraser {
 }
 
 interface SeriesEraser {
-    // sizeBytes : taille connue au moment de la suggestion (le DELETE Sonarr ne renvoie rien)
     suspend fun deleteSeries(sonarrSeriesId: Int, sizeBytes: Long): DeleteOutcome
 }
 

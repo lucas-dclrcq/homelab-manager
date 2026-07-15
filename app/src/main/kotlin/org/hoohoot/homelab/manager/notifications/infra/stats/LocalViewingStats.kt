@@ -22,11 +22,6 @@ import java.time.temporal.ChronoUnit
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-/**
- * Implémentation de ViewingStats sur l'historique local playback_session (module statistics),
- * en remplacement de l'API Jellystat. Chaque appel bascule sur un contexte Vertx safe :
- * les consommateurs (commandes du bot Matrix) tournent hors des dispatchers Quarkus.
- */
 @ApplicationScoped
 class LocalViewingStats(
     private val statisticsQueries: StatisticsQueries,

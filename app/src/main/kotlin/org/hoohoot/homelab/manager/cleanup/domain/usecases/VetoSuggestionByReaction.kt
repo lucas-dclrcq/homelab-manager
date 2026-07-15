@@ -7,9 +7,6 @@ import org.hoohoot.homelab.manager.cleanup.domain.ports.Suggestions
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupSuggestionEntity
 import java.time.LocalDateTime
 
-// Veto immédiat quand une réaction ❌ arrive sur l'annonce : retour direct dans le chat sans
-// attendre l'échéance. La lecture des réactions à l'échéance reste le filet de sécurité
-// (réactions posées pendant un redémarrage de l'app).
 @ApplicationScoped
 class VetoSuggestionByReaction(
     private val suggestions: Suggestions,

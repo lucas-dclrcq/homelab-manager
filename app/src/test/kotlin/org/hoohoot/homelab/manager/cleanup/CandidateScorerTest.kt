@@ -150,7 +150,6 @@ internal class CandidateScorerTest {
         val breakdown = scorer.evaluate(input()).breakdown()
 
         assertThat(breakdown.component("requesterActivity").points).isEqualTo(0.0)
-        // 82.5 points sur 90 de poids -> 91.67 une fois renormalisé
         assertThat(breakdown.total).isEqualTo(91.67)
     }
 

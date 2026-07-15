@@ -33,7 +33,6 @@ class GetPlaysOverTime(
         granularity: TimeGranularity,
         allTime: Boolean,
     ): List<TimePoint> {
-        // All time : combler depuis le premier point mesuré, pas depuis epoch
         val start = if (allTime) points.firstOrNull()?.bucketStart ?: return emptyList() else fromLocal
         val byBucket = points.associateBy { it.bucketStart }
         val filled = mutableListOf<TimePoint>()

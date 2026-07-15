@@ -2,7 +2,6 @@ package org.hoohoot.homelab.manager.cleanup.domain
 
 import java.time.LocalDateTime
 
-// Configuration effective du nettoyage, chargée des properties (cleanup.*)
 data class CleanupConfig(
     val diskPath: String,
     val thresholdFreeBytes: Long,
@@ -64,7 +63,6 @@ data class CleanupSeason(
     val previousAiring: LocalDateTime?,
 )
 
-// Entrée de la bibliothèque Jellyfin, porteuse des provider ids partagés avec Radarr/Sonarr
 data class JellyfinLibraryEntry(
     val itemId: String,
     val name: String,
@@ -77,7 +75,6 @@ data class JellyfinLibraryEntry(
 
 enum class JellyfinEntryType { MOVIE, SERIES }
 
-// Agrégat de visionnage d'un film (une ligne par item Jellyfin)
 data class MovieWatchAggregate(
     val itemId: String,
     val itemName: String,
@@ -86,7 +83,6 @@ data class MovieWatchAggregate(
     val lastInProgressAt: LocalDateTime?,
 )
 
-// Agrégat de visionnage d'une saison (une ligne par saison Jellyfin visionnée)
 data class SeasonWatchAggregate(
     val seriesId: String?,
     val seriesName: String?,
@@ -98,7 +94,6 @@ data class SeasonWatchAggregate(
 
 enum class Correlation { PROVIDER_ID, TITLE, NONE }
 
-// Visionnage corrélé d'un média *arr : ce que le scoring consomme
 data class CorrelatedWatch(
     val correlation: Correlation,
     val lastWatchedAt: LocalDateTime?,
@@ -125,7 +120,6 @@ sealed interface Evaluation {
     data class Scored(val breakdown: ScoreBreakdown) : Evaluation
 }
 
-// Objet racine JSONB (cleanup_candidate.score_breakdown) : jamais une List à la racine
 data class ScoreBreakdown(
     val total: Double = 0.0,
     val components: List<ScoreComponent> = emptyList(),
@@ -149,7 +143,6 @@ data class ScoreInputs(
     val correlation: String = Correlation.NONE.name,
 )
 
-// Objet racine JSONB (cleanup_campaign.state)
 data class CampaignState(
     val executionSummary: ExecutionSummary? = null,
 )
@@ -175,7 +168,6 @@ sealed interface DeleteOutcome {
     data class Failed(val reason: String) : DeleteOutcome
 }
 
-// Qui agit sur une ressource cleanup : l'utilisateur (limité aux siennes) ou un admin
 sealed interface Accessor {
     data class User(val username: String) : Accessor
     data object Admin : Accessor

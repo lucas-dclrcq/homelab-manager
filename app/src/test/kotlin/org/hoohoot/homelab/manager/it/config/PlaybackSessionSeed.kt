@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-/** Seed de playback_session pour les tests IT (base partagée : utiliser des users/médias identifiables). */
 internal object PlaybackSessionSeed {
 
     fun insertSession(

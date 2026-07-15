@@ -30,7 +30,6 @@ class RadarrCleanupAdapter(
         else DeleteOutcome.Failed("Radarr a répondu ${exception.response?.status} : ${exception.message}")
     }
 
-    // Best-effort : sans les tags on perd juste l'attribution du demandeur
     private suspend fun tagLabels(): Map<Int, String> = try {
         radarrRestClient.getTags().orEmpty()
             .mapNotNull { tag -> tag.id?.let { id -> tag.label?.let { id to it } } }

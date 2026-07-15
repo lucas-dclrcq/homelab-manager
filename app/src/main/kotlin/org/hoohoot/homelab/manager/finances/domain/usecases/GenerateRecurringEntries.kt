@@ -16,9 +16,6 @@ class GenerateRecurringEntries(
     private val recurringRules: RecurringRules,
     private val financeEntries: FinanceEntries,
 ) {
-    // Rejouable à volonté : on re-parcourt toutes les périodes depuis start_date et
-    // saveIfAbsent ignore celles déjà matérialisées — le rattrapage après une longue
-    // extinction du serveur est donc automatique
     suspend operator fun invoke(today: LocalDate = LocalDate.now()): Int {
         var created = 0
         val currentPeriod = YearMonth.from(today)

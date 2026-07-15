@@ -12,8 +12,6 @@ import org.hoohoot.homelab.manager.shared.matrix.bot.MatrixBotSession
 import org.hoohoot.homelab.manager.shared.matrix.bot.reactions.ReactionBotHandler
 import org.hoohoot.homelab.manager.shared.vertx.runOnSafeVertxContext
 
-// Une réaction ❌ sur l'annonce d'une suggestion vaut veto immédiat : l'issue est
-// annoncée dans le chat sans attendre l'échéance
 @ApplicationScoped
 class SuggestionVetoReactionHandler(
     private val vetoSuggestionByReaction: VetoSuggestionByReaction,
@@ -29,7 +27,6 @@ class SuggestionVetoReactionHandler(
     ) {
         if (!MatrixVetoReactionsAdapter.isVetoEmoji(key)) return
 
-        // Les handlers bot tournent sur les dispatchers trixnity : Panache exige un contexte Vertx safe
         val vetoed = runOnSafeVertxContext(vertx) {
             vetoSuggestionByReaction(targetEventId.full, sender.localpart)
         }

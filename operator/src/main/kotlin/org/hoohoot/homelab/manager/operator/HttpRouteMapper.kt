@@ -20,7 +20,6 @@ const val DEFAULT_DESCRIPTION = "Managed by homelab-manager-operator"
 @ApplicationScoped
 class HttpRouteMapper(private val config: OperatorConfig) {
 
-    /** Retourne null si la route n'est pas éligible (non annotée enabled=true ou URL indéterminable) */
     fun map(route: HTTPRoute): DesiredApplication? {
         val annotations = route.metadata?.annotations.orEmpty()
         val prefix = config.annotationPrefix()

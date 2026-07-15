@@ -17,8 +17,6 @@ class DeleteFinanceEntry(
 ) {
     suspend operator fun invoke(id: UUID): EntryDeleteResult {
         val entity = financeEntries.findById(id) ?: return EntryDeleteResult.NotFound
-        // Supprimer une occurrence RECURRING la ferait régénérer par le job : on édite
-        // l'écriture ou on désactive la règle à la place
         if (entity.source == EntrySource.RECURRING) return EntryDeleteResult.RecurringForbidden
         financeEntries.delete(id)
         return EntryDeleteResult.Deleted

@@ -78,7 +78,6 @@ internal class EnergyExpenseTest {
         assertThat(runJob()).isEqualTo("SUCCESS")
 
         val entries = energyEntries()
-        // Rattrapage : 3 mois en arrière
         assertThat(entries).hasSize(3)
         assertThat(entries).allSatisfy { assertThat(it["type"]).isEqualTo("EXPENSE") }
         assertThat(entries.map { it["period"] }).doesNotHaveDuplicates()
@@ -98,7 +97,6 @@ internal class EnergyExpenseTest {
         assertThat(lastMonthEntry["amountCents"]).isEqualTo(expectedCents)
         assertThat(lastMonthEntry["label"]).isEqualTo("Électricité $previousMonth")
 
-        // Deuxième run : rien de nouveau
         assertThat(runJob()).isEqualTo("SUCCESS")
         assertThat(energyEntries()).hasSize(3)
     }

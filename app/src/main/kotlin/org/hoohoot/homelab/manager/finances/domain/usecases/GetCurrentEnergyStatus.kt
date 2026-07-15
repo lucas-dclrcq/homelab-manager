@@ -9,7 +9,6 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
 
-// Heures moyennes d'un mois (365,25 j / 12) pour projeter la conso mensuelle
 private const val HOURS_PER_MONTH = 730.5
 
 data class EnergyStatus(
@@ -27,7 +26,6 @@ class GetCurrentEnergyStatus(
     suspend operator fun invoke(): EnergyStatus {
         val kwhPrice = financeSettings.get().kwhPrice
 
-        // Prometheus indisponible ne doit pas casser la page Finances : on renvoie des nulls
         val currentWatts = runCatching { energyMetrics.currentPowerWatts() }
             .onFailure { Log.warn("Impossible de récupérer la puissance instantanée depuis Prometheus", it) }
             .getOrNull()

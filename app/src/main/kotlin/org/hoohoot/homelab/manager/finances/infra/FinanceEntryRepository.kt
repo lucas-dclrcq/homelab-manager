@@ -119,8 +119,6 @@ class FinanceEntryRepository : FinanceEntries {
             entity.persist<FinanceEntryEntity>()
         }.awaitSuspending()
 
-    // Check-then-insert dans une même transaction : l'index unique (rule_id, period) /
-    // (period, source=ENERGY) reste le garde-fou en cas de course entre run planifié et manuel
     override suspend fun saveIfAbsent(entity: FinanceEntryEntity): Boolean =
         Panache.withTransaction {
             val existing = when {

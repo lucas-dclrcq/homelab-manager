@@ -16,8 +16,6 @@ class ImportJellystatBackup(
     private val playbackSessions: PlaybackSessions,
 ) {
     suspend operator fun invoke(file: Path): ImportResult {
-        // Lecture bloquante d'un gros fichier : déportée sur un worker Vertx (pas Dispatchers.IO,
-        // dont les threads n'ont pas le classloader Quarkus)
         val content = VertxContextSupport.executeBlocking(Callable { reader.read(file) }).awaitSuspending()
         var imported = 0
         content.records.chunked(BATCH_SIZE).forEach { batch ->

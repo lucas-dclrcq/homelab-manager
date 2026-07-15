@@ -89,7 +89,6 @@ internal class JobsAdminTest {
             .`when`().post("/api/admin/jobs/sonarr-sync/run")
             .then().statusCode(Response.Status.OK.statusCode)
 
-        // Different live values from now on: /api/stats must keep serving the persisted snapshot
         wireMock.register(
             get(urlPathEqualTo("/api/v3/movie")).willReturn(okJson("""[{"id": 9, "title": "Alien"}]"""))
         )
@@ -102,7 +101,6 @@ internal class JobsAdminTest {
         assertThat(stats.getInt("movieCount")).isEqualTo(2)
         assertThat(stats.getInt("seriesCount")).isEqualTo(1)
         assertThat(stats.getInt("episodeCount")).isEqualTo(28)
-        // Radarr and Sonarr snapshots both report /data: the merge dedupes it
         assertThat(stats.getLong("diskTotalBytes")).isEqualTo(2000)
         assertThat(stats.getLong("diskFreeBytes")).isEqualTo(500)
         assertThat(stats.getLong("diskUsedBytes")).isEqualTo(1500)

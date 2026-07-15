@@ -7,7 +7,6 @@ import org.hoohoot.homelab.manager.cleanup.domain.Titles
 import org.hoohoot.homelab.manager.cleanup.domain.ports.MovieCatalog
 import org.hoohoot.homelab.manager.cleanup.domain.ports.SeriesCatalog
 
-// Les APIs *arr ne supportent pas de recherche : on filtre la bibliothèque côté backend
 @ApplicationScoped
 class SearchProtectableMedia(
     private val movieCatalog: MovieCatalog,

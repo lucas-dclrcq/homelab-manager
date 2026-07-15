@@ -35,7 +35,6 @@ class MediaDownloadRepository {
         }.awaitSuspending()?.downloadedAt
     }
 
-    // Insère uniquement les candidats absents (dédup sur source + externalId), renvoie le nombre inséré
     suspend fun saveNewDownloads(source: String, candidates: List<MediaDownloadEntity>): Int {
         if (candidates.isEmpty()) return 0
         return Panache.withTransaction {

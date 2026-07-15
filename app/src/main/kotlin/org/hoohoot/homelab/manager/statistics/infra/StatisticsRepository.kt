@@ -24,10 +24,6 @@ import org.hoohoot.homelab.manager.statistics.domain.WeekdayActivity
 import org.hoohoot.homelab.manager.statistics.domain.ports.StatisticsQueries
 import java.time.LocalDateTime
 
-/**
- * Agrégations SQL natives sur playback_session. La base stocke des timestamps UTC ;
- * les regroupements heure/jour utilisent le double AT TIME ZONE pour raisonner en heure locale.
- */
 @ApplicationScoped
 class StatisticsRepository(
     @param:ConfigProperty(name = "statistics.timezone") private val timezone: String,
@@ -304,7 +300,6 @@ class StatisticsRepository(
     }
 
     companion object {
-        /** Binge score = min(100, moyenne d'épisodes distincts vus par jour actif et par user ÷ cap × 100). */
         private const val BINGE_CAP_EPISODES_PER_DAY = 6.0
     }
 }

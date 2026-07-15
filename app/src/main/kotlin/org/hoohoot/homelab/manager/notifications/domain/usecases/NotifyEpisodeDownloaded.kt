@@ -35,7 +35,6 @@ class NotifyEpisodeDownloaded(
             ),
         )
 
-        // Les épisodes d'une même série sont regroupés dans un thread Matrix
         if (episode.seriesId != null) {
             val activeThread = threads.getThreadByMediaId(episode.seriesId, "series")
             val sentNotificationId = sender.send(NotificationRoom.MEDIA, message, activeThread)

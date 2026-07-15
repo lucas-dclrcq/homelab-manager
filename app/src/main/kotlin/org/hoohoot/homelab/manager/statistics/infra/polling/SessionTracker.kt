@@ -38,16 +38,6 @@ private class TrackedSession(
     var last: ActiveSession,
 )
 
-/**
- * Suit les sessions de lecture Jellyfin entre deux snapshots de GET /Sessions et produit
- * les sessions terminées (disparues du snapshot ou périmées) prêtes à persister.
- *
- * L'état vit en mémoire : il est perdu au redémarrage (les sessions en cours à ce moment-là
- * ne sont pas comptabilisées, compromis accepté) et suppose une instance unique de l'application.
- *
- * Le temps de pause est accumulé par delta entre deux ticks où la session est en pause ; la durée
- * réellement visionnée est donc `(dernière vue − début) − pauses`, à la granularité du polling près.
- */
 class SessionTracker(
     private val minPlaySeconds: Long,
     private val staleAfterSeconds: Long,
@@ -65,8 +55,6 @@ class SessionTracker(
             val tracked = sessions[key]
             when {
                 tracked == null -> sessions[key] = TrackedSession(now, now, 0, session)
-                // Trou de polling trop long (Jellyfin injoignable) : on clôt l'ancienne session
-                // plutôt que de lui imputer tout le temps du trou, et on en démarre une nouvelle
                 isStale(tracked, now) -> {
                     finalize(tracked)?.let(finished::add)
                     sessions[key] = TrackedSession(now, now, 0, session)

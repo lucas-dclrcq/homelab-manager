@@ -28,7 +28,6 @@ interface StatisticsQueries {
     suspend fun platformBreakdown(range: StatsRange): List<PlatformShare>
     suspend fun playsOverTime(range: StatsRange, granularity: TimeGranularity): List<TimePoint>
 
-    // Requêtes du bot Matrix / weekly report (bornes UTC brutes, pas de notion de période d'affichage)
     suspend fun mostPopular(fromUtc: LocalDateTime, toUtc: LocalDateTime, kind: MediaKind, limit: Int): List<MostPopular>
     suspend fun mostViewed(fromUtc: LocalDateTime, toUtc: LocalDateTime, kind: MediaKind, limit: Int): List<MostViewed>
     suspend fun seriesWatchers(seriesId: String): List<SeriesWatcher>

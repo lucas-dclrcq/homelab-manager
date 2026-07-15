@@ -15,12 +15,6 @@ import org.hoohoot.homelab.manager.statistics.domain.ports.PlaybackSessions
 import java.time.Duration
 import java.time.Instant
 
-/**
- * Polle GET /Sessions de Jellyfin à intervalle court pour alimenter l'historique de visionnage.
- *
- * Volontairement hors du pattern ManagedJob/JobRunner : un tick toutes les 15 s inonderait
- * la table job_execution. Les erreurs (Jellyfin injoignable) sont loguées en warn throttlé.
- */
 @ApplicationScoped
 class JellyfinSessionPoller(
     @param:RestClient private val jellyfin: JellyfinRestClient,
@@ -67,7 +61,6 @@ class JellyfinSessionPoller(
             val mediaType = when (item.type) {
                 "Movie" -> MediaType.MOVIE
                 "Episode" -> MediaType.EPISODE
-                // Trailers, audio, live TV, livres... hors périmètre des stats
                 else -> return null
             }
             return ActiveSession(

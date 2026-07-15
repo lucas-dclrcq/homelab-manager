@@ -66,14 +66,11 @@ internal class MemberSyncTest {
         assertThat(paul["displayName"]).isEqualTo("Paul Sync")
         assertThat(paul["email"]).isEqualTo("paul@hoohoot.org")
         assertThat(paul["fromAuthentik"]).isEqualTo(true)
-        // name vide → fallback sur le username
         assertThat(members.first { it["username"] == "sync-noah" }["displayName"]).isEqualTo("sync-noah")
 
-        // Re-run à l'identique : idempotent, pas de doublon
         assertThat(runSync()).isEqualTo("SUCCESS")
         assertThat(fetchMembers().filter { (it["username"] as String).startsWith("sync-") }).hasSize(3)
 
-        // Mara disparaît de l'annuaire : désactivée mais conservée (historique des cotisations)
         wireMock.resetMappings()
         stubUsersPage(
             page = 1, next = 0,

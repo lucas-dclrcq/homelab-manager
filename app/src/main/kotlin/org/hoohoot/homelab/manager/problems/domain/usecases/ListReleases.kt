@@ -20,7 +20,6 @@ class ListReleases(
     private val releases: Releases,
 ) {
     companion object {
-        // VOSTFR volontairement exclu : sous-titres, pas doublage
         private val VF_REGEX = Regex("""\b(MULTI|VF[FIQ2]?|FRENCH|TRUEFRENCH)\b""", RegexOption.IGNORE_CASE)
         private val RESOLUTION_REGEX = Regex("""(2160|1080|720|576|480)p""", RegexOption.IGNORE_CASE)
 
@@ -35,8 +34,6 @@ class ListReleases(
         if (workflow.problemType == null) {
             return ListReleasesResult.Conflict("a problem must be selected first")
         }
-        // Les règles Radarr rejettent la plupart des releases FR : on recommande nous-mêmes celles
-        // qui sont en torrent, à une bonne résolution, avec un tag VF/MULTI dans le titre.
         val desiredResolution = workflow.state.media?.desiredResolution?.toIntOrNull()
         val annotated = releases.searchForMovie(movieId)
             .map { AnnotatedRelease(it, it.isFrench(), it.isRecommended(desiredResolution)) }
@@ -51,9 +48,6 @@ class ListReleases(
     private fun Release.isFrench(): Boolean =
         languages.any { it.equals("French", ignoreCase = true) } || VF_REGEX.containsMatchIn(title)
 
-    // On recommande les torrents VF/MULTI à la résolution EXACTE demandée par le profil Radarr :
-    // ni en dessous (downgrade), ni au-dessus (ex : pas de 2160p quand le profil vise 1080p).
-    // Profil inconnu → permissif (on ne peut pas filtrer sur la résolution).
     private fun Release.isRecommended(desiredResolution: Int?): Boolean {
         if (!protocol.equals("torrent", ignoreCase = true)) return false
         if (!VF_REGEX.containsMatchIn(title)) return false

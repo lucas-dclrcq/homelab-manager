@@ -14,11 +14,7 @@ class VertxContextDispatcher(private val context: Context) : CoroutineDispatcher
     }
 }
 
-/**
- * Exécute [block] sur un contexte Vertx duplé et marqué safe — prérequis d'Hibernate Reactive
- * Panache. Nécessaire pour le code appelé hors requête HTTP ou scheduler Quarkus (ex : commandes
- * du bot Matrix qui tournent sur les dispatchers trixnity).
- */
+// Hibernate Reactive Panache exige un contexte Vertx duplé et marqué safe hors requête HTTP/scheduler
 suspend fun <T> runOnSafeVertxContext(vertx: Vertx, block: suspend () -> T): T {
     val context = VertxContext.getOrCreateDuplicatedContext(vertx)
     VertxContextSafetyToggle.setContextSafe(context, true)

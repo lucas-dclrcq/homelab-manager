@@ -31,8 +31,6 @@ class RadarrProblemsAdapter(
         radarrRestClient.grabRelease(RadarrGrabRequest(guid, indexerId))
     }
 
-    // Résolution cible (cutoff) de chaque profil de qualité. Best-effort : en cas d'échec, on
-    // recommande de façon permissive plutôt que de casser la recherche de films.
     private suspend fun desiredResolutionByProfile(): Map<Int, String> =
         try {
             radarrRestClient.getQualityProfiles().orEmpty()
@@ -47,7 +45,6 @@ class RadarrProblemsAdapter(
             emptyMap()
         }
 
-    // Le cutoff référence soit l'id d'une qualité (feuille), soit l'id d'un groupe de qualités
     private fun RadarrQualityProfile.cutoffResolution(): Int? {
         val target = cutoff ?: return null
         fun find(items: List<RadarrQualityProfileItem>): Int? {

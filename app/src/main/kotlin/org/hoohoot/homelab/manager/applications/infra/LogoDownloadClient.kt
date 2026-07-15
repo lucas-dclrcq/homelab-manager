@@ -10,11 +10,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 import org.jboss.resteasy.reactive.RestResponse
 import java.time.temporal.ChronoUnit
 
-/**
- * Les logos sont servis depuis des URLs absolues variables : @Url remplace la base à chaque appel.
- * RestResponse plutôt que Response : l'entité est lue de façon non bloquante (readEntity sur
- * l'event loop lève BlockingNotAllowedException).
- */
+// RestResponse (pas Response) : readEntity sur l'event loop lèverait BlockingNotAllowedException
 @RegisterRestClient(configKey = "logo-download")
 @Retry(maxRetries = 2, delay = 500, jitter = 250, retryOn = [ProcessingException::class, TimeoutException::class])
 @Timeout(value = 30, unit = ChronoUnit.SECONDS)

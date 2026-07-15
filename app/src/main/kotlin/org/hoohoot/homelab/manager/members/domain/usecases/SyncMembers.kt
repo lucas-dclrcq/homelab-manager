@@ -13,8 +13,6 @@ class SyncMembers(
 ) {
     suspend operator fun invoke(): MemberSyncStats {
         val users = memberDirectory.fetchUsers()
-        // Un annuaire vide ressemble plus à un incident (mauvais groupe, token invalide)
-        // qu'à une communauté dissoute : on ne désactive pas tout le monde sur cette base
         check(users.isNotEmpty()) { "Authentik n'a renvoyé aucun utilisateur : synchronisation abandonnée" }
         val stats = members.syncFromDirectory(users)
         Log.info("Member sync: ${stats.created} créés, ${stats.updated} mis à jour, ${stats.deactivated} désactivés")

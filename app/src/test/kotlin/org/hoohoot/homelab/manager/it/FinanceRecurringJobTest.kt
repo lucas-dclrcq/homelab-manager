@@ -39,7 +39,6 @@ internal class FinanceRecurringJobTest {
 
     private fun entriesWithLabel(label: String): List<Map<String, Any>> {
         val today = LocalDate.now()
-        // Le rattrapage peut chevaucher deux années civiles
         return listOf(today.year, today.year - 1).flatMap { year ->
             RestAssured.given()
                 .`when`().get("/api/finances/entries?year=$year&pageSize=100")
@@ -57,7 +56,6 @@ internal class FinanceRecurringJobTest {
         assertThat(runJob()).isEqualTo("SUCCESS")
 
         val entries = entriesWithLabel("Abonnement box récurrent")
-        // day_of_month=1 : une occurrence pour chacun des 4 mois écoulés (M-3 .. mois courant)
         assertThat(entries).hasSize(4)
         assertThat(entries).allSatisfy {
             assertThat(it["source"]).isEqualTo("RECURRING")
@@ -65,7 +63,6 @@ internal class FinanceRecurringJobTest {
         }
         assertThat(entries.map { it["period"] }).doesNotHaveDuplicates()
 
-        // Deuxième run : aucune écriture supplémentaire
         assertThat(runJob()).isEqualTo("SUCCESS")
         assertThat(entriesWithLabel("Abonnement box récurrent")).hasSize(4)
     }
@@ -80,7 +77,6 @@ internal class FinanceRecurringJobTest {
         assertThat(runJob()).isEqualTo("SUCCESS")
 
         assertThat(entriesWithLabel("Règle inactive")).isEmpty()
-        // end_date = M-2 : seules les occurrences de M-3 et M-2 sont dues
         assertThat(entriesWithLabel("Règle terminée")).hasSize(2)
     }
 }
