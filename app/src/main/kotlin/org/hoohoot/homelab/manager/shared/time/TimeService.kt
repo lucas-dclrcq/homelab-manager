@@ -52,7 +52,7 @@ class TimeService {
     fun getDaysSince(date: LocalDate): Int {
         val currentDate = java.time.Instant.ofEpochMilli(clock.now().toEpochMilliseconds())
             .atZone(ZoneOffset.UTC).toLocalDate()
-        return date.daysUntil(currentDate)
+        return java.time.temporal.ChronoUnit.DAYS.between(date, currentDate).toInt()
     }
 
     fun setFixedClock(fixedInstant: Instant) {
