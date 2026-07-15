@@ -81,6 +81,9 @@ class ProblemWorkflowEntity : PanacheEntityBase {
     @Column(name = "completed_at")
     var completedAt: LocalDateTime? = null
 
+    @Column(name = "notification_event_id")
+    var notificationEventId: String? = null
+
     companion object : PanacheCompanionBase<ProblemWorkflowEntity, UUID> {
         const val MEDIA_TYPE_MOVIE = "movie"
         const val MEDIA_TYPE_TV = "tv"

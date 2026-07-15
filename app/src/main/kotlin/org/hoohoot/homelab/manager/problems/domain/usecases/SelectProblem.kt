@@ -1,14 +1,19 @@
 package org.hoohoot.homelab.manager.problems.domain.usecases
 
 import jakarta.enterprise.context.ApplicationScoped
+import org.hoohoot.homelab.manager.notifications.domain.NotificationId
 import org.hoohoot.homelab.manager.problems.domain.Accessor
 import org.hoohoot.homelab.manager.problems.domain.ProblemResult
+import org.hoohoot.homelab.manager.problems.domain.ports.ProblemNotifier
 import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
 import org.hoohoot.homelab.manager.problems.infra.ProblemWorkflowEntity
 import java.util.UUID
 
 @ApplicationScoped
-class SelectProblem(private val workflows: ProblemWorkflows) {
+class SelectProblem(
+    private val workflows: ProblemWorkflows,
+    private val notifier: ProblemNotifier,
+) {
     companion object {
         private const val MAX_DESCRIPTION_LENGTH = 2000
 
@@ -45,6 +50,8 @@ class SelectProblem(private val workflows: ProblemWorkflows) {
             }
         }
 
+        val inThread = workflow.notificationEventId?.let { NotificationId(it) }
+
         val updated = workflows.update(id, accessor) { entity ->
             entity.problemType = problemType
             if (problemType == ProblemWorkflowEntity.PROBLEM_OTHER) {
@@ -52,6 +59,18 @@ class SelectProblem(private val workflows: ProblemWorkflows) {
                 entity.state = entity.state.copy(description = trimmedDescription)
             }
         } ?: return ProblemResult.NotFound
+
+        // Notifie le channel support quand le problème passe en REPORTED
+        if (updated.status == ProblemWorkflowEntity.STATUS_REPORTED) {
+            notifier.problemReported(
+                mediaTitle = updated.mediaTitle,
+                problemType = updated.problemType,
+                description = updated.state.description,
+                reporter = updated.username,
+                inThread = inThread,
+            )
+        }
+
         return ProblemResult.Ok(updated)
     }
 }

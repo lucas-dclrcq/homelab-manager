@@ -2,13 +2,17 @@ package org.hoohoot.homelab.manager.problems.domain.usecases
 
 import jakarta.enterprise.context.ApplicationScoped
 import org.hoohoot.homelab.manager.problems.domain.ProblemResult
+import org.hoohoot.homelab.manager.problems.domain.ports.ProblemNotifier
 import org.hoohoot.homelab.manager.problems.domain.ports.ProblemWorkflows
 import org.hoohoot.homelab.manager.problems.infra.ProblemWorkflowEntity
 import java.time.LocalDateTime
 import java.util.UUID
 
 @ApplicationScoped
-class CreateWorkflow(private val workflows: ProblemWorkflows) {
+class CreateWorkflow(
+    private val workflows: ProblemWorkflows,
+    private val notifier: ProblemNotifier,
+) {
     companion object {
         private val MEDIA_TYPES = setOf(
             ProblemWorkflowEntity.MEDIA_TYPE_MOVIE,
@@ -27,6 +31,12 @@ class CreateWorkflow(private val workflows: ProblemWorkflows) {
         entity.status = ProblemWorkflowEntity.STATUS_IN_PROGRESS
         entity.createdAt = LocalDateTime.now()
         entity.updatedAt = LocalDateTime.now()
+        
+        val notifId = notifier.workflowCreated(username, mediaType)
+        if (notifId != null) {
+            entity.notificationEventId = notifId.value
+        }
+
         return ProblemResult.Ok(workflows.save(entity))
     }
 }
