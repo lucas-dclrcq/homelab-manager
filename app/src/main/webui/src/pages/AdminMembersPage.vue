@@ -38,16 +38,7 @@ const syncResult = computed(
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-          Membres
-        </h1>
-        <p class="mt-2 text-ink-soft">
-          La liste des membres de Hoohoot, synchronisée depuis Authentik toutes
-          les 6 heures.
-        </p>
-      </div>
+    <header class="flex flex-wrap items-end justify-end gap-4">
       <BaseButton
         variant="secondary"
         :loading="isSyncing"

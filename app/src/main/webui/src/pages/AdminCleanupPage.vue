@@ -125,16 +125,7 @@ const weights = computed(() => {
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-          Nettoyage
-        </h1>
-        <p class="mt-2 text-ink-soft">
-          La config effective des campagnes, l'historique, et la grosse manette
-          pour lancer un scan à la main.
-        </p>
-      </div>
+    <header class="flex flex-wrap items-end justify-end gap-4">
       <BaseButton
         :disabled="hasActiveCampaign"
         :title="

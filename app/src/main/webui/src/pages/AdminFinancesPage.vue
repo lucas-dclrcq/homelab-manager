@@ -148,15 +148,6 @@ function submitSettings() {
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header>
-      <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-        Finances
-      </h1>
-      <p class="mt-2 text-ink-soft">
-        La gestion des sous : écritures, récurrences, membres et prix du kWh.
-      </p>
-    </header>
-
     <div class="flex flex-wrap gap-1.5">
       <button
         v-for="item in tabs"

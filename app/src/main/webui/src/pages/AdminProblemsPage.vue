@@ -40,16 +40,6 @@ const { mutate: deleteWorkflow, isPending: isDeleting } =
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header>
-      <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-        Problèmes
-      </h1>
-      <p class="mt-2 text-ink-soft">
-        Tous les problèmes signalés par les membres. Reprends-en un, marque-le
-        résolu ou fais le ménage.
-      </p>
-    </header>
-
     <ProblemsAdminTable
       @resolve="resolving = $event"
       @delete="deleting = $event"

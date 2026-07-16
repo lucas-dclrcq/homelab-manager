@@ -43,15 +43,7 @@ const { mutate: deleteApplication, isPending: isDeleting } =
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-          Applications
-        </h1>
-        <p class="mt-2 text-ink-soft">
-          Le catalogue de hoohoot : ajoute, corrige ou retire des applis.
-        </p>
-      </div>
+    <header class="flex flex-wrap items-end justify-end gap-4">
       <BaseButton @click="openCreate">
         <UiIcon name="plus" class="size-4" />
         Ajouter une appli

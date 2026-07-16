@@ -161,7 +161,9 @@ function suggestionByline(suggestion: CleanupSuggestionDto): string {
         <div class="min-w-0 flex-1">
           <p class="truncate font-display font-bold">
             {{ suggestion.displayTitle
-            }}<template v-if="suggestion.year"> ({{ suggestion.year }})</template>
+            }}<template v-if="suggestion.year">
+              ({{ suggestion.year }})</template
+            >
           </p>
           <p class="text-xs text-mute">
             {{ suggestionByline(suggestion) }}

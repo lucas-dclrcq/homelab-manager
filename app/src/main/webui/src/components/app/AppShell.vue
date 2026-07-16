@@ -43,21 +43,7 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
           >
             Le coin technique
           </div>
-          <SideNavItem
-            to="/admin/applications"
-            label="Applications"
-            icon="package"
-          />
-          <SideNavItem to="/admin/finances" label="Finances" icon="wallet" />
-          <SideNavItem to="/admin/members" label="Membres" icon="users" />
-          <SideNavItem
-            to="/admin/statistics"
-            label="Statistiques"
-            icon="upload"
-          />
-          <SideNavItem to="/admin/problems" label="Problèmes" icon="wrench" />
-          <SideNavItem to="/admin/cleanup" label="Nettoyage" icon="trash-2" />
-          <SideNavItem to="/admin/jobs" label="Tâches" icon="clock" />
+          <SideNavItem to="/admin" label="Administration" icon="shield" />
         </template>
 
         <template #footer>

@@ -41,54 +41,51 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      redirect: { name: 'admin-applications' },
-    },
-    {
-      path: '/admin/applications',
-      name: 'admin-applications',
-      component: () => import('../pages/AdminApplicationsPage.vue'),
+      component: () => import('../pages/AdminLayout.vue'),
       meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/jobs',
-      name: 'admin-jobs',
-      component: () => import('../pages/AdminJobsPage.vue'),
-      meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/finances',
-      name: 'admin-finances',
-      component: () => import('../pages/AdminFinancesPage.vue'),
-      meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/members',
-      name: 'admin-members',
-      component: () => import('../pages/AdminMembersPage.vue'),
-      meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/statistics',
-      name: 'admin-statistics',
-      component: () => import('../pages/AdminStatisticsPage.vue'),
-      meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/problems',
-      name: 'admin-problems',
-      component: () => import('../pages/AdminProblemsPage.vue'),
-      meta: { requiresAdmin: true },
+      children: [
+        { path: '', redirect: { name: 'admin-applications' } },
+        {
+          path: 'applications',
+          name: 'admin-applications',
+          component: () => import('../pages/AdminApplicationsPage.vue'),
+        },
+        {
+          path: 'finances',
+          name: 'admin-finances',
+          component: () => import('../pages/AdminFinancesPage.vue'),
+        },
+        {
+          path: 'members',
+          name: 'admin-members',
+          component: () => import('../pages/AdminMembersPage.vue'),
+        },
+        {
+          path: 'statistics',
+          name: 'admin-statistics',
+          component: () => import('../pages/AdminStatisticsPage.vue'),
+        },
+        {
+          path: 'problems',
+          name: 'admin-problems',
+          component: () => import('../pages/AdminProblemsPage.vue'),
+        },
+        {
+          path: 'cleanup',
+          name: 'admin-cleanup',
+          component: () => import('../pages/AdminCleanupPage.vue'),
+        },
+        {
+          path: 'jobs',
+          name: 'admin-jobs',
+          component: () => import('../pages/AdminJobsPage.vue'),
+        },
+      ],
     },
     {
       path: '/admin/problems/:id',
       name: 'admin-problem-workflow',
       component: () => import('../pages/ProblemWorkflowPage.vue'),
-      meta: { requiresAdmin: true },
-    },
-    {
-      path: '/admin/cleanup',
-      name: 'admin-cleanup',
-      component: () => import('../pages/AdminCleanupPage.vue'),
       meta: { requiresAdmin: true },
     },
   ],

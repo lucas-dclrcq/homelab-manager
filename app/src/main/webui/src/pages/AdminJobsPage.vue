@@ -4,15 +4,6 @@ import JobsPanel from '../components/app/JobsPanel.vue'
 
 <template>
   <div class="flex max-w-5xl flex-col gap-8">
-    <header>
-      <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
-        Tâches
-      </h1>
-      <p class="mt-2 text-ink-soft">
-        Les synchronisations et routines planifiées de hoohoot.
-      </p>
-    </header>
-
     <JobsPanel />
   </div>
 </template>
