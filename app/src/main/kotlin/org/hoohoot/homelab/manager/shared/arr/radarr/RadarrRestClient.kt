@@ -80,6 +80,27 @@ interface RadarrRestClient {
     @Produces(MediaType.APPLICATION_JSON)
     @Retry(maxRetries = 0)
     suspend fun grabRelease(request: RadarrGrabRequest): RadarrRelease?
+
+    @GET
+    @Path("/queue")
+    suspend fun getQueue(
+        @QueryParam("page") page: Int,
+        @QueryParam("pageSize") pageSize: Int,
+        @QueryParam("includeUnknownMovieItems") includeUnknownMovieItems: Boolean,
+    ): RadarrQueuePage?
+
+    @GET
+    @Path("/manualimport")
+    suspend fun getManualImport(
+        @QueryParam("downloadId") downloadId: String,
+        @QueryParam("filterExistingFiles") filterExistingFiles: Boolean,
+    ): List<RadarrManualImportItem>?
+
+    @POST
+    @Path("/command")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Retry(maxRetries = 0)
+    suspend fun postCommand(command: RadarrManualImportCommand): RadarrCommandResource?
 }
 
 suspend fun RadarrRestClient.getMovieCalendar(start: Instant, end: Instant): List<RadarrMovie> =

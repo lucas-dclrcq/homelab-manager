@@ -3,11 +3,16 @@ package org.hoohoot.homelab.manager.problems.infra
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
+import org.hoohoot.homelab.manager.problems.domain.BlockedImport
 import org.hoohoot.homelab.manager.problems.domain.LibraryMovie
 import org.hoohoot.homelab.manager.problems.domain.Release
+import org.hoohoot.homelab.manager.problems.domain.isForceableRejection
+import org.hoohoot.homelab.manager.problems.domain.ports.ImportQueue
 import org.hoohoot.homelab.manager.problems.domain.ports.MovieLibrary
 import org.hoohoot.homelab.manager.problems.domain.ports.Releases
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrGrabRequest
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrManualImportCommand
+import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrManualImportFile
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrMovie
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrQualityProfile
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrQualityProfileItem
@@ -17,7 +22,7 @@ import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 @ApplicationScoped
 class RadarrProblemsAdapter(
     @param:RestClient private val radarrRestClient: RadarrRestClient,
-) : MovieLibrary, Releases {
+) : MovieLibrary, Releases, ImportQueue {
 
     override suspend fun allMovies(): List<LibraryMovie> {
         val resolutionByProfile = desiredResolutionByProfile()
@@ -29,6 +34,41 @@ class RadarrProblemsAdapter(
 
     override suspend fun grab(guid: String, indexerId: Int) {
         radarrRestClient.grabRelease(RadarrGrabRequest(guid, indexerId))
+    }
+
+    // importBlocked depuis Radarr 5.3, importPending avant : on accepte les deux,
+    // le vrai gating se fait sur le message de rejet
+    override suspend fun blockedImports(): List<BlockedImport> =
+        radarrRestClient.getQueue(page = 1, pageSize = 1000, includeUnknownMovieItems = false)
+            ?.records.orEmpty()
+            .filter { it.trackedDownloadState == "importBlocked" || it.trackedDownloadState == "importPending" }
+            .mapNotNull { record ->
+                BlockedImport(
+                    radarrMovieId = record.movieId ?: return@mapNotNull null,
+                    downloadId = record.downloadId ?: return@mapNotNull null,
+                    title = record.title,
+                    statusMessages = record.statusMessages.flatMap { it.messages },
+                )
+            }
+
+    override suspend fun forceImport(downloadId: String, radarrMovieId: Int): Boolean {
+        val files = radarrRestClient.getManualImport(downloadId, filterExistingFiles = true).orEmpty()
+            .filter { it.movie?.id == radarrMovieId }
+            // Un fichier rejeté pour un autre motif (sample, film inconnu...) n'est jamais forcé
+            .filter { item -> item.rejections.all { rejection -> rejection.reason?.let(::isForceableRejection) == true } }
+            .mapNotNull { item ->
+                val path = item.path ?: return@mapNotNull null
+                RadarrManualImportFile(
+                    path = path,
+                    movieId = radarrMovieId,
+                    quality = item.quality,
+                    languages = item.languages,
+                    downloadId = downloadId,
+                )
+            }
+        if (files.isEmpty()) return false
+        radarrRestClient.postCommand(RadarrManualImportCommand(files = files))
+        return true
     }
 
     // Résolution cible (cutoff) de chaque profil de qualité. Best-effort : en cas d'échec, on

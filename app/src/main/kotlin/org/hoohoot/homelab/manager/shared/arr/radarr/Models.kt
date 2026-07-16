@@ -1,5 +1,6 @@
 package org.hoohoot.homelab.manager.shared.arr.radarr
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.hoohoot.homelab.manager.shared.arr.HistoryQuality
 
 data class RadarrHistoryRecord(
@@ -88,4 +89,59 @@ data class RadarrRelease(
 data class RadarrGrabRequest(
     val guid: String,
     val indexerId: Int
+)
+
+data class RadarrQueuePage(
+    val totalRecords: Int? = null,
+    val records: List<RadarrQueueRecord> = emptyList()
+)
+
+data class RadarrQueueRecord(
+    val id: Long? = null,
+    val movieId: Int? = null,
+    val downloadId: String? = null,
+    val title: String? = null,
+    val trackedDownloadState: String? = null,
+    val statusMessages: List<RadarrQueueStatusMessage> = emptyList()
+)
+
+data class RadarrQueueStatusMessage(
+    val title: String? = null,
+    val messages: List<String> = emptyList()
+)
+
+// quality/languages sont relayés tels quels dans la commande ManualImport : Radarr attend le
+// QualityModel complet, que les DTOs history (lossy) ne portent pas → passthrough JsonNode
+data class RadarrManualImportItem(
+    val path: String? = null,
+    val downloadId: String? = null,
+    val movie: RadarrMovie? = null,
+    val quality: JsonNode? = null,
+    val languages: JsonNode? = null,
+    val rejections: List<RadarrImportRejection> = emptyList()
+)
+
+data class RadarrImportRejection(
+    val reason: String? = null,
+    val type: String? = null
+)
+
+data class RadarrManualImportCommand(
+    val files: List<RadarrManualImportFile>,
+    val importMode: String = "auto",
+    val name: String = "ManualImport"
+)
+
+data class RadarrManualImportFile(
+    val path: String,
+    val movieId: Int,
+    val quality: JsonNode?,
+    val languages: JsonNode?,
+    val downloadId: String
+)
+
+data class RadarrCommandResource(
+    val id: Long? = null,
+    val name: String? = null,
+    val status: String? = null
 )

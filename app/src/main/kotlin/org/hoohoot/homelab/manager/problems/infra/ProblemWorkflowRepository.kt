@@ -75,4 +75,27 @@ class ProblemWorkflowRepository : ProblemWorkflows {
                 }
         }.awaitSuspending().count { it.status == ProblemWorkflowEntity.STATUS_COMPLETED }
     }
+
+    override suspend fun listAwaitingImport(): List<ProblemWorkflowEntity> =
+        Panache.withSession {
+            ProblemWorkflowEntity.list("status = ?1", ProblemWorkflowEntity.STATUS_AWAITING_IMPORT)
+        }.awaitSuspending()
+
+    override suspend fun markImportForced(radarrMovieIds: Set<Int>): Int {
+        if (radarrMovieIds.isEmpty()) return 0
+        return Panache.withTransaction {
+            ProblemWorkflowEntity
+                .list(
+                    "status = ?1 and radarrMovieId in ?2",
+                    ProblemWorkflowEntity.STATUS_AWAITING_IMPORT,
+                    radarrMovieIds,
+                )
+                .invoke { workflows ->
+                    workflows.forEach { workflow ->
+                        workflow.state = workflow.state.copy(importForcedAt = LocalDateTime.now())
+                        workflow.updatedAt = LocalDateTime.now()
+                    }
+                }
+        }.awaitSuspending().size
+    }
 }

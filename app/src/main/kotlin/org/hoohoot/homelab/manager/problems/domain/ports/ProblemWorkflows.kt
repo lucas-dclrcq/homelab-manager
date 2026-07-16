@@ -13,4 +13,6 @@ interface ProblemWorkflows {
     suspend fun update(id: UUID, accessor: Accessor, mutate: (ProblemWorkflowEntity) -> Unit): ProblemWorkflowEntity?
     suspend fun delete(id: UUID): Boolean
     suspend fun completeAwaitingForMovies(movieIdToImportedAt: Map<Int, LocalDateTime>): Int
+    suspend fun listAwaitingImport(): List<ProblemWorkflowEntity>
+    suspend fun markImportForced(radarrMovieIds: Set<Int>): Int
 }

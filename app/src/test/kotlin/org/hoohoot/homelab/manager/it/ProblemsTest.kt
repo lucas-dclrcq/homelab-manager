@@ -3,6 +3,7 @@ package org.hoohoot.homelab.manager.it
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.jsonResponse
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
@@ -255,6 +256,69 @@ internal class ProblemsTest {
                         ]"""
                     )
                 )
+        )
+    }
+
+    private fun registerEmptyRadarrHistory() {
+        wireMock.register(
+            get(urlPathEqualTo("/api/v3/history/since"))
+                .withQueryParam("includeMovie", equalTo("true"))
+                .willReturn(okJson("[]"))
+        )
+    }
+
+    private fun registerBlockedQueueItem(movieId: Int, downloadId: String, message: String) {
+        wireMock.register(
+            get(urlPathEqualTo("/api/v3/queue")).willReturn(
+                okJson(
+                    """{
+                        "page": 1, "pageSize": 1000, "totalRecords": 1,
+                        "records": [
+                          {
+                            "id": 42, "movieId": $movieId, "downloadId": "$downloadId",
+                            "title": "Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R",
+                            "status": "completed",
+                            "trackedDownloadStatus": "warning", "trackedDownloadState": "importBlocked",
+                            "statusMessages": [
+                              {"title": "Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R", "messages": ["$message"]}
+                            ]
+                          }
+                        ]
+                    }"""
+                )
+            )
+        )
+    }
+
+    private fun registerManualImportFile(
+        downloadId: String,
+        movieId: Int,
+        rejectionReason: String = "Not an upgrade for existing movie file. Existing quality: Bluray-720p. New Quality WEBDL-1080p.",
+    ) {
+        wireMock.register(
+            get(urlPathEqualTo("/api/v3/manualimport"))
+                .withQueryParam("downloadId", equalTo(downloadId))
+                .willReturn(
+                    okJson(
+                        """[
+                            {
+                              "path": "/downloads/Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R/dune2.mkv",
+                              "movie": {"id": $movieId, "title": "Dune: Part Two", "year": 2024},
+                              "quality": {"quality": {"id": 3, "name": "WEBDL-1080p", "resolution": 1080}, "revision": {"version": 1, "real": 0, "isRepack": false}},
+                              "languages": [{"id": 2, "name": "French"}],
+                              "downloadId": "$downloadId",
+                              "rejections": [{"reason": "$rejectionReason", "type": "permanent"}]
+                            }
+                        ]"""
+                    )
+                )
+        )
+    }
+
+    private fun registerManualImportCommand() {
+        wireMock.register(
+            post(urlPathEqualTo("/api/v3/command"))
+                .willReturn(jsonResponse("""{"id": 1, "name": "ManualImport", "status": "queued"}""", 201))
         )
     }
 
@@ -572,6 +636,122 @@ internal class ProblemsTest {
         runJob("radarr-downloads-sync")
 
         assertThat(getWorkflow(id).getString("status")).isEqualTo("AWAITING_IMPORT")
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `radarr sync forces the import of a grabbed release blocked as not an upgrade`() {
+        val id = runToAwaitingImport()
+        registerEmptyRadarrHistory()
+        registerBlockedQueueItem(
+            movieId = 1,
+            downloadId = "abc123",
+            message = "Not an upgrade for existing movie file. Existing quality: Bluray-720p. New Quality WEBDL-1080p.",
+        )
+        registerManualImportFile(downloadId = "abc123", movieId = 1)
+        registerManualImportCommand()
+
+        runJob("radarr-downloads-sync")
+
+        wireMock.verifyThat(
+            1,
+            postRequestedFor(urlPathEqualTo("/api/v3/command"))
+                .withRequestBody(matchingJsonPath("$.name", equalTo("ManualImport")))
+                .withRequestBody(matchingJsonPath("$.importMode", equalTo("auto")))
+                .withRequestBody(
+                    matchingJsonPath(
+                        "$.files[0].path",
+                        equalTo("/downloads/Dune.Part.Two.2024.MULTI.1080p.WEB.H264-Slay3R/dune2.mkv"),
+                    )
+                )
+                .withRequestBody(matchingJsonPath("$.files[0].movieId", equalTo("1")))
+                .withRequestBody(matchingJsonPath("$.files[0].quality.quality.name", equalTo("WEBDL-1080p")))
+                .withRequestBody(matchingJsonPath("$.files[0].downloadId", equalTo("abc123")))
+        )
+        assertThat(getWorkflow(id).getString("status")).isEqualTo("AWAITING_IMPORT")
+
+        // L'import forcé apparaît ensuite dans l'historique : le workflow se complète
+        // sans reposter la commande (garde importForcedAt)
+        registerRadarrImportHistory(movieId = 1, importedAt = Instant.now().plus(1, ChronoUnit.HOURS))
+        runJob("radarr-downloads-sync")
+
+        assertThat(getWorkflow(id).getString("status")).isEqualTo("COMPLETED")
+        wireMock.verifyThat(1, postRequestedFor(urlPathEqualTo("/api/v3/command")))
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `radarr sync also forces imports blocked as not a custom format upgrade`() {
+        runToAwaitingImport()
+        registerEmptyRadarrHistory()
+        registerBlockedQueueItem(
+            movieId = 1,
+            downloadId = "cf42",
+            message = "Not a Custom Format upgrade for existing movie file(s). New: [], Existing: [VF]",
+        )
+        registerManualImportFile(
+            downloadId = "cf42",
+            movieId = 1,
+            rejectionReason = "Not a Custom Format upgrade for existing movie file(s). New: [], Existing: [VF]",
+        )
+        registerManualImportCommand()
+
+        runJob("radarr-downloads-sync")
+
+        wireMock.verifyThat(1, postRequestedFor(urlPathEqualTo("/api/v3/command")))
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `radarr sync does not force imports blocked for another reason`() {
+        val id = runToAwaitingImport()
+        registerEmptyRadarrHistory()
+        registerBlockedQueueItem(
+            movieId = 1,
+            downloadId = "abc123",
+            message = "No files found are eligible for import",
+        )
+        registerManualImportCommand()
+
+        runJob("radarr-downloads-sync")
+
+        wireMock.verifyThat(0, postRequestedFor(urlPathEqualTo("/api/v3/command")))
+        assertThat(getWorkflow(id).getString("status")).isEqualTo("AWAITING_IMPORT")
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `radarr sync leaves blocked imports of movies without a workflow untouched`() {
+        runToAwaitingImport() // workflow en attente pour le film 1
+        registerEmptyRadarrHistory()
+        registerBlockedQueueItem(movieId = 99, downloadId = "xyz789", message = "Not an upgrade for existing movie file.")
+        registerManualImportCommand()
+
+        runJob("radarr-downloads-sync")
+
+        wireMock.verifyThat(0, postRequestedFor(urlPathEqualTo("/api/v3/command")))
+    }
+
+    @Test
+    @TestSecurity(user = "alice", roles = ["admin", "user"])
+    fun `a file rejected for another reason is not forced and is retried at the next sync`() {
+        runToAwaitingImport()
+        registerEmptyRadarrHistory()
+        registerBlockedQueueItem(
+            movieId = 1,
+            downloadId = "abc123",
+            message = "Not an upgrade for existing movie file.",
+        )
+        registerManualImportFile(downloadId = "abc123", movieId = 1, rejectionReason = "Sample")
+        registerManualImportCommand()
+
+        runJob("radarr-downloads-sync")
+        wireMock.verifyThat(0, postRequestedFor(urlPathEqualTo("/api/v3/command")))
+
+        // Le workflow n'a pas été marqué comme forcé : le cycle suivant retente et réussit
+        registerManualImportFile(downloadId = "abc123", movieId = 1)
+        runJob("radarr-downloads-sync")
+        wireMock.verifyThat(1, postRequestedFor(urlPathEqualTo("/api/v3/command")))
     }
 
     @Test

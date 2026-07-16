@@ -9,6 +9,7 @@ import org.hoohoot.homelab.manager.shared.arr.lidarr.LidarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.radarr.RadarrRestClient
 import org.hoohoot.homelab.manager.shared.arr.sonarr.SonarrRestClient
 import org.hoohoot.homelab.manager.problems.domain.usecases.CompleteAwaitingWorkflows
+import org.hoohoot.homelab.manager.problems.domain.usecases.ForceBlockedImports
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -22,6 +23,7 @@ class DownloadsSyncService(
     @param:RestClient private val lidarrRestClient: LidarrRestClient,
     private val mediaDownloadRepository: MediaDownloadRepository,
     private val completeAwaitingWorkflows: CompleteAwaitingWorkflows,
+    private val forceBlockedImports: ForceBlockedImports,
     @param:ConfigProperty(name = "downloads-sync.backfill-days") private val backfillDays: Long,
     @param:ConfigProperty(name = "downloads-sync.bazarr.page-length") private val bazarrPageLength: Int,
 ) {
@@ -33,6 +35,14 @@ class DownloadsSyncService(
     }
 
     suspend fun syncRadarr() {
+        // Débloque les imports refusés « pas un upgrade » avant de lire l'historique ;
+        // un échec (ex : queue Radarr injoignable) ne doit jamais casser la sync des téléchargements
+        try {
+            forceBlockedImports()
+        } catch (exception: Exception) {
+            Log.error("Radarr downloads sync: force blocked imports failed", exception)
+        }
+
         val since = sinceFor(MediaDownloadEntity.SOURCE_RADARR)
         val records = radarrRestClient.getHistorySince(since.toApiDate(), includeMovie = true).orEmpty()
         val candidates = records

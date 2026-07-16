@@ -31,11 +31,11 @@ data class GrabbedRelease(
     val size: Long? = null,
 )
 
-// Objet racine obligatoire pour le client PG réactif (jamais une List à la racine du JSONB)
 data class ProblemWorkflowState(
     val media: MediaSnapshot? = null,
     val grabbedRelease: GrabbedRelease? = null,
     val description: String? = null,
+    val importForcedAt: LocalDateTime? = null,
 )
 
 @Entity
