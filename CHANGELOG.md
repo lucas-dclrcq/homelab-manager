@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.1](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.3.0...v0.3.1) (2026-07-16)
+
+
+### Bug Fixes
+
+* another try at infinite loop because of cache control ([fc7b6a7](https://github.com/lucas-dclrcq/homelab-manager/commit/fc7b6a760c40d3241b9809fe93a07090556e5ae0))
+
+
+### Refactoring
+
+* group admin modules under unique admin page ([adbf08d](https://github.com/lucas-dclrcq/homelab-manager/commit/adbf08d3e50e240261378946e63af0089a83ff60))
+
+
+### Chores
+
+* **deps:** update dependency prettier to v3.9.5 ([#91](https://github.com/lucas-dclrcq/homelab-manager/issues/91)) ([96bdbf8](https://github.com/lucas-dclrcq/homelab-manager/commit/96bdbf896dca030e56ce61c37d2f244d2fab1f67))
+* **deps:** update dependency typescript to ~5.9.0 ([#92](https://github.com/lucas-dclrcq/homelab-manager/issues/92)) ([a417a5f](https://github.com/lucas-dclrcq/homelab-manager/commit/a417a5f47716982fbf691c4009f9fa3ac4980af5))
+* **main:** release 0.3.1-SNAPSHOT ([#124](https://github.com/lucas-dclrcq/homelab-manager/issues/124)) ([c943f30](https://github.com/lucas-dclrcq/homelab-manager/commit/c943f301908e2d2044fa90579c0cd58efcf2098d))
+
 ## [0.3.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.2.0...v0.3.0) (2026-07-15)
 
 
