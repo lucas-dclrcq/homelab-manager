@@ -9,12 +9,26 @@ export const AXIOS_INSTANCE = axios.create({
   headers: { 'X-Requested-With': 'JavaScript' },
 })
 
+// Guard against a reload storm: if reloading does not restore the session (e.g.
+// the server keeps answering 401 without redirecting to the IdP), reloading again
+// immediately would pin the CPU. Allow at most one auto-reload per interval; any
+// successful response means we are authenticated again and clears the guard.
+const RELOAD_GUARD_KEY = 'auth-reload-at'
+const RELOAD_MIN_INTERVAL_MS = 10_000
+
 AXIOS_INSTANCE.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    sessionStorage.removeItem(RELOAD_GUARD_KEY)
+    return response
+  },
   (error) => {
     const status = error?.response?.status
     if (status === 401 || status === 499) {
-      window.location.reload()
+      const lastReloadAt = Number(sessionStorage.getItem(RELOAD_GUARD_KEY) ?? 0)
+      if (Date.now() - lastReloadAt > RELOAD_MIN_INTERVAL_MS) {
+        sessionStorage.setItem(RELOAD_GUARD_KEY, String(Date.now()))
+        window.location.reload()
+      }
       return new Promise(() => {})
     }
     return Promise.reject(error)
