@@ -13,7 +13,6 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
 
 <template>
   <div class="flex min-h-screen flex-col lg:flex-row">
-    <!-- La nuit que la chouette surveille : sidebar encre nuit-prune -->
     <aside
       class="w-full shrink-0 bg-ink text-cream lg:sticky lg:top-0 lg:h-screen lg:w-62"
     >
@@ -26,12 +25,7 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
             >
           </div>
         </template>
-
-        <div
-          class="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.1em] text-[#8f8798] uppercase"
-        >
-          Hoohoot
-        </div>
+        
         <SideNavItem to="/" label="Accueil" icon="house" />
         <SideNavItem to="/applications" label="Tes applis" icon="layout-grid" />
         <SideNavItem to="/finances" label="Finances" icon="piggy-bank" />
@@ -40,11 +34,6 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
         <SideNavItem to="/cleanup" label="Nettoyage" icon="trash-2" />
 
         <template v-if="userStore.isAdmin">
-          <div
-            class="px-3 pt-4 pb-1 text-[11px] font-bold tracking-[0.1em] text-[#8f8798] uppercase"
-          >
-            Le coin technique
-          </div>
           <SideNavItem to="/admin" label="Administration" icon="shield" />
         </template>
 
