@@ -21,7 +21,9 @@ const initials = computed(() => userStore.username.slice(0, 2).toUpperCase())
         <template #header>
           <div class="flex items-center gap-3 px-2 pt-1">
             <img :src="owlMono" alt="" class="h-10" />
-            <span class="font-display text-[22px] font-extrabold">Hoohoot</span>
+            <span class="relative top-1.25 font-display text-[22px] font-extrabold"
+              >Hoohoot</span
+            >
           </div>
         </template>
 
