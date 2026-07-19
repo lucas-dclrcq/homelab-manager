@@ -17,7 +17,6 @@ import org.hoohoot.homelab.manager.applications.domain.usecases.DeleteApplicatio
 import org.hoohoot.homelab.manager.applications.domain.usecases.ListApplications
 import org.hoohoot.homelab.manager.applications.domain.usecases.UpdateApplication
 import org.hoohoot.homelab.manager.shared.api.badRequest
-import org.hoohoot.homelab.manager.shared.security.OperatorApiKeyProtected
 import java.util.UUID
 
 data class OperatorApplicationRequest(
@@ -38,7 +37,6 @@ data class OperatorApplicationRequest(
  * Exclu du contrat OpenAPI consommé par Orval (mp.openapi.scan.exclude.classes).
  */
 @Path("/api/operator/applications")
-@OperatorApiKeyProtected
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 class OperatorApplicationsResource(
