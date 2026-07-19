@@ -31,6 +31,7 @@ import type {
   CleanupMediaDto,
   CleanupOverviewDto,
   CleanupProtectionDto,
+  CleanupProtectionsPageDto,
   CleanupSuggestionDto,
   CreateProtectionRequest,
   CreateSuggestionRequest,
@@ -43,6 +44,7 @@ import type {
   FinanceSettingsRequest,
   FinanceSummaryDto,
   ForceScanRequest,
+  GetApiCleanupProtectionsParams,
   GetApiCleanupSearchMoviesParams,
   GetApiCleanupSearchSeriesParams,
   GetApiFinancesEntriesParams,
@@ -3767,39 +3769,57 @@ export const usePostApiCleanupProtections = <TError = void, TContext = unknown>(
  * @summary List Protections
  */
 export const getApiCleanupProtections = (
+  params: MaybeRef<GetApiCleanupProtectionsParams>,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<CleanupProtectionDto[]>(
-    { url: `/api/cleanup/protections`, method: "GET", signal },
+  params = unref(params);
+
+  return customInstance<CleanupProtectionsPageDto>(
+    {
+      url: `/api/cleanup/protections`,
+      method: "GET",
+      params: unref(params),
+      signal,
+    },
     options,
   );
 };
 
-export const getGetApiCleanupProtectionsQueryKey = () => {
-  return ["api", "cleanup", "protections"] as const;
+export const getGetApiCleanupProtectionsQueryKey = (
+  params?: MaybeRef<GetApiCleanupProtectionsParams>,
+) => {
+  return [
+    "api",
+    "cleanup",
+    "protections",
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getGetApiCleanupProtectionsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiCleanupProtections>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<
-      Awaited<ReturnType<typeof getApiCleanupProtections>>,
-      TError,
-      TData
-    >
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+  params: MaybeRef<GetApiCleanupProtectionsParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCleanupProtections>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = getGetApiCleanupProtectionsQueryKey();
+  const queryKey = getGetApiCleanupProtectionsQueryKey(params);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof getApiCleanupProtections>>
-  > = ({ signal }) => getApiCleanupProtections(requestOptions, signal);
+  > = ({ signal }) => getApiCleanupProtections(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getApiCleanupProtections>>,
@@ -3821,6 +3841,7 @@ export function useGetApiCleanupProtections<
   TData = Awaited<ReturnType<typeof getApiCleanupProtections>>,
   TError = unknown,
 >(
+  params: MaybeRef<GetApiCleanupProtectionsParams>,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -3835,7 +3856,7 @@ export function useGetApiCleanupProtections<
 ): UseQueryReturnType<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetApiCleanupProtectionsQueryOptions(options);
+  const queryOptions = getGetApiCleanupProtectionsQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<
     TData,

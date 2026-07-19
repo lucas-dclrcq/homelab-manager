@@ -454,6 +454,30 @@
           }
         }
       },
+      "CleanupProtectionsPageDto" : {
+        "type" : "object",
+        "required" : [ "items", "total", "page", "pageSize" ],
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CleanupProtectionDto"
+            }
+          },
+          "total" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
       "CleanupSuggestionDto" : {
         "type" : "object",
         "required" : [ "id", "mediaKind", "radarrMovieId", "sonarrSeriesId", "seasonNumber", "title", "displayTitle", "year", "posterUrl", "sizeBytes", "suggestedBy", "status", "deleteAfter", "vetoedBy", "freedBytes", "failureReason", "createdAt" ],
@@ -3381,16 +3405,30 @@
       },
       "get" : {
         "tags" : [ "Cleanup" ],
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "schema" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "required" : true
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/CleanupProtectionDto"
-                  }
+                  "$ref" : "#/components/schemas/CleanupProtectionsPageDto"
                 }
               }
             }

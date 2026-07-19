@@ -46,6 +46,8 @@ class CleanupResource(
     companion object {
         // Les issues récentes (veto, suppression…) restent visibles quelques jours dans l'UI
         private const val RECENT_SUGGESTIONS_DAYS = 7L
+        private const val DEFAULT_PROTECTIONS_PAGE_SIZE = 8
+        private const val MAX_PROTECTIONS_PAGE_SIZE = 100
     }
 
     private val username: String get() = identity.principal.name
@@ -71,8 +73,14 @@ class CleanupResource(
 
     @GET
     @Path("/protections")
-    suspend fun listProtections(): List<CleanupProtectionDto> =
-        protections.all().map { it.toDto() }
+    suspend fun listProtections(
+        @QueryParam("page") page: Int?,
+        @QueryParam("pageSize") pageSize: Int?,
+    ): CleanupProtectionsPageDto =
+        protections.page(
+            page = (page ?: 0).coerceAtLeast(0),
+            pageSize = (pageSize ?: DEFAULT_PROTECTIONS_PAGE_SIZE).coerceIn(1, MAX_PROTECTIONS_PAGE_SIZE),
+        ).toDto()
 
     @POST
     @Path("/protections")

@@ -12,6 +12,7 @@ import org.hoohoot.homelab.manager.cleanup.domain.ScoreBreakdown
 import org.hoohoot.homelab.manager.cleanup.domain.SuggestResult
 import org.hoohoot.homelab.manager.cleanup.domain.UnprotectResult
 import org.hoohoot.homelab.manager.cleanup.domain.VetoResult
+import org.hoohoot.homelab.manager.cleanup.domain.ports.ProtectionsPage
 import org.hoohoot.homelab.manager.cleanup.domain.usecases.CampaignWithCandidates
 import org.hoohoot.homelab.manager.cleanup.domain.usecases.EffectiveCleanupConfig
 import org.hoohoot.homelab.manager.cleanup.infra.CleanupCampaignEntity
@@ -98,6 +99,13 @@ data class CleanupProtectionDto(
     val protectedBy: String,
     val source: String,
     val createdAt: LocalDateTime,
+)
+
+data class CleanupProtectionsPageDto(
+    val items: List<CleanupProtectionDto>,
+    val total: Long,
+    val page: Int,
+    val pageSize: Int,
 )
 
 data class CleanupMediaDto(
@@ -233,6 +241,13 @@ internal fun CleanupProtectionEntity.toDto() = CleanupProtectionDto(
     protectedBy = protectedBy,
     source = source,
     createdAt = createdAt,
+)
+
+internal fun ProtectionsPage.toDto() = CleanupProtectionsPageDto(
+    items = items.map { it.toDto() },
+    total = total,
+    page = page,
+    pageSize = pageSize,
 )
 
 internal fun CleanupMovie.toMediaDto() = CleanupMediaDto(

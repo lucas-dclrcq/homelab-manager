@@ -1,6 +1,7 @@
 import { unref, type MaybeRef } from 'vue'
 import { useQueryClient, type QueryClient } from '@tanstack/vue-query'
 import { isAxiosError } from 'axios'
+import type { GetApiCleanupProtectionsParams } from '../api/model'
 import {
   getGetApiAdminCleanupCampaignsQueryKey,
   getGetApiCleanupCampaignQueryKey,
@@ -22,10 +23,6 @@ import {
   usePostApiCleanupSuggestions,
 } from '../api/service/homelab'
 
-// Façade TanStack du nettoyage : les composants passent par ici, jamais
-// directement par les composables Orval, pour garder les invalidations croisées.
-
-/** Invalide la vue user et les vues admin (la clé liste préfixe aussi les détails). */
 export function invalidateCampaigns(queryClient: QueryClient) {
   queryClient.invalidateQueries({
     queryKey: getGetApiCleanupCampaignQueryKey(),
@@ -100,8 +97,12 @@ export function useVetoMutation(callbacks: MutationCallbacks = {}) {
   })
 }
 
-export function useProtections() {
-  return useGetApiCleanupProtections()
+export function useProtections(
+  params: MaybeRef<GetApiCleanupProtectionsParams>,
+) {
+  return useGetApiCleanupProtections(params, {
+    query: { placeholderData: (previous) => previous },
+  })
 }
 
 export function useCreateProtection(callbacks: MutationCallbacks = {}) {
@@ -122,7 +123,6 @@ export function useDeleteProtection(
 
 export function useSuggestions() {
   return useGetApiCleanupSuggestions({
-    // Un veto ❌ ou une suggestion d'un autre utilisateur peut arriver à tout moment : veille lente
     query: { refetchInterval: 60_000 },
   })
 }
@@ -141,8 +141,6 @@ export function useCleanupConfig() {
 
 export function useCleanupCampaigns(pollWhile?: MaybeRef<boolean>) {
   return useGetApiAdminCleanupCampaigns({
-    // Après « Forcer un scan » (202), la campagne naît en arrière-plan : on
-    // poll jusqu'à la voir apparaître (pattern JellystatImportCard)
     query: { refetchInterval: () => (unref(pollWhile) ? 3_000 : false) },
   })
 }

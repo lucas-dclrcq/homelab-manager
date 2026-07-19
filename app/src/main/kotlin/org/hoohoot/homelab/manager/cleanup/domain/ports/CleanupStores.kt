@@ -37,8 +37,18 @@ interface Suggestions {
     suspend fun update(id: UUID, mutate: (CleanupSuggestionEntity) -> Unit): CleanupSuggestionEntity?
 }
 
+data class ProtectionsPage(
+    val items: List<CleanupProtectionEntity>,
+    val total: Long,
+    val page: Int,
+    val pageSize: Int,
+)
+
 interface Protections {
     suspend fun all(): List<CleanupProtectionEntity>
+
+    // Vue paginée pour l'UI ; les vérifications de couverture passent par all()
+    suspend fun page(page: Int, pageSize: Int): ProtectionsPage
     suspend fun find(id: UUID): CleanupProtectionEntity?
     suspend fun save(entity: CleanupProtectionEntity): CleanupProtectionEntity
     suspend fun delete(id: UUID): Boolean
