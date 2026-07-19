@@ -34,6 +34,9 @@ data class JellyfinPlayState(
 
     @field:JsonProperty("PositionTicks")
     val positionTicks: Long? = null,
+
+    @field:JsonProperty("PlayMethod")
+    val playMethod: String? = null,
 )
 
 data class JellyfinNowPlayingItem(
@@ -60,4 +63,18 @@ data class JellyfinNowPlayingItem(
 
     @field:JsonProperty("IndexNumber")
     val indexNumber: Int? = null,
+
+    @field:JsonProperty("MediaStreams")
+    val mediaStreams: List<JellyfinMediaStream>? = null,
+)
+
+data class JellyfinMediaStream(
+    @field:JsonProperty("Type")
+    val type: String? = null,
+
+    @field:JsonProperty("Codec")
+    val codec: String? = null,
+
+    @field:JsonProperty("Height")
+    val height: Int? = null,
 )

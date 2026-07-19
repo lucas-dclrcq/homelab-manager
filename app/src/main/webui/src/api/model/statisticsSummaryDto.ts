@@ -11,4 +11,5 @@ export interface StatisticsSummaryDto {
   playCount: number;
   completedItems: number;
   peakHour: StatisticsSummaryDtoPeakHour;
+  activeUsers: number;
 }

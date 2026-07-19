@@ -1,56 +1,58 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import {
-  useGetApiStatisticsActivityByHour,
-  useGetApiStatisticsActivityByWeekday,
-  useGetApiStatisticsPlatforms,
-  useGetApiStatisticsPlaysOverTime,
-  useGetApiStatisticsSummary,
-  useGetApiStatisticsTopUsers,
-} from '../api/service/homelab'
-import StatCard from '../components/ui/StatCard.vue'
-import BaseCard from '../components/ui/BaseCard.vue'
-import BaseSpinner from '../components/ui/BaseSpinner.vue'
-import NowPlayingCard from '../components/statistics/NowPlayingCard.vue'
-import TopUsersPodium from '../components/statistics/TopUsersPodium.vue'
-import TopMediaTable from '../components/statistics/TopMediaTable.vue'
-import WeekdayActivityChart from '../components/statistics/WeekdayActivityChart.vue'
-import HourlyActivityChart from '../components/statistics/HourlyActivityChart.vue'
-import PlatformsChart from '../components/statistics/PlatformsChart.vue'
-import PlaysOverTimeChart from '../components/statistics/PlaysOverTimeChart.vue'
-import {
-  formatWatchTime,
-  periodOptions,
-  type StatsPeriodValue,
-  type TopUsersMetric,
-} from '../lib/statistics'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import StatsTabs from '../components/statistics/StatsTabs.vue'
+import OverviewTab from '../components/statistics/tabs/OverviewTab.vue'
+import UsersTab from '../components/statistics/tabs/UsersTab.vue'
+import MediaTab from '../components/statistics/tabs/MediaTab.vue'
+import ActivityTab from '../components/statistics/tabs/ActivityTab.vue'
+import QualityTab from '../components/statistics/tabs/QualityTab.vue'
+import LibraryTab from '../components/statistics/tabs/LibraryTab.vue'
+import { periodOptions, type StatsPeriodValue } from '../lib/statistics'
 
-const period = ref<StatsPeriodValue>('THIS_WEEK')
-const topUsersMetric = ref<TopUsersMetric>('time')
-const params = computed(() => ({ period: period.value }))
-// Le changement de période resert le cache TanStack au lieu de re-marteler l'API
-const queryOptions = { query: { staleTime: 60_000 } }
+const tabs = [
+  { key: 'overview', label: "Vue d'ensemble", icon: 'chart-line' },
+  { key: 'users', label: 'Spectateurs', icon: 'users' },
+  { key: 'media', label: 'Médias', icon: 'film' },
+  { key: 'activity', label: 'Activité', icon: 'activity' },
+  { key: 'quality', label: 'Qualité', icon: 'zap' },
+  { key: 'library', label: 'Bibliothèque', icon: 'package' },
+] as const
 
-const { data: summary } = useGetApiStatisticsSummary(params, queryOptions)
-const { data: topUsers, isPending: topUsersPending } =
-  useGetApiStatisticsTopUsers(params, queryOptions)
-const { data: weekdayActivity, isPending: weekdayPending } =
-  useGetApiStatisticsActivityByWeekday(params, queryOptions)
-const { data: hourlyActivity, isPending: hourlyPending } =
-  useGetApiStatisticsActivityByHour(params, queryOptions)
-const { data: platforms, isPending: platformsPending } =
-  useGetApiStatisticsPlatforms(params, queryOptions)
-const { data: playsOverTime, isPending: overTimePending } =
-  useGetApiStatisticsPlaysOverTime(params, queryOptions)
+type TabKey = (typeof tabs)[number]['key']
 
-const peakHourValue = computed(() => {
-  const peakHour = summary.value?.peakHour
-  return peakHour == null ? '—' : `${peakHour}h`
+const route = useRoute()
+const router = useRouter()
+
+const validTabs = tabs.map((tab) => tab.key) as readonly string[]
+const validPeriods = periodOptions.map((option) => option.value) as readonly string[]
+
+const activeTab = computed<TabKey>(() => {
+  const tab = route.query.tab
+  return (typeof tab === 'string' && validTabs.includes(tab)
+    ? tab
+    : 'overview') as TabKey
 })
+
+const period = computed<StatsPeriodValue>(() => {
+  const value = route.query.period
+  return (typeof value === 'string' && validPeriods.includes(value)
+    ? value
+    : 'THIS_WEEK') as StatsPeriodValue
+})
+
+function setTab(tab: string) {
+  router.replace({ query: { ...route.query, tab } })
+}
+
+function setPeriod(event: Event) {
+  const value = (event.target as HTMLSelectElement).value
+  router.replace({ query: { ...route.query, period: value } })
+}
 </script>
 
 <template>
-  <div class="flex max-w-5xl flex-col gap-8">
+  <div class="flex max-w-5xl flex-col gap-6">
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 class="roost font-display text-[34px] font-extrabold leading-tight">
@@ -62,12 +64,11 @@ const peakHourValue = computed(() => {
         </p>
       </div>
       <label class="block">
-        <span class="mb-1.5 block text-xs font-bold text-ink-soft"
-          >Période</span
-        >
+        <span class="mb-1.5 block text-xs font-bold text-ink-soft">Période</span>
         <select
-          v-model="period"
+          :value="period"
           class="rounded-xl border-[1.5px] border-line bg-white px-3.5 py-2.5 text-[15px] font-bold text-ink focus:border-amber focus:ring-[3px] focus:ring-amber/45 focus:outline-none"
+          @change="setPeriod"
         >
           <option
             v-for="option in periodOptions"
@@ -80,107 +81,17 @@ const peakHourValue = computed(() => {
       </label>
     </header>
 
-    <NowPlayingCard />
+    <StatsTabs
+      :tabs="tabs"
+      :model-value="activeTab"
+      @update:model-value="setTab"
+    />
 
-    <div class="grid gap-4 sm:grid-cols-3">
-      <StatCard
-        label="Temps de visionnage"
-        :value="summary ? formatWatchTime(summary.totalWatchTimeSeconds) : '…'"
-        icon="clock"
-        tone="amber"
-      />
-      <StatCard
-        label="Médias complétés"
-        :value="summary ? String(summary.completedItems) : '…'"
-        icon="circle-check"
-        tone="sage"
-      />
-      <StatCard
-        label="Heure de pointe"
-        :value="summary ? peakHourValue : '…'"
-        icon="activity"
-        tone="sky"
-      />
-    </div>
-
-    <BaseCard>
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="font-display text-xl font-bold">Top visionneurs</h2>
-        <div
-          class="flex overflow-hidden rounded-xl border-[1.5px] border-line text-sm font-bold"
-        >
-          <button
-            type="button"
-            class="cursor-pointer px-4 py-1.5 transition-colors"
-            :class="
-              topUsersMetric === 'time'
-                ? 'bg-amber text-ink'
-                : 'bg-white text-ink-soft'
-            "
-            @click="topUsersMetric = 'time'"
-          >
-            Heures visionnées
-          </button>
-          <button
-            type="button"
-            class="cursor-pointer px-4 py-1.5 transition-colors"
-            :class="
-              topUsersMetric === 'plays'
-                ? 'bg-amber text-ink'
-                : 'bg-white text-ink-soft'
-            "
-            @click="topUsersMetric = 'plays'"
-          >
-            Visionnages
-          </button>
-        </div>
-      </div>
-      <BaseSpinner v-if="topUsersPending" />
-      <p v-else-if="!topUsers?.length" class="text-sm text-mute">
-        Personne n'a rien regardé sur cette période. Suspect.
-      </p>
-      <TopUsersPodium v-else :users="topUsers" :metric="topUsersMetric" />
-    </BaseCard>
-
-    <TopMediaTable :period="period" />
-
-    <div class="grid gap-6 lg:grid-cols-2">
-      <BaseCard>
-        <h2 class="mb-4 font-display text-xl font-bold">
-          Activité par jour de la semaine
-        </h2>
-        <BaseSpinner v-if="weekdayPending" />
-        <WeekdayActivityChart
-          v-else-if="weekdayActivity"
-          :activity="weekdayActivity"
-        />
-      </BaseCard>
-      <BaseCard>
-        <h2 class="mb-4 font-display text-xl font-bold">Activité par heure</h2>
-        <BaseSpinner v-if="hourlyPending" />
-        <HourlyActivityChart
-          v-else-if="hourlyActivity"
-          :activity="hourlyActivity"
-        />
-      </BaseCard>
-      <BaseCard>
-        <h2 class="mb-4 font-display text-xl font-bold">Plateformes</h2>
-        <BaseSpinner v-if="platformsPending" />
-        <p v-else-if="!platforms?.length" class="text-sm text-mute">
-          Aucune lecture sur cette période.
-        </p>
-        <PlatformsChart v-else :platforms="platforms" />
-      </BaseCard>
-      <BaseCard>
-        <h2 class="mb-4 font-display text-xl font-bold">
-          Lectures dans le temps
-        </h2>
-        <BaseSpinner v-if="overTimePending" />
-        <PlaysOverTimeChart
-          v-else-if="playsOverTime"
-          :over-time="playsOverTime"
-        />
-      </BaseCard>
-    </div>
+    <OverviewTab v-if="activeTab === 'overview'" :period="period" />
+    <UsersTab v-else-if="activeTab === 'users'" :period="period" />
+    <MediaTab v-else-if="activeTab === 'media'" :period="period" />
+    <ActivityTab v-else-if="activeTab === 'activity'" :period="period" />
+    <QualityTab v-else-if="activeTab === 'quality'" :period="period" />
+    <LibraryTab v-else-if="activeTab === 'library'" :period="period" />
   </div>
 </template>

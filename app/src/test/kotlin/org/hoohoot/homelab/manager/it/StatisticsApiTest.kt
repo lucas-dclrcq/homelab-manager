@@ -43,6 +43,10 @@ internal class StatisticsApiTest {
                     durationSeconds = 1800,
                     completed = true,
                     platform = "WEB",
+                    playMethod = "DIRECT",
+                    videoCodec = "h264",
+                    audioCodec = "aac",
+                    videoHeight = 1080,
                 )
             }
         }
@@ -56,6 +60,10 @@ internal class StatisticsApiTest {
             durationSeconds = 7200,
             completed = true,
             platform = "ANDROID_TV",
+            playMethod = "TRANSCODE",
+            videoCodec = "hevc",
+            audioCodec = "ac3",
+            videoHeight = 2160,
         )
         PlaybackSessionSeed.insertSession(
             userName = "stats-jean",
@@ -81,6 +89,7 @@ internal class StatisticsApiTest {
         assertThat(summary.getLong("playCount")).isEqualTo(8L)
         assertThat(summary.getLong("completedItems")).isEqualTo(7L)
         assertThat(summary.getInt("peakHour")).isEqualTo(14)
+        assertThat(summary.getLong("activeUsers")).isEqualTo(2L)
     }
 
     @Test
@@ -97,6 +106,8 @@ internal class StatisticsApiTest {
         assertThat(users.getLong("[0].playCount")).isEqualTo(7L)
         assertThat(users.getString("[1].userName")).isEqualTo("stats-jean")
         assertThat(users.getLong("[1].watchTimeSeconds")).isEqualTo(3600L)
+        // Dernier visionnage renseigné (film vu le 12 juin)
+        assertThat(users.getString("[0].lastSeen")).startsWith("2020-06-12T")
     }
 
     @Test
@@ -231,6 +242,66 @@ internal class StatisticsApiTest {
 
         assertThat(overTime.getString("granularity")).isEqualTo("HOUR")
         assertThat(overTime.getList<Any>("points")).hasSize(24)
+    }
+
+    @Test
+    @TestSecurity(user = "bob", roles = ["user"])
+    fun `activity heatmap groups plays by weekday and hour in local timezone`() {
+        val heatmap = RestAssured.given()
+            .`when`().get("/api/statistics/activity-heatmap?period=ALL_TIME")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        // Mercredi (ISO 3) et jeudi (4) à 14h Paris : 3 lectures chacun ; vendredi (5) à 20h et 21h
+        assertThat(heatmap.getInt("find { it.isoDayOfWeek == 3 && it.hour == 14 }.plays")).isEqualTo(3)
+        assertThat(heatmap.getInt("find { it.isoDayOfWeek == 4 && it.hour == 14 }.plays")).isEqualTo(3)
+        assertThat(heatmap.getInt("find { it.isoDayOfWeek == 5 && it.hour == 20 }.plays")).isEqualTo(1)
+        assertThat(heatmap.getInt("find { it.isoDayOfWeek == 5 && it.hour == 21 }.plays")).isEqualTo(1)
+    }
+
+    @Test
+    @TestSecurity(user = "bob", roles = ["user"])
+    fun `quality breakdown groups resolutions, codecs and playback methods with unknown fallback`() {
+        val quality = RestAssured.given()
+            .`when`().get("/api/statistics/quality?period=ALL_TIME")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        // 6 épisodes 1080p/h264/direct, 1 film 4K/hevc/transcode, 1 film sans qualité => Inconnu
+        assertThat(quality.getInt("resolutions.find { it.label == '1080p' }.plays")).isEqualTo(6)
+        assertThat(quality.getInt("resolutions.find { it.label == '4K' }.plays")).isEqualTo(1)
+        assertThat(quality.getInt("resolutions.find { it.label == 'Inconnu' }.plays")).isEqualTo(1)
+        assertThat(quality.getInt("videoCodecs.find { it.label == 'H264' }.plays")).isEqualTo(6)
+        assertThat(quality.getInt("videoCodecs.find { it.label == 'HEVC' }.plays")).isEqualTo(1)
+        assertThat(quality.getInt("playbackMethods.find { it.label == 'DIRECT' }.plays")).isEqualTo(6)
+        assertThat(quality.getInt("playbackMethods.find { it.label == 'TRANSCODE' }.plays")).isEqualTo(1)
+        assertThat(quality.getInt("playbackMethods.find { it.label == 'Inconnu' }.plays")).isEqualTo(1)
+    }
+
+    @Test
+    @TestSecurity(user = "bob", roles = ["user"])
+    fun `session history paginates most recent first and exposes quality columns`() {
+        val history = RestAssured.given()
+            .`when`().get("/api/statistics/history?period=ALL_TIME&page=0&pageSize=20")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+
+        assertThat(history.getLong("totalCount")).isEqualTo(8L)
+        assertThat(history.getInt("totalPages")).isEqualTo(1)
+        // Le plus récent d'abord : le film de jean (19h) devance celui de marie (18h)
+        assertThat(history.getString("items[0].userName")).isEqualTo("stats-jean")
+        // Le film 4K/transcode de marie expose ses colonnes qualité
+        assertThat(history.getString("items.find { it.userName == 'stats-marie' && it.itemName == 'Stats Movie' }.resolution"))
+            .isEqualTo("4K")
+        assertThat(history.getString("items.find { it.userName == 'stats-marie' && it.itemName == 'Stats Movie' }.playMethod"))
+            .isEqualTo("TRANSCODE")
+
+        val paged = RestAssured.given()
+            .`when`().get("/api/statistics/history?period=ALL_TIME&page=0&pageSize=3")
+            .then().statusCode(Response.Status.OK.statusCode)
+            .extract().jsonPath()
+        assertThat(paged.getInt("totalPages")).isEqualTo(3)
+        assertThat(paged.getList<Any>("items")).hasSize(3)
     }
 
     @Test

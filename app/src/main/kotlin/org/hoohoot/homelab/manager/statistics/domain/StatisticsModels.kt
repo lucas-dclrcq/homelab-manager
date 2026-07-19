@@ -16,6 +16,8 @@ enum class SortDirection { ASC, DESC }
 
 enum class TimeGranularity { HOUR, DAY, MONTH }
 
+enum class PlaybackMethod { DIRECT, TRANSCODE }
+
 data class PlaybackSessionRecord(
     val userId: String,
     val userName: String,
@@ -37,6 +39,10 @@ data class PlaybackSessionRecord(
     val completed: Boolean = false,
     val source: SessionSource,
     val importKey: String? = null,
+    val playMethod: PlaybackMethod? = null,
+    val videoCodec: String? = null,
+    val audioCodec: String? = null,
+    val videoHeight: Int? = null,
 )
 
 data class StatisticsSummary(
@@ -44,6 +50,7 @@ data class StatisticsSummary(
     val playCount: Long,
     val completedItems: Long,
     val peakHour: Int?,
+    val activeUsers: Long,
 )
 
 data class TopUser(
@@ -52,6 +59,7 @@ data class TopUser(
     val watchTimeSeconds: Long,
     val itemsWatched: Long,
     val playCount: Long,
+    val lastSeen: LocalDateTime?,
 )
 
 data class TopSeries(
@@ -93,6 +101,39 @@ data class SeriesWatcher(
     val lastEpisodeNumber: Int?,
 )
 
+data class HeatmapCell(val isoDayOfWeek: Int, val hour: Int, val plays: Long)
+
+data class SessionHistoryEntry(
+    val userName: String,
+    val itemName: String,
+    val seriesName: String?,
+    val seasonNumber: Int?,
+    val episodeNumber: Int?,
+    val mediaType: MediaType,
+    val startedAt: LocalDateTime,
+    val playDurationSeconds: Long,
+    val progressPercent: Double?,
+    val completed: Boolean,
+    val client: String?,
+    val deviceName: String?,
+    val platform: String,
+    val playMethod: PlaybackMethod?,
+    val videoCodec: String?,
+    val audioCodec: String?,
+    val resolution: String?,
+)
+
+data class SessionHistoryPage(val items: List<SessionHistoryEntry>, val totalCount: Long)
+
+data class QualitySlice(val label: String, val plays: Long, val watchTimeSeconds: Long)
+
+data class QualityBreakdown(
+    val resolutions: List<QualitySlice>,
+    val videoCodecs: List<QualitySlice>,
+    val audioCodecs: List<QualitySlice>,
+    val playbackMethods: List<QualitySlice>,
+)
+
 data class NowPlayingSession(
     val userName: String,
     val itemName: String,
@@ -106,6 +147,20 @@ data class NowPlayingSession(
     val platform: String,
     val startedAt: LocalDateTime,
 )
+
+object Resolutions {
+    const val UNKNOWN = "Inconnu"
+
+    /** Étiquette de résolution dérivée de la hauteur du flux vidéo source. */
+    fun label(height: Int?): String = when {
+        height == null -> UNKNOWN
+        height >= 2160 -> "4K"
+        height >= 1080 -> "1080p"
+        height >= 720 -> "720p"
+        height > 0 -> "SD"
+        else -> UNKNOWN
+    }
+}
 
 object Platforms {
     const val OTHER = "OTHER"

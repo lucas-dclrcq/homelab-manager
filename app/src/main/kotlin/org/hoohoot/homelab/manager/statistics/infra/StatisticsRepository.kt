@@ -4,13 +4,21 @@ import io.quarkus.hibernate.reactive.panache.kotlin.Panache
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.hoohoot.homelab.manager.statistics.domain.HeatmapCell
 import org.hoohoot.homelab.manager.statistics.domain.HourActivity
 import org.hoohoot.homelab.manager.statistics.domain.MediaKind
+import org.hoohoot.homelab.manager.statistics.domain.MediaType
 import org.hoohoot.homelab.manager.statistics.domain.MostPopular
 import org.hoohoot.homelab.manager.statistics.domain.MostViewed
 import org.hoohoot.homelab.manager.statistics.domain.PlatformShare
 import org.hoohoot.homelab.manager.statistics.domain.Platforms
+import org.hoohoot.homelab.manager.statistics.domain.PlaybackMethod
+import org.hoohoot.homelab.manager.statistics.domain.QualityBreakdown
+import org.hoohoot.homelab.manager.statistics.domain.QualitySlice
+import org.hoohoot.homelab.manager.statistics.domain.Resolutions
 import org.hoohoot.homelab.manager.statistics.domain.SeriesWatcher
+import org.hoohoot.homelab.manager.statistics.domain.SessionHistoryEntry
+import org.hoohoot.homelab.manager.statistics.domain.SessionHistoryPage
 import org.hoohoot.homelab.manager.statistics.domain.SortDirection
 import org.hoohoot.homelab.manager.statistics.domain.StatisticsSummary
 import org.hoohoot.homelab.manager.statistics.domain.StatsRange
@@ -36,7 +44,8 @@ class StatisticsRepository(
     override suspend fun summary(range: StatsRange): StatisticsSummary {
         val totals = querySingle(
             """SELECT COALESCE(SUM(play_duration_seconds), 0), COUNT(*),
-                      COUNT(DISTINCT (user_id, item_id)) FILTER (WHERE completed)
+                      COUNT(DISTINCT (user_id, item_id)) FILTER (WHERE completed),
+                      COUNT(DISTINCT user_id)
                FROM playback_session WHERE started_at >= :from AND started_at < :to""",
             range,
         )
@@ -54,13 +63,14 @@ class StatisticsRepository(
             playCount = totals[1].asLong(),
             completedItems = totals[2].asLong(),
             peakHour = peakHour?.get(0)?.asInt(),
+            activeUsers = totals[3].asLong(),
         )
     }
 
     override suspend fun topUsers(range: StatsRange): List<TopUser> =
         queryRows(
             """SELECT user_id, MAX(user_name), COALESCE(SUM(play_duration_seconds), 0),
-                      COUNT(DISTINCT item_id), COUNT(*)
+                      COUNT(DISTINCT item_id), COUNT(*), MAX(started_at)
                FROM playback_session WHERE started_at >= :from AND started_at < :to
                GROUP BY user_id ORDER BY 3 DESC""",
             range,
@@ -71,6 +81,7 @@ class StatisticsRepository(
                 watchTimeSeconds = row[2].asLong(),
                 itemsWatched = row[3].asLong(),
                 playCount = row[4].asLong(),
+                lastSeen = row[5]?.asLocalDateTime(),
             )
         }
 
@@ -198,6 +209,87 @@ class StatisticsRepository(
             granularity = granularity,
         ).map { row -> TimePoint(row[0].asLocalDateTime(), row[1].asLong(), row[2].asLong()) }
 
+    override suspend fun activityHeatmap(range: StatsRange): List<HeatmapCell> =
+        queryRows(
+            """SELECT CAST(EXTRACT(ISODOW FROM (started_at AT TIME ZONE 'UTC') AT TIME ZONE :tz) AS int) AS d,
+                      CAST(EXTRACT(HOUR FROM (started_at AT TIME ZONE 'UTC') AT TIME ZONE :tz) AS int) AS h,
+                      COUNT(*)
+               FROM playback_session WHERE started_at >= :from AND started_at < :to
+               GROUP BY d, h ORDER BY d, h""",
+            range,
+            withTimezone = true,
+        ).map { row -> HeatmapCell(row[0].asInt(), row[1].asInt(), row[2].asLong()) }
+
+    override suspend fun qualityBreakdown(range: StatsRange): QualityBreakdown = QualityBreakdown(
+        resolutions = qualitySlices(
+            """SELECT CASE
+                          WHEN video_height IS NULL THEN '${Resolutions.UNKNOWN}'
+                          WHEN video_height >= 2160 THEN '4K'
+                          WHEN video_height >= 1080 THEN '1080p'
+                          WHEN video_height >= 720 THEN '720p'
+                          WHEN video_height > 0 THEN 'SD'
+                          ELSE '${Resolutions.UNKNOWN}' END AS label,
+                      COUNT(*), COALESCE(SUM(play_duration_seconds), 0)
+               FROM playback_session WHERE started_at >= :from AND started_at < :to
+               GROUP BY label ORDER BY 2 DESC""",
+            range,
+        ),
+        videoCodecs = qualitySlices(codecSql("video_codec"), range),
+        audioCodecs = qualitySlices(codecSql("audio_codec"), range),
+        playbackMethods = qualitySlices(
+            """SELECT COALESCE(play_method, '${Resolutions.UNKNOWN}'), COUNT(*), COALESCE(SUM(play_duration_seconds), 0)
+               FROM playback_session WHERE started_at >= :from AND started_at < :to
+               GROUP BY 1 ORDER BY 2 DESC""",
+            range,
+        ),
+    )
+
+    // Nom de colonne piloté en dur (video_codec / audio_codec) : pas d'injection possible
+    private fun codecSql(column: String): String =
+        """SELECT COALESCE(UPPER($column), '${Resolutions.UNKNOWN}'), COUNT(*), COALESCE(SUM(play_duration_seconds), 0)
+           FROM playback_session WHERE started_at >= :from AND started_at < :to
+           GROUP BY 1 ORDER BY 2 DESC"""
+
+    private suspend fun qualitySlices(sql: String, range: StatsRange): List<QualitySlice> =
+        queryRows(sql, range).map { row -> QualitySlice(row[0] as String, row[1].asLong(), row[2].asLong()) }
+
+    override suspend fun sessionHistory(range: StatsRange, page: Int, pageSize: Int): SessionHistoryPage {
+        val total = Panache.withSession {
+            PlaybackSessionEntity.count("startedAt >= ?1 and startedAt < ?2", range.fromUtc, range.toUtc)
+        }.awaitSuspending()
+        val items = queryRows(
+            """SELECT user_name, item_name, series_name, season_number, episode_number, media_type,
+                      started_at, play_duration_seconds, progress_percent, completed, client, device_name, platform,
+                      play_method, video_codec, audio_codec, video_height
+               FROM playback_session WHERE started_at >= :from AND started_at < :to
+               ORDER BY started_at DESC""",
+            range,
+            firstResult = page * pageSize,
+            maxResults = pageSize,
+        ).map { row ->
+            SessionHistoryEntry(
+                userName = row[0] as String,
+                itemName = row[1] as String,
+                seriesName = row[2] as String?,
+                seasonNumber = row[3]?.asInt(),
+                episodeNumber = row[4]?.asInt(),
+                mediaType = MediaType.valueOf(row[5] as String),
+                startedAt = row[6].asLocalDateTime(),
+                playDurationSeconds = row[7].asLong(),
+                progressPercent = row[8]?.asDouble(),
+                completed = row[9] as Boolean,
+                client = row[10] as String?,
+                deviceName = row[11] as String?,
+                platform = Platforms.fromClient(row[10] as String?),
+                playMethod = (row[13] as String?)?.let { PlaybackMethod.valueOf(it) },
+                videoCodec = row[14] as String?,
+                audioCodec = row[15] as String?,
+                resolution = (row[16] as Number?)?.toInt()?.let { Resolutions.label(it) },
+            )
+        }
+        return SessionHistoryPage(items, total)
+    }
+
     override suspend fun mostPopular(fromUtc: LocalDateTime, toUtc: LocalDateTime, kind: MediaKind, limit: Int): List<MostPopular> =
         queryRows(
             when (kind) {
@@ -266,6 +358,7 @@ class StatisticsRepository(
         withTimezone: Boolean = false,
         granularity: TimeGranularity? = null,
         maxResults: Int? = null,
+        firstResult: Int? = null,
     ): List<Array<Any?>> {
         val params = buildMap {
             put("from", range.fromUtc)
@@ -273,7 +366,7 @@ class StatisticsRepository(
             if (withTimezone) put("tz", timezone)
             granularity?.let { put("granularity", it.name.lowercase()) }
         }
-        return queryRows(sql, params, maxResults)
+        return queryRows(sql, params, maxResults, firstResult)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -281,12 +374,14 @@ class StatisticsRepository(
         sql: String,
         params: Map<String, Any>,
         maxResults: Int? = null,
+        firstResult: Int? = null,
     ): List<Array<Any?>> =
         Panache.withSession {
             Panache.getSession().flatMap { session ->
                 val query = session.createNativeQuery(sql.trimIndent(), Array::class.java)
                 params.forEach { (name, value) -> query.setParameter(name, value) }
                 maxResults?.let { query.setMaxResults(it) }
+                firstResult?.let { query.setFirstResult(it) }
                 query.resultList
             }
         }.awaitSuspending().map { row ->
