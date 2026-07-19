@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.4.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.3.1...v0.4.0) (2026-07-19)
+
+
+### Features
+
+* add pagination on protection list ([0f62c66](https://github.com/lucas-dclrcq/homelab-manager/commit/0f62c66626eab80bd45aa8785829532f17a52b25))
+* **problems:** better handle blocked imports ([b8d559b](https://github.com/lucas-dclrcq/homelab-manager/commit/b8d559b9cd191e6cd7b6f70e52a6f679b78bcfa9))
+
+
+### Bug Fixes
+
+* **deps:** update dependency pinia to v4 ([#130](https://github.com/lucas-dclrcq/homelab-manager/issues/130)) ([9b0a8cd](https://github.com/lucas-dclrcq/homelab-manager/commit/9b0a8cd20ef9e50d244f7b8f072ce7a8d770ff4c))
+
+
+### Refactoring
+
+* **operator:** use native http security policy instead of custom filter to protect operator routes ([403aa64](https://github.com/lucas-dclrcq/homelab-manager/commit/403aa64717ea8fee344d30060499af5c135ba626))
+
+
+### Styles
+
+* remove categories on side nav ([187d227](https://github.com/lucas-dclrcq/homelab-manager/commit/187d2276c4ad50f73d599da0b83444b7e4641f3a))
+* vertically align logo with title ([b97ef9c](https://github.com/lucas-dclrcq/homelab-manager/commit/b97ef9c7fea2453509ca5e6a17707a60e90bf37f))
+
+
+### Chores
+
+* **main:** release 0.3.2-SNAPSHOT ([#132](https://github.com/lucas-dclrcq/homelab-manager/issues/132)) ([5a4ef0d](https://github.com/lucas-dclrcq/homelab-manager/commit/5a4ef0dd542f14fe3cba0c03b37a673b989eb611))
+
 ## [0.3.1](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.3.0...v0.3.1) (2026-07-16)
 
 
