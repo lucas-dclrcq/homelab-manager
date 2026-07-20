@@ -865,6 +865,24 @@
           }
         }
       },
+      "HeatmapCellDto" : {
+        "type" : "object",
+        "required" : [ "isoDayOfWeek", "hour", "plays" ],
+        "properties" : {
+          "isoDayOfWeek" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "hour" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "plays" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "HourActivityDto" : {
         "type" : "object",
         "required" : [ "hour", "plays", "watchTimeSeconds" ],
@@ -1374,6 +1392,53 @@
           }
         }
       },
+      "QualityBreakdownDto" : {
+        "type" : "object",
+        "required" : [ "resolutions", "videoCodecs", "audioCodecs", "playbackMethods" ],
+        "properties" : {
+          "resolutions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QualitySliceDto"
+            }
+          },
+          "videoCodecs" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QualitySliceDto"
+            }
+          },
+          "audioCodecs" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QualitySliceDto"
+            }
+          },
+          "playbackMethods" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QualitySliceDto"
+            }
+          }
+        }
+      },
+      "QualitySliceDto" : {
+        "type" : "object",
+        "required" : [ "label", "plays", "watchTimeSeconds" ],
+        "properties" : {
+          "label" : {
+            "type" : "string"
+          },
+          "plays" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "watchTimeSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "RadarrWebhookMovie" : {
         "type" : "object",
         "properties" : {
@@ -1710,6 +1775,95 @@
           }
         }
       },
+      "SessionHistoryEntryDto" : {
+        "type" : "object",
+        "required" : [ "userName", "itemName", "seriesName", "seasonNumber", "episodeNumber", "mediaType", "startedAt", "playDurationSeconds", "progressPercent", "completed", "client", "deviceName", "platform", "playMethod", "videoCodec", "audioCodec", "resolution" ],
+        "properties" : {
+          "userName" : {
+            "type" : "string"
+          },
+          "itemName" : {
+            "type" : "string"
+          },
+          "seriesName" : {
+            "type" : [ "string", "null" ]
+          },
+          "seasonNumber" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "episodeNumber" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "mediaType" : {
+            "type" : "string"
+          },
+          "startedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "playDurationSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "progressPercent" : {
+            "type" : [ "number", "null" ],
+            "format" : "double"
+          },
+          "completed" : {
+            "type" : "boolean"
+          },
+          "client" : {
+            "type" : [ "string", "null" ]
+          },
+          "deviceName" : {
+            "type" : [ "string", "null" ]
+          },
+          "platform" : {
+            "type" : "string"
+          },
+          "playMethod" : {
+            "type" : [ "string", "null" ]
+          },
+          "videoCodec" : {
+            "type" : [ "string", "null" ]
+          },
+          "audioCodec" : {
+            "type" : [ "string", "null" ]
+          },
+          "resolution" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "SessionHistoryPageDto" : {
+        "type" : "object",
+        "required" : [ "items", "page", "pageSize", "totalPages", "totalCount" ],
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SessionHistoryEntryDto"
+            }
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "SonarrWebhookEpisode" : {
         "type" : "object",
         "properties" : {
@@ -1811,7 +1965,7 @@
       },
       "StatisticsSummaryDto" : {
         "type" : "object",
-        "required" : [ "totalWatchTimeSeconds", "playCount", "completedItems", "peakHour" ],
+        "required" : [ "totalWatchTimeSeconds", "playCount", "completedItems", "peakHour", "activeUsers" ],
         "properties" : {
           "totalWatchTimeSeconds" : {
             "type" : "integer",
@@ -1828,6 +1982,10 @@
           "peakHour" : {
             "type" : [ "integer", "null" ],
             "format" : "int32"
+          },
+          "activeUsers" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
@@ -1944,7 +2102,7 @@
       },
       "TopUserDto" : {
         "type" : "object",
-        "required" : [ "userName", "watchTimeSeconds", "itemsWatched", "playCount" ],
+        "required" : [ "userName", "watchTimeSeconds", "itemsWatched", "playCount", "lastSeen" ],
         "properties" : {
           "userName" : {
             "type" : "string"
@@ -1960,6 +2118,13 @@
           "playCount" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "lastSeen" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -4335,6 +4500,87 @@
         "summary" : "Get Activity By Weekday"
       }
     },
+    "/api/statistics/activity-heatmap" : {
+      "get" : {
+        "tags" : [ "Statistics" ],
+        "parameters" : [ {
+          "name" : "period",
+          "in" : "query",
+          "schema" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/StatsPeriod"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/HeatmapCellDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Activity Heatmap"
+      }
+    },
+    "/api/statistics/history" : {
+      "get" : {
+        "tags" : [ "Statistics" ],
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0
+          },
+          "required" : true
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          },
+          "required" : true
+        }, {
+          "name" : "period",
+          "in" : "query",
+          "schema" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/StatsPeriod"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionHistoryPageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get History"
+      }
+    },
     "/api/statistics/now-playing" : {
       "get" : {
         "tags" : [ "Statistics" ],
@@ -4417,6 +4663,36 @@
           }
         },
         "summary" : "Get Plays Over Time"
+      }
+    },
+    "/api/statistics/quality" : {
+      "get" : {
+        "tags" : [ "Statistics" ],
+        "parameters" : [ {
+          "name" : "period",
+          "in" : "query",
+          "schema" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/StatsPeriod"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/QualityBreakdownDto"
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get Quality"
       }
     },
     "/api/statistics/summary" : {

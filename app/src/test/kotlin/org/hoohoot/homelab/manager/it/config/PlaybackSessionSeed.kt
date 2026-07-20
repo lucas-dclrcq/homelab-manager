@@ -27,6 +27,10 @@ internal object PlaybackSessionSeed {
         completed: Boolean = false,
         platform: String? = null,
         client: String? = null,
+        playMethod: String? = null,
+        videoCodec: String? = null,
+        audioCodec: String? = null,
+        videoHeight: Int? = null,
     ) {
         VertxContextSupport.subscribeAndAwait {
             Panache.withTransaction {
@@ -48,6 +52,10 @@ internal object PlaybackSessionSeed {
                     this.playDurationSeconds = durationSeconds
                     this.completed = completed
                     this.source = SessionSource.POLLING
+                    this.playMethod = playMethod
+                    this.videoCodec = videoCodec
+                    this.audioCodec = audioCodec
+                    this.videoHeight = videoHeight
                     this.createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 }.persist<PlaybackSessionEntity>()
             }

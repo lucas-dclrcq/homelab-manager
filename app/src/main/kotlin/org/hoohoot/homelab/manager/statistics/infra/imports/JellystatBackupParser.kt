@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hoohoot.homelab.manager.statistics.domain.MediaType
+import org.hoohoot.homelab.manager.statistics.domain.PlaybackMethod
 import org.hoohoot.homelab.manager.statistics.domain.PlaybackSessionRecord
 import org.hoohoot.homelab.manager.statistics.domain.Platforms
 import org.hoohoot.homelab.manager.statistics.domain.SessionSource
@@ -126,6 +127,14 @@ class JellystatBackupParser(
         val runtimeSeconds = runTimeTicks?.let { (it / TICKS_PER_SECOND).toInt() }?.takeIf { it > 0 }
         val progress = runtimeSeconds?.let { (durationSeconds.toDouble() / it * 100).coerceAtMost(100.0) }
 
+        // Champs de qualité : présents selon la version de Jellystat, on reste tolérant (null sinon)
+        val mediaStreams = row.get("MediaStreams")?.takeIf { it.isArray }
+        val videoStream = mediaStreams?.firstOrNull { it.text("Type") == "Video" }
+        val audioStream = mediaStreams?.firstOrNull { it.text("Type") == "Audio" }
+        val playMethod = (row.text("PlayMethod") ?: row.text("PlaybackMethod"))?.let {
+            if (it.equals("Transcode", ignoreCase = true)) PlaybackMethod.TRANSCODE else PlaybackMethod.DIRECT
+        }
+
         return PlaybackSessionRecord(
             userId = userId,
             userName = userName,
@@ -147,6 +156,10 @@ class JellystatBackupParser(
             completed = progress != null && progress >= completedThreshold * 100,
             source = SessionSource.IMPORT,
             importKey = importKey,
+            playMethod = playMethod,
+            videoCodec = videoStream?.text("Codec"),
+            audioCodec = audioStream?.text("Codec"),
+            videoHeight = videoStream?.int("Height"),
         )
     }
 

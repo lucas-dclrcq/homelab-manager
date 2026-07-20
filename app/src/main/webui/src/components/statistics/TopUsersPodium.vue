@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TopUserDto } from '../../api/model'
+import { formatDate } from '../../lib/format'
 import { formatWatchTime, type TopUsersMetric } from '../../lib/statistics'
 
 const props = defineProps<{ users: TopUserDto[]; metric: TopUsersMetric }>()
@@ -41,6 +42,11 @@ function secondaryValue(user: TopUserDto): string {
     ? formatWatchTime(user.watchTimeSeconds)
     : `${user.itemsWatched} médias`
 }
+
+function lastSeenLabel(user: TopUserDto): string {
+  // Timestamp stocké en UTC sans suffixe : on force la zone avant formatage
+  return user.lastSeen ? `vu le ${formatDate(`${user.lastSeen}Z`)}` : ''
+}
 </script>
 
 <template>
@@ -74,8 +80,14 @@ function secondaryValue(user: TopUserDto): string {
         <span class="w-6 shrink-0 text-right font-bold text-mute">
           {{ index + 4 }}
         </span>
-        <span class="min-w-0 flex-1 truncate font-bold">
-          {{ user.userName }}
+        <span class="min-w-0 flex-1 truncate">
+          <span class="font-bold">{{ user.userName }}</span>
+          <span
+            v-if="lastSeenLabel(user)"
+            class="ml-2 hidden text-xs text-mute sm:inline"
+          >
+            {{ lastSeenLabel(user) }}
+          </span>
         </span>
         <span class="shrink-0 text-ink-soft">
           {{ primaryValue(user) }}

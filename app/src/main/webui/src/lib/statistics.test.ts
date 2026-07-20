@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  downloadEventLabel,
   formatEpisodeRef,
   formatHours,
   formatSince,
   formatWatchTime,
   platformLabel,
+  playbackMethodLabel,
 } from './statistics'
 
 const norm = (s: string) => s.replace(/\s+/g, ' ').trim()
@@ -76,5 +78,27 @@ describe('platformLabel', () => {
 
   it('retombe sur la valeur brute si inconnue', () => {
     expect(platformLabel('PLAYSTATION')).toBe('PLAYSTATION')
+  })
+})
+
+describe('playbackMethodLabel', () => {
+  it('mappe les méthodes de lecture connues', () => {
+    expect(playbackMethodLabel('DIRECT')).toBe('Lecture directe')
+    expect(playbackMethodLabel('TRANSCODE')).toBe('Transcodage')
+  })
+
+  it('retombe sur la valeur brute si inconnue', () => {
+    expect(playbackMethodLabel('Inconnu')).toBe('Inconnu')
+  })
+})
+
+describe('downloadEventLabel', () => {
+  it('mappe les types de téléchargement', () => {
+    expect(downloadEventLabel('movie_downloaded')).toBe('Film')
+    expect(downloadEventLabel('subtitles_downloaded')).toBe('Sous-titres')
+  })
+
+  it('retombe sur la valeur brute si inconnue', () => {
+    expect(downloadEventLabel('unknown_event')).toBe('unknown_event')
   })
 })

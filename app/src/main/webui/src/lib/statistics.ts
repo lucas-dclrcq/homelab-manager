@@ -27,6 +27,27 @@ export function platformLabel(platform: string): string {
   return platformLabels[platform] ?? platform
 }
 
+export const playbackMethodLabels: Record<string, string> = {
+  DIRECT: 'Lecture directe',
+  TRANSCODE: 'Transcodage',
+}
+
+export function playbackMethodLabel(method: string): string {
+  return playbackMethodLabels[method] ?? method
+}
+
+// Type d'événement de la timeline de téléchargements (feature Bibliothèque)
+export const downloadEventLabels: Record<string, string> = {
+  movie_downloaded: 'Film',
+  episode_downloaded: 'Épisode',
+  album_downloaded: 'Album',
+  subtitles_downloaded: 'Sous-titres',
+}
+
+export function downloadEventLabel(eventType: string): string {
+  return downloadEventLabels[eventType] ?? eventType
+}
+
 export function formatWatchTime(seconds: number): string {
   if (seconds < 60) return '< 1 min'
   const hours = Math.floor(seconds / 3600)

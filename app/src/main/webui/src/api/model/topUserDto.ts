@@ -4,10 +4,12 @@
  * Homelab Manager API
  * OpenAPI spec version: 0.0.1
  */
+import type { TopUserDtoLastSeen } from "./topUserDtoLastSeen";
 
 export interface TopUserDto {
   userName: string;
   watchTimeSeconds: number;
   itemsWatched: number;
   playCount: number;
+  lastSeen: TopUserDtoLastSeen;
 }

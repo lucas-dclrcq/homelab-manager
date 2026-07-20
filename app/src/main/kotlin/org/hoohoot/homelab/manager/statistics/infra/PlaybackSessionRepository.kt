@@ -51,6 +51,10 @@ class PlaybackSessionRepository : PlaybackSessions {
                             .setParameter(19, record.completed)
                             .setParameter(20, record.source.name)
                             .setParameter(21, record.importKey)
+                            .setParameter(22, record.playMethod?.name)
+                            .setParameter(23, record.videoCodec)
+                            .setParameter(24, record.audioCodec)
+                            .setParameter(25, record.videoHeight)
                             .executeUpdate()
                             .map { count -> inserted + count }
                     }
@@ -81,6 +85,10 @@ class PlaybackSessionRepository : PlaybackSessions {
         it.completed = completed
         it.source = source
         it.importKey = importKey
+        it.playMethod = playMethod?.name
+        it.videoCodec = videoCodec
+        it.audioCodec = audioCodec
+        it.videoHeight = videoHeight
         it.createdAt = LocalDateTime.now(ZoneOffset.UTC)
     }
 
@@ -92,8 +100,10 @@ class PlaybackSessionRepository : PlaybackSessions {
             INSERT INTO playback_session (id, user_id, user_name, item_id, item_name, series_id, series_name,
                                           season_number, episode_number, media_type, client, device_name, platform,
                                           started_at, ended_at, play_duration_seconds, runtime_seconds,
-                                          progress_percent, completed, source, import_key)
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21)
+                                          progress_percent, completed, source, import_key,
+                                          play_method, video_codec, audio_codec, video_height)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21,
+                    ?22, ?23, ?24, ?25)
             ON CONFLICT (import_key) WHERE import_key IS NOT NULL DO NOTHING
         """.trimIndent()
     }

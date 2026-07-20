@@ -2,6 +2,7 @@ package org.hoohoot.homelab.manager.statistics.infra.polling
 
 import org.hoohoot.homelab.manager.statistics.domain.MediaType
 import org.hoohoot.homelab.manager.statistics.domain.NowPlayingSession
+import org.hoohoot.homelab.manager.statistics.domain.PlaybackMethod
 import org.hoohoot.homelab.manager.statistics.domain.PlaybackSessionRecord
 import org.hoohoot.homelab.manager.statistics.domain.Platforms
 import org.hoohoot.homelab.manager.statistics.domain.SessionSource
@@ -27,6 +28,10 @@ data class ActiveSession(
     val isPaused: Boolean = false,
     val positionTicks: Long? = null,
     val runTimeTicks: Long? = null,
+    val playMethod: PlaybackMethod? = null,
+    val videoCodec: String? = null,
+    val audioCodec: String? = null,
+    val videoHeight: Int? = null,
 )
 
 private data class TrackerKey(val userId: String, val deviceId: String, val itemId: String)
@@ -140,6 +145,10 @@ class SessionTracker(
             progressPercent = progress,
             completed = progress != null && progress >= completedThreshold * 100,
             source = SessionSource.POLLING,
+            playMethod = session.playMethod,
+            videoCodec = session.videoCodec,
+            audioCodec = session.audioCodec,
+            videoHeight = session.videoHeight,
         )
     }
 

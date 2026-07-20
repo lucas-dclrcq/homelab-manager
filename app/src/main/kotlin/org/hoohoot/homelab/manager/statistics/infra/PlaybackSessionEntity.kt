@@ -82,6 +82,18 @@ class PlaybackSessionEntity : PanacheEntityBase {
     @Column(name = "import_key")
     var importKey: String? = null
 
+    @Column(name = "play_method")
+    var playMethod: String? = null
+
+    @Column(name = "video_codec")
+    var videoCodec: String? = null
+
+    @Column(name = "audio_codec")
+    var audioCodec: String? = null
+
+    @Column(name = "video_height")
+    var videoHeight: Int? = null
+
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: LocalDateTime
 
