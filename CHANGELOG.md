@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.4.0...v0.5.0) (2026-07-20)
+
+
+### Features
+
+* **statistics:** tabbed stats page with Jellystat-inspired categories ([#148](https://github.com/lucas-dclrcq/homelab-manager/issues/148)) ([1c5606c](https://github.com/lucas-dclrcq/homelab-manager/commit/1c5606c2a26f0bae5cd73d4d85749a3581ec40ac))
+
+
+### Bug Fixes
+
+* **deps:** update quarkus.platform.version to v3.37.3 ([#127](https://github.com/lucas-dclrcq/homelab-manager/issues/127)) ([85f0626](https://github.com/lucas-dclrcq/homelab-manager/commit/85f0626ccc9f2c33353879ab3a6648d1f234fb62))
+
+
+### Chores
+
+* **deps:** update actions/setup-java action to v5 ([#129](https://github.com/lucas-dclrcq/homelab-manager/issues/129)) ([2f8686c](https://github.com/lucas-dclrcq/homelab-manager/commit/2f8686c6d256820874f3d7d876d4f619a40d653e))
+* **deps:** update dependency @vitejs/plugin-vue to v6 ([#102](https://github.com/lucas-dclrcq/homelab-manager/issues/102)) ([8fdc8ad](https://github.com/lucas-dclrcq/homelab-manager/commit/8fdc8adf35c37e91caca916e96a0071b0dd00519))
+* **deps:** update node.js to v24 ([#119](https://github.com/lucas-dclrcq/homelab-manager/issues/119)) ([a762049](https://github.com/lucas-dclrcq/homelab-manager/commit/a762049f3489965d34077142e7762aacb96ad772))
+* **deps:** update registry.access.redhat.com/ubi8/ubi-minimal docker tag to v8.10-1784076713 ([#115](https://github.com/lucas-dclrcq/homelab-manager/issues/115)) ([3c5e2a8](https://github.com/lucas-dclrcq/homelab-manager/commit/3c5e2a805251339b4b66cf112f54d6385f483712))
+* **main:** release 0.4.1-SNAPSHOT ([#145](https://github.com/lucas-dclrcq/homelab-manager/issues/145)) ([4acf5d3](https://github.com/lucas-dclrcq/homelab-manager/commit/4acf5d36bb803024ec94e45b3b2f860c2e9325e3))
+
 ## [0.4.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.3.1...v0.4.0) (2026-07-19)
 
 
