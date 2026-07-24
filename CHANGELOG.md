@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.1](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.5.0...v0.5.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* **docker:** image needs latest glibc for matrix crypto lib to work ([a488a42](https://github.com/lucas-dclrcq/homelab-manager/commit/a488a42667ef76733c77d8fc0d5b46945bb353f6))
+
+
+### Chores
+
+* **deps:** update dependency org.jacoco:jacoco-maven-plugin to v0.8.15 ([#125](https://github.com/lucas-dclrcq/homelab-manager/issues/125)) ([39411c2](https://github.com/lucas-dclrcq/homelab-manager/commit/39411c253cecc0f86345ac86e40c37d0c0084831))
+* **deps:** update tailwindcss monorepo to v4.3.3 ([#146](https://github.com/lucas-dclrcq/homelab-manager/issues/146)) ([a915ed1](https://github.com/lucas-dclrcq/homelab-manager/commit/a915ed1377d80b94a0b444324bf79a6f42c6924e))
+* **main:** release 0.5.1-SNAPSHOT ([#150](https://github.com/lucas-dclrcq/homelab-manager/issues/150)) ([0974efc](https://github.com/lucas-dclrcq/homelab-manager/commit/0974efc6a5248b2efc3d8ee5cc29e953ca0c8c3a))
+
 ## [0.5.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.4.0...v0.5.0) (2026-07-20)
 
 
