@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.6.0...v0.7.0) (2026-07-26)
+
+
+### Features
+
+* **notifications:** add nana endpoint for webhook ([9648a3b](https://github.com/lucas-dclrcq/homelab-manager/commit/9648a3bd45f34f6bb552685bd599a9312e73142a))
+
+
+### Chores
+
+* **main:** release 0.6.1-SNAPSHOT ([#155](https://github.com/lucas-dclrcq/homelab-manager/issues/155)) ([175be10](https://github.com/lucas-dclrcq/homelab-manager/commit/175be106bb7f2308c98160e2a885ff830d5e6128))
+
 ## [0.6.0](https://github.com/lucas-dclrcq/homelab-manager/compare/v0.5.1...v0.6.0) (2026-07-24)
 
 
