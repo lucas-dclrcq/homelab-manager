@@ -4,8 +4,9 @@
 
 - An **application dashboard** listing the services running in the homelab, kept up to date automatically by a companion
   **Kubernetes operator** that watches Gateway API `HTTPRoute`s (see [operator/README.md](operator/README.md)).
-- **Matrix notifications** for media events: webhooks from Sonarr, Radarr, Lidarr, Bazarr and Jellyseerr are enriched
-  and forwarded to Matrix rooms, plus a weekly activity report.
+- **Matrix notifications** for media events: webhooks from Sonarr, Radarr, Lidarr, Bazarr, Jellyseerr and
+  [nana](https://github.com/lucas-dclrcq/nana) (ebook downloads) are enriched and forwarded to Matrix rooms, plus a
+  weekly activity report.
 - A **Matrix bot** for interacting with the setup from chat.
 - A **downloads timeline and library stats**, built by periodically syncing the *arr apps, Jellyfin and Jellystat.
 
@@ -60,6 +61,7 @@ The app is configured entirely through environment variables (Quarkus maps `some
 | `MATRIX_ROOM_MEDIA`         | Room for movie/TV notifications (e.g. `!media:server.tld`)                                                           |
 | `MATRIX_ROOM_MUSIC`         | Room for music notifications                                                                                         |
 | `MATRIX_ROOM_SUPPORT`       | Room for support/report notifications                                                                                |
+| `MATRIX_ROOM_BOOKS`         | Room for ebook download notifications (nana)                                                                         |
 | `MATRIX_BOT_ENABLED`        | Enable the Matrix bot (`true`/`false`)                                                                               |
 | `MATRIX_BOT_PREFIX`         | Command prefix the bot answers to                                                                                    |
 | `MATRIX_BOT_BASE_URL`       | Homeserver URL for the bot account                                                                                   |

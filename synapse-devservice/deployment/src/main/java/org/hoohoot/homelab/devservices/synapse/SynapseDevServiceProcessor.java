@@ -75,14 +75,15 @@ public class SynapseDevServiceProcessor {
         props.put("matrix.room.media", result.mediaRoomId());
         props.put("matrix.room.music", result.musicRoomId());
         props.put("matrix.room.support", result.supportRoomId());
+        props.put("matrix.room.books", result.booksRoomId());
         props.put("element.base-url", elementUrl);
 
         devServiceProperties = props;
 
         log.infof("Synapse DevService started: %s", result.synapseUrl());
         log.infof("Element Web available at: %s", elementUrl);
-        log.infof("Rooms created - media: %s, music: %s, support: %s",
-                result.mediaRoomId(), result.musicRoomId(), result.supportRoomId());
+        log.infof("Rooms created - media: %s, music: %s, support: %s, books: %s",
+                result.mediaRoomId(), result.musicRoomId(), result.supportRoomId(), result.booksRoomId());
 
         return new DevServicesResultBuildItem("synapse", null, props);
     }

@@ -60,7 +60,8 @@ public class SynapseContainer {
             String botAccessToken,
             String mediaRoomId,
             String musicRoomId,
-            String supportRoomId
+            String supportRoomId,
+            String booksRoomId
     ) {}
 
     public StartResult start(String synapseImage) {
@@ -88,12 +89,14 @@ public class SynapseContainer {
         String mediaRoomId = createRoom("media");
         String musicRoomId = createRoom("music");
         String supportRoomId = createRoom("support");
+        String booksRoomId = createRoom("books");
 
         inviteAndJoin(mediaRoomId, "@" + BOT_USERNAME + ":localhost", botAccessToken);
         inviteAndJoin(musicRoomId, "@" + BOT_USERNAME + ":localhost", botAccessToken);
         inviteAndJoin(supportRoomId, "@" + BOT_USERNAME + ":localhost", botAccessToken);
+        inviteAndJoin(booksRoomId, "@" + BOT_USERNAME + ":localhost", botAccessToken);
 
-        return new StartResult(synapseUrl, adminAccessToken, botAccessToken, mediaRoomId, musicRoomId, supportRoomId);
+        return new StartResult(synapseUrl, adminAccessToken, botAccessToken, mediaRoomId, musicRoomId, supportRoomId, booksRoomId);
     }
 
     public void stop() {

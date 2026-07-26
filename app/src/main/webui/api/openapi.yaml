@@ -1185,6 +1185,41 @@ components:
         expensesCents:
           type: integer
           format: int64
+    NanaWebhookDownload:
+      type: object
+      properties:
+        title:
+          type:
+          - string
+          - "null"
+        extension:
+          type:
+          - string
+          - "null"
+        requestedBy:
+          type:
+          - string
+          - "null"
+        sizeBytes:
+          type:
+          - integer
+          - "null"
+          format: int64
+        errorMessage:
+          type:
+          - string
+          - "null"
+    NanaWebhookPayload:
+      type: object
+      properties:
+        event:
+          type:
+          - string
+          - "null"
+        download:
+          anyOf:
+          - $ref: "#/components/schemas/NanaWebhookDownload"
+          - type: "null"
     NowPlayingDto:
       type: object
       required:
@@ -3468,6 +3503,25 @@ paths:
         "400":
           description: Bad Request
       summary: Handle Lidarr Notification
+  /api/notifications/nana:
+    post:
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NanaWebhookPayload"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Handle Nana Notification
   /api/notifications/radarr:
     post:
       tags:

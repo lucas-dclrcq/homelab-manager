@@ -51,5 +51,6 @@ class MatrixNotificationSender(
         NotificationRoom.MEDIA -> roomProvider.media
         NotificationRoom.MUSIC -> roomProvider.music
         NotificationRoom.SUPPORT -> roomProvider.support
+        NotificationRoom.BOOKS -> roomProvider.books
     }
 }

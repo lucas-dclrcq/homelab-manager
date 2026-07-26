@@ -4,4 +4,5 @@ enum class NotificationRoom {
     MEDIA,
     MUSIC,
     SUPPORT,
+    BOOKS,
 }
