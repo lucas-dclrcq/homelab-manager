@@ -36,7 +36,7 @@
     "eslint": "^10.7.0",
     "eslint-plugin-vue": "^10.9.2",
     "jsdom": "^29.1.1",
-    "orval": "^7.8.0",
+    "orval": "^8.0.0",
     "prettier": "^3.5.3",
     "tailwindcss": "^4.3.2",
     "typescript": "~5.9.0",
